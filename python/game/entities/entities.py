@@ -18,9 +18,9 @@ class Obstacle:
     
     def collides_with(self, player):
         # Simple AABB collision
-        return (self.x < player.x + player.size and
+        return (self.x < player.x + player.SIZE and
                 self.x + self.width > player.x and
-                self.y < player.y + player.size and
+                self.y < player.y + player.SIZE and
                 self.y + self.height > player.y)
 
 class GameState:

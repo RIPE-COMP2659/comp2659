@@ -1,11 +1,12 @@
-class Player:
+from .entity import Entity
+
+class Player(Entity):
     SIZE = 20
     GRAVITY = 0.8
     JUMP_STRENGTH = -15
 
     def __init__(self, x=100, y=300):
-        self.x = x
-        self.y = y
+        super().__init__(x, y)
         self.dy = 0
         self.is_jumping = False
         self.on_ground = False
@@ -29,3 +30,10 @@ class Player:
             self.is_jumping = False
         else:
             self.on_ground = False
+
+    def reset(self, x=100, y=300):
+        self.x = x
+        self.y = y
+        self.dy = 0
+        self.is_jumping = False
+        self.on_ground = False

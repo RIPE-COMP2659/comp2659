@@ -1,6 +1,7 @@
 """
 Rendering functions for Geometry Dash
 """
+TEMP_PLAYER_SIZE = 20
 
 def draw_rect(buffer, x, y, width, height, color):
     """Draw a filled rectangle"""
@@ -66,8 +67,8 @@ def draw_game(buffer, game_state):
         draw_rect(buffer, 
                  game_state.player.x, 
                  game_state.player.y, 
-                 game_state.player.size, 
-                 game_state.player.size, 
+                 TEMP_PLAYER_SIZE, 
+                 TEMP_PLAYER_SIZE, 
                  255)
         
         # Draw obstacles (gray)
