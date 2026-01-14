@@ -1,38 +1,7 @@
 """
 Game entities for Geometry Dash clone
 """
-
-class Player:
-    def __init__(self, x=100, y=300):
-        self.x = x
-        self.y = y
-        self.size = 20
-        self.velocity_y = 0
-        self.gravity = 0.8
-        self.jump_strength = -15
-        self.is_jumping = False
-        self.on_ground = False
-    
-    def jump(self):
-        if self.on_ground:
-            self.velocity_y = self.jump_strength
-            self.is_jumping = True
-            self.on_ground = False
-    
-    def update(self, ground_y=350):
-        # Apply gravity
-        self.velocity_y += self.gravity
-        self.y += self.velocity_y
-        
-        # Check ground collision
-        if self.y + self.size >= ground_y:
-            self.y = ground_y - self.size
-            self.velocity_y = 0
-            self.on_ground = True
-            self.is_jumping = False
-        else:
-            self.on_ground = False
-
+from game.entities.player import Player
 
 class Obstacle:
     def __init__(self, x, height=40, width=30):
@@ -53,7 +22,6 @@ class Obstacle:
                 self.x + self.width > player.x and
                 self.y < player.y + player.size and
                 self.y + self.height > player.y)
-
 
 class GameState:
     def __init__(self):
