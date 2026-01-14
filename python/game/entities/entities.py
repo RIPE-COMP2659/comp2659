@@ -1,27 +1,8 @@
 """
 Game entities for Geometry Dash clone
 """
+from game.entities.obstacle import Obstacle
 from game.entities.player import Player
-
-class Obstacle:
-    def __init__(self, x, height=40, width=30):
-        self.x = x
-        self.height = height
-        self.width = width
-        self.y = 350 - height  # Sits on ground
-    
-    def update(self, speed):
-        self.x -= speed
-    
-    def is_off_screen(self):
-        return self.x + self.width < 0
-    
-    def collides_with(self, player):
-        # Simple AABB collision
-        return (self.x < player.x + player.SIZE and
-                self.x + self.width > player.x and
-                self.y < player.y + player.SIZE and
-                self.y + self.height > player.y)
 
 class GameState:
     def __init__(self):
