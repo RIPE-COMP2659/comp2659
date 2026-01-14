@@ -44,14 +44,27 @@ class Player(Entity):
             self.is_jumping = True
             self.on_ground = False
 
-    def update(self, ground_y=350):
+    def update(self, ground_y=350, platform_y=None):
+        """
+        Update player physics
+        
+        Args:
+            ground_y: The main ground level
+            platform_y: Optional platform surface Y position to land on
+        """
         # Apply gravity
         self.dy += self.GRAVITY
         self.y += self.dy
 
-        # Check ground collision
-        if self.y + self.SIZE >= ground_y:
-            self.y = ground_y - self.SIZE
+        # Determine which surface to land on
+        landing_y = ground_y
+        if platform_y is not None:
+            # If there's a platform, use it as the landing surface
+            landing_y = platform_y
+
+        # Check collision with landing surface
+        if self.y + self.SIZE >= landing_y:
+            self.y = landing_y - self.SIZE
             self.dy = 0
             self.on_ground = True
             self.is_jumping = False

@@ -28,8 +28,24 @@ class GameState(Entity):
         if self.game_over:
             return
         
-        # Update player
-        self.player.update(self.ground_y)
+        # Check if player is landing on any box
+        platform_y = None
+        landed_on_box = False
+        
+        for box in self.boxes:
+            # Check if player is landing on top of this box
+            if box.is_player_landing_on_top(self.player):
+                platform_y = box.y  # Player can land on this box
+                landed_on_box = True
+                break
+            
+            # Check if player collides with sides of box (death)
+            if box.collides_with_sides(self.player):
+                self.game_over = True
+                return
+        
+        # Update player with platform info
+        self.player.update(self.ground_y, platform_y)
         
         # Spawn boxes
         self.spawn_timer += 1
@@ -41,10 +57,6 @@ class GameState(Entity):
         # Update boxes
         for box in self.boxes:
             box.update(self.scroll_speed)
-            
-            # Check collision
-            if box.collides_with(self.player):
-                self.game_over = True
             
             # Score when box passes player
             if box.x + Box.SIZE < self.player.x and not hasattr(box, 'scored'):
