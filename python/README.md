@@ -8,7 +8,7 @@ If you're not already using [pyenv](https://github.com/pyenv/pyenv) for your Pyt
 
 See the [official documentation](https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/) for troubleshooting.
 
-Parker is using Python 3.14.0a1-win32, but other versions may work.
+Parker is using Python 3.12.0, but other versions may work.
 
 <details>
   <summary>Windows</summary>
@@ -47,5 +47,36 @@ Parker is using Python 3.14.0a1-win32, but other versions may work.
   **Install dependencies:**
   ```bash
   python3 -m pip install -r requirements.txt
+  ```
+</details>
+
+## Usage
+<details>
+  <summary>Windows</summary>
+
+  **Activate your virtual enviroment if it isn't already:**:
+  ```bash
+  .venv\Scripts\activate
+  ```
+
+  **Run main.py:**:
+  ```bash
+  python main.py
+  ```
+</details>
+
+<details>
+  <summary>Unix/macOS</summary>
+
+  Note: Untested
+
+  **Activate your virtual environment if it isn't already:**
+  ```bash
+  source .venv/bin/activate
+  ```
+
+  **Run main.py:**
+  ```bash
+  python3 main.py
   ```
 </details>
