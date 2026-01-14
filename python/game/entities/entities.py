@@ -8,7 +8,7 @@ class GameState:
     def __init__(self):
         self.player = Player()
         self.obstacles = []
-        self.scroll_speed = 5
+        self.scroll_speed = 10
         self.score = 0
         self.game_over = False
         self.ground_y = 350
