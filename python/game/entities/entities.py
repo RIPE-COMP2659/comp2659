@@ -1,23 +1,25 @@
 """
 Game entities for Geometry Dash clone
 """
-from game.entities.obstacle import Obstacle
+from game.entities.box import Box
 from game.entities.player import Player
+from game.entities.entity import Entity
 
-class GameState:
+class GameState(Entity):
     def __init__(self):
+        super().__init__(0, 0)  # GameState doesn't need position
         self.player = Player()
-        self.obstacles = []
+        self.boxes = []  # Changed from obstacles to boxes
         self.scroll_speed = 10
         self.score = 0
         self.game_over = False
         self.ground_y = 350
         self.spawn_timer = 0
-        self.spawn_interval = 60  # Frames between obstacles
+        self.spawn_interval = 60  # Frames between boxes
         
     def reset(self):
         self.player = Player()
-        self.obstacles = []
+        self.boxes = []
         self.score = 0
         self.game_over = False
         self.spawn_timer = 0
@@ -29,27 +31,25 @@ class GameState:
         # Update player
         self.player.update(self.ground_y)
         
-        # Spawn obstacles
+        # Spawn boxes
         self.spawn_timer += 1
         if self.spawn_timer >= self.spawn_interval:
             self.spawn_timer = 0
-            # Random height between 30 and 60
-            import random
-            height = random.randint(30, 60)
-            self.obstacles.append(Obstacle(640, height))
+            # Fixed size box at ground level
+            self.boxes.append(Box(640, self.ground_y - Box.SIZE))
         
-        # Update obstacles
-        for obstacle in self.obstacles:
-            obstacle.update(self.scroll_speed)
+        # Update boxes
+        for box in self.boxes:
+            box.update(self.scroll_speed)
             
             # Check collision
-            if obstacle.collides_with(self.player):
+            if box.collides_with(self.player):
                 self.game_over = True
             
-            # Score when obstacle passes player
-            if obstacle.x + obstacle.width < self.player.x and not hasattr(obstacle, 'scored'):
-                obstacle.scored = True
+            # Score when box passes player
+            if box.x + Box.SIZE < self.player.x and not hasattr(box, 'scored'):
+                box.scored = True
                 self.score += 1
         
-        # Remove off-screen obstacles
-        self.obstacles = [obs for obs in self.obstacles if not obs.is_off_screen()]
+        # Remove off-screen boxes
+        self.boxes = [box for box in self.boxes if not box.is_off_screen()]

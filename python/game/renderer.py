@@ -1,7 +1,22 @@
 """
 Rendering functions for Geometry Dash
 """
-TEMP_PLAYER_SIZE = 20
+
+def draw_sprite(buffer, sprite, x, y):
+    """Draw a sprite at position (x, y)"""
+    if sprite is None:
+        return
+    
+    sprite_height = len(sprite)
+    sprite_width = len(sprite[0]) if sprite_height > 0 else 0
+    
+    for dy in range(sprite_height):
+        for dx in range(sprite_width):
+            px = int(x + dx)
+            py = int(y + dy)
+            if 0 <= px < 640 and 0 <= py < 400:
+                buffer[py][px] = sprite[dy][dx]
+
 
 def draw_rect(buffer, x, y, width, height, color):
     """Draw a filled rectangle"""
@@ -63,22 +78,12 @@ def draw_game(buffer, game_state):
         # Draw ground line
         draw_line(buffer, game_state.ground_y, 200)
         
-        # Draw player (white square)
-        draw_rect(buffer, 
-                 game_state.player.x, 
-                 game_state.player.y, 
-                 TEMP_PLAYER_SIZE, 
-                 TEMP_PLAYER_SIZE, 
-                 255)
+        # Draw player sprite
+        draw_sprite(buffer, game_state.player.sprite, game_state.player.x, game_state.player.y)
         
-        # Draw obstacles (gray)
-        for obstacle in game_state.obstacles:
-            draw_rect(buffer,
-                     obstacle.x,
-                     obstacle.y,
-                     obstacle.width,
-                     obstacle.height,
-                     180)
+        # Draw box sprites
+        for box in game_state.boxes:
+            draw_sprite(buffer, box.sprite, box.x, box.y)
         
         # Draw score
         draw_text_simple(buffer, game_state.score, 10, 10, size=3)
