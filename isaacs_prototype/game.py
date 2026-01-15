@@ -1,6 +1,44 @@
 import csv
 
 
+class Platform:
+    """A platform object in the game."""
+    
+    def __init__(self, x, y, width, height):
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        
+    def get_bounds(self):
+        """Get platform bounding box."""
+        return {
+            'left': self.x,
+            'right': self.x + self.width,
+            'top': self.y,
+            'bottom': self.y + self.height
+        }
+
+
+class Obstacle:
+    """An obstacle (spike) object in the game."""
+    
+    def __init__(self, x, y, width, height):
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        
+    def get_bounds(self):
+        """Get obstacle bounding box."""
+        return {
+            'left': self.x,
+            'right': self.x + self.width,
+            'top': self.y,
+            'bottom': self.y + self.height
+        }
+
+
 class Player:
     """Player character for Geometry Dash."""
     
@@ -43,19 +81,26 @@ class GameState:
     """Main game class for Geometry Dash."""
     
     def __init__(self, level_file='world.csv'):
+        # Display settings (640x400 Atari ST resolution)
+        self.display_width = 640
+        self.display_height = 400
+        self.chunk_width = self.display_width + 1  # One extra column on the right
+        
         # Load level from CSV
         self.level = self.load_level(level_file)
         self.level_height = len(self.level)
         self.level_width = len(self.level[0]) if self.level_height > 0 else 0
         
-        # Display settings (640x400 Atari ST resolution)
-        self.display_width = 640
-        self.display_height = 400
+        # Parse platforms and obstacles from level
+        self.platforms = []
+        self.obstacles = []
+        self.parse_level_objects()
         
         # Game objects
         self.player = Player(x=20, y=10, size=8)
         self.camera_x = 0
         self.scroll_speed = 2
+        self.current_chunk_start = 0  # Track current chunk position
         
         # Game state
         self.game_over = False
@@ -71,13 +116,81 @@ class GameState:
                 data.append([int(val) for val in row])
         return data
     
-    def check_collision(self, pixel_value):
-        """Check if a pixel value is solid."""
-        # 255 = ground/platforms, 200 = spikes, 0 = air
-        return pixel_value >= 200
+    def parse_level_objects(self):
+        """Parse level data to extract platforms and obstacles as objects."""
+        # Track which pixels we've already processed
+        processed = [[False for _ in range(self.level_width)] for _ in range(self.level_height)]
+        
+        for y in range(self.level_height):
+            for x in range(self.level_width):
+                if processed[y][x]:
+                    continue
+                    
+                pixel_value = self.level[y][x]
+                
+                # Found a platform block
+                if pixel_value == 255:
+                    # Find the extent of this platform
+                    width = 1
+                    height = 1
+                    
+                    # Expand horizontally
+                    while x + width < self.level_width and self.level[y][x + width] == 255:
+                        width += 1
+                    
+                    # Expand vertically
+                    valid_height = True
+                    while y + height < self.level_height and valid_height:
+                        for dx in range(width):
+                            if self.level[y + height][x + dx] != 255:
+                                valid_height = False
+                                break
+                        if valid_height:
+                            height += 1
+                    
+                    # Mark all pixels as processed
+                    for dy in range(height):
+                        for dx in range(width):
+                            processed[y + dy][x + dx] = True
+                    
+                    self.platforms.append(Platform(x, y, width, height))
+                
+                # Found an obstacle (spike)
+                elif pixel_value == 200:
+                    # Find the extent of this obstacle
+                    width = 1
+                    height = 1
+                    
+                    # Expand horizontally
+                    while x + width < self.level_width and self.level[y][x + width] == 200:
+                        width += 1
+                    
+                    # Expand vertically
+                    valid_height = True
+                    while y + height < self.level_height and valid_height:
+                        for dx in range(width):
+                            if self.level[y + height][x + dx] != 200:
+                                valid_height = False
+                                break
+                        if valid_height:
+                            height += 1
+                    
+                    # Mark all pixels as processed
+                    for dy in range(height):
+                        for dx in range(width):
+                            processed[y + dy][x + dx] = True
+                    
+                    self.obstacles.append(Obstacle(x, y, width, height))
+    
+    def check_box_collision(self, box1, box2):
+        """Check if two bounding boxes collide."""
+        return not (box1['right'] <= box2['left'] or 
+                    box1['left'] >= box2['right'] or 
+                    box1['bottom'] <= box2['top'] or 
+                    box1['top'] >= box2['bottom'])
     
     def update_player_collision(self):
-        """Handle player collision with level."""
+        """Handle player collision with platforms and obstacles."""
         bounds = self.player.get_bounds()
         
         # Check if player is out of bounds
@@ -89,42 +202,54 @@ class GameState:
         # Check ground collision (below player)
         self.player.on_ground = False
         if self.player.velocity_y >= 0:  # Moving down
-            for x in range(bounds['left'], min(bounds['right'], self.level_width)):
-                if bounds['bottom'] < self.level_height:
-                    pixel = self.level[bounds['bottom'], x]
-                    if pixel == 255:  # Ground
-                        self.player.y = bounds['bottom'] - self.player.size
-                        self.player.velocity_y = 0
-                        self.player.on_ground = True
-                        break
-                    elif pixel == 200:  # Spike
-                        self.player.alive = False
-                        self.game_over = True
-                        return
+            for platform in self.platforms:
+                # Only check platforms in visible range
+                if platform.x + platform.width < self.camera_x - 100:
+                    continue
+                if platform.x > self.camera_x + self.display_width + 100:
+                    continue
+                    
+                platform_bounds = platform.get_bounds()
+                
+                # Check if player is landing on top of platform
+                if (bounds['bottom'] >= platform_bounds['top'] and 
+                    bounds['bottom'] <= platform_bounds['top'] + 3 and
+                    bounds['right'] > platform_bounds['left'] and 
+                    bounds['left'] < platform_bounds['right']):
+                    self.player.y = platform_bounds['top'] - self.player.size
+                    self.player.velocity_y = 0
+                    self.player.on_ground = True
+                    break
         
-        # Check ceiling collision (above player)
-        if self.player.velocity_y < 0:  # Moving up
-            for x in range(bounds['left'], min(bounds['right'], self.level_width)):
-                if bounds['top'] >= 0:
-                    pixel = self.level[bounds['top'], x]
-                    if self.check_collision(pixel):
-                        self.player.y = bounds['top'] + 1
-                        self.player.velocity_y = 0
-                        if pixel == 200:  # Hit spike
-                            self.player.alive = False
-                            self.game_over = True
-                            return
+        # Check obstacle collisions
+        for obstacle in self.obstacles:
+            # Only check obstacles in visible range
+            if obstacle.x + obstacle.width < self.camera_x - 100:
+                continue
+            if obstacle.x > self.camera_x + self.display_width + 100:
+                continue
+                
+            obstacle_bounds = obstacle.get_bounds()
+            if self.check_box_collision(bounds, obstacle_bounds):
+                self.player.alive = False
+                self.game_over = True
+                return
         
-        # Check side collisions
-        for y in range(bounds['top'], min(bounds['bottom'], self.level_height)):
-            if bounds['right'] < self.level_width:
-                pixel = self.level[y, bounds['right']]
-                if pixel == 200:  # Spike
-                    self.player.alive = False
-                    self.game_over = True
-                    return
-                elif pixel == 255:  # Wall
-                    self.player.x = bounds['right'] - self.player.size - 1
+        # Check platform collisions (ceiling and walls)
+        for platform in self.platforms:
+            # Only check platforms in visible range
+            if platform.x + platform.width < self.camera_x - 100:
+                continue
+            if platform.x > self.camera_x + self.display_width + 100:
+                continue
+                
+            platform_bounds = platform.get_bounds()
+            
+            # Check ceiling collision
+            if self.player.velocity_y < 0:
+                if self.check_box_collision(bounds, platform_bounds):
+                    self.player.y = platform_bounds['bottom']
+                    self.player.velocity_y = 0
     
     def update(self):
         """Update game state."""
@@ -138,6 +263,10 @@ class GameState:
         # Auto-scroll camera
         self.camera_x += self.scroll_speed
         self.score = int(self.camera_x / 10)
+        
+        # Update current chunk when we scroll past the current frame
+        if self.camera_x >= self.current_chunk_start + self.display_width:
+            self.current_chunk_start += self.display_width
         
         # Check if player fell behind
         if self.player.x < self.camera_x:
@@ -154,6 +283,7 @@ class GameState:
         """Reset game to initial state."""
         self.player = Player(x=20, y=10, size=8)
         self.camera_x = 0
+        self.current_chunk_start = 0
         self.game_over = False
         self.win = False
         self.score = 0
@@ -166,15 +296,45 @@ def draw_game(buffer, game_state):
         for x in range(640):
             buffer[y][x] = 0
     
-    # Calculate visible portion of level
+    # Calculate visible portion of level (current chunk)
     start_x = int(game_state.camera_x)
+    end_x = start_x + game_state.chunk_width
     
-    # Draw level to buffer
-    for y in range(min(game_state.level_height, 400)):
-        for x in range(640):
-            world_x = start_x + x
-            if 0 <= world_x < game_state.level_width:
-                buffer[y][x] = game_state.level[y][world_x]
+    # Draw platforms in current chunk
+    for platform in game_state.platforms:
+        # Skip platforms outside the visible chunk
+        if platform.x + platform.width < start_x:
+            continue
+        if platform.x >= end_x:
+            continue
+        
+        # Draw platform
+        for dy in range(platform.height):
+            for dx in range(platform.width):
+                world_x = platform.x + dx
+                world_y = platform.y + dy
+                screen_x = world_x - start_x
+                
+                if 0 <= screen_x < 640 and 0 <= world_y < 400:
+                    buffer[world_y][screen_x] = 255
+    
+    # Draw obstacles in current chunk
+    for obstacle in game_state.obstacles:
+        # Skip obstacles outside the visible chunk
+        if obstacle.x + obstacle.width < start_x:
+            continue
+        if obstacle.x >= end_x:
+            continue
+        
+        # Draw obstacle
+        for dy in range(obstacle.height):
+            for dx in range(obstacle.width):
+                world_x = obstacle.x + dx
+                world_y = obstacle.y + dy
+                screen_x = world_x - start_x
+                
+                if 0 <= screen_x < 640 and 0 <= world_y < 400:
+                    buffer[world_y][screen_x] = 200
     
     # Draw player
     if game_state.player.alive:
