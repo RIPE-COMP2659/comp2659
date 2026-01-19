@@ -15,6 +15,7 @@ Parker doesn't think there are prerequisites, but we will run into issue and add
 ## How Run
 
 ```bash
+cd src
 make test
 ```
 
