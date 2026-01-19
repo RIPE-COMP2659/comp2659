@@ -17,6 +17,13 @@ UNITY_FILES = tests/unity/unity.c
 # Output executable
 TEST_EXEC = testhelloworld.exe
 
+# Detect OS for cross-platform compatibility
+ifeq ($(OS),Windows_NT)
+    RM = del /Q
+else
+    RM = rm -f
+endif
+
 # Default target
 all: test
 
@@ -34,6 +41,7 @@ helloworld: helloworld.c
 
 # Clean up build files
 clean:
-	-del /Q *.exe *.o
+	-$(RM) *.exe *.o
 
+# Commands to run tests, otherwise make may assume these are files.
 .PHONY: all test clean
