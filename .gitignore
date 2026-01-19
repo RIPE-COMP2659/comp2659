@@ -1,4 +1,12 @@
+# Python artifacts
 python/.venv/
 __pycache__/
+
+# Executable files
 testhelloworld
 *.exe
+
+# Coverage files
+*.gcov
+*.gcda
+*.gcno
