@@ -26,7 +26,7 @@ test: $(TEST_EXEC)
 
 # Build the test executable
 $(TEST_EXEC): $(TEST_SRC) $(SRC) $(UNITY_FILES)
-	$(CC) $(CFLAGS) $(INCLUDES) $(TEST_SRC) $(SRC) $(UNITY_FILES) -o $(TEST_EXEC)
+	$(CC) $(CFLAGS) $(INCLUDES) -DTESTING $(TEST_SRC) $(SRC) $(UNITY_FILES) -o $(TEST_EXEC)
 
 # Build the main program
 helloworld: helloworld.c
