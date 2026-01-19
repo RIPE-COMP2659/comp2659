@@ -15,7 +15,7 @@ TEST_SRC = tests/testhelloworld.c
 UNITY_FILES = tests/unity/unity.c
 
 # Output executable
-TEST_EXEC = testhelloworld
+TEST_EXEC = testhelloworld.exe
 
 # Default target
 all: test
@@ -34,6 +34,6 @@ helloworld: helloworld.c
 
 # Clean up build files
 clean:
-	rm -f $(TEST_EXEC) helloworld.exe *.o
+	-del /Q *.exe *.o
 
 .PHONY: all test clean
