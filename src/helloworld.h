@@ -1,4 +1,4 @@
-#ifndef HELLO_WORLD_h
+#ifndef HELLO_WORLD_H
 #define HELLO_WORLD_H
 
 // Function to add two integers
