@@ -10,7 +10,7 @@ Parker doesn't think there are prerequisites, but we will run into issue and add
 
 ## Ensure that Make is installed
 
-1. [Install for Windows](https://gnuwin32.sourceforge.net/packages/make.htm)
+1. [Install for Windows](https://www.youtube.com/watch?v=5TavcolACQY&t=227s)
 
 ## How Run
 
