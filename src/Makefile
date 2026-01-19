@@ -6,13 +6,13 @@ CFLAGS = -Wall -Wextra -std=c99
 
 # Include directories
 # -I. means include from current directory (for helloworld.h)
-# -Iunity means include from unity subdirectory (for unity.h)
-INCLUDES = -I. -Iunity
+# -Itests/unity means include from tests/unity subdirectory (for unity.h)
+INCLUDES = -I. -Itests/unity
 
 # Source files
 SRC = helloworld.c
-TEST_SRC = testhelloworld.c
-UNITY_FILES = unity/unity.c
+TEST_SRC = tests/testhelloworld.c
+UNITY_FILES = tests/unity/unity.c
 
 # Output executable
 TEST_EXEC = testhelloworld
