@@ -4,8 +4,6 @@ Parker doesn't think there are prerequisites, but we will run into issue and add
 
 **TODO:** Update documentation for when new files are created.
 
-**TODO:** Create a seperate directory for tests.
-
 **TODO:** Get code coverage.
 
 ## Ensure that Make is installed
