@@ -4,4 +4,4 @@ Made for the final project/overall project of COMP2659 at Mount Royal University
 ## Structure
 * [documents](documents) contains assignment handouts
 
-Contributors: [@emykh268](https://github.com/emykh268), [@PkHutch](https://github.com/PkHutch), [@sudonym-i](https://github.com/sudonym-i)
+Contributors: [@emykh268](https://github.com/emykh268), [@PkHutch](https://github.com/PkHutch), [@rileygramlich](https://github.com/rileygramlich), [@sudonym-i](https://github.com/sudonym-i)
