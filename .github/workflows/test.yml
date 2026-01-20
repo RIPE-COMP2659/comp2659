@@ -1,0 +1,38 @@
+name: C Tests
+
+on:
+  push:
+    branches: [ main, master, development, test, issue-15 ]
+  pull_request:
+    branches: [ main, master, development, test, issue-15 ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Install dependencies
+      run: sudo apt-get update && sudo apt-get install -y gcc make gcov
+    
+    - name: Run tests
+      run: cd src && make test
+    
+    - name: Generate coverage report
+      run: |
+        cd src
+        gcov helloworld.c
+        echo "Coverage Summary:"
+        cat helloworld.c.gcov | head -20
+    
+    - name: Upload coverage files
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: coverage-report
+        path: |
+          src/*.gcov
+          src/*.gcda
+          src/*.gcno
