@@ -11,27 +11,27 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - name: Checkout code
+    - name: (process) Checkout code
       uses: actions/checkout@v3
     
-    - name: Install dependencies
+    - name: (process) Install dependencies
       run: sudo apt-get update && sudo apt-get install -y gcc make
     
-    - name: Build, test, and generate coverage
+    - name: -> Tests & Code Coverage <-
       run: cd src && make generate-coverage
     
-    - name: Test & coverage summary
+    - name: Code coverage summary
       if: always()
       run: |
         cd src
         echo "=== Test & Coverage Summary ==="
         cat helloworld.c.gcov 2>/dev/null | head -20 || echo "No coverage files found"
     
-    - name: Upload test results and coverage
+    - name: (process) Upload test results and coverage
       uses: actions/upload-artifact@v4
       if: always()
       with:
-        name: test-results-and-coverage
+        name: (process) test-results-and-coverage
         path: |
           src/*.gcov
           src/*.gcda
