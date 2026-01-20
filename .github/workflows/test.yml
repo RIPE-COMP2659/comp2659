@@ -3,6 +3,7 @@ name: C Tests
 on:
   pull_request:
     branches: [ production, development, test ]
+  workflow_dispatch:
 
 jobs:
   test:
