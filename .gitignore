@@ -1,8 +1,8 @@
 # Python artifacts
-python/.venv/
-__pycache__/
+.venv
+__pycache__
 
-# Executable files
+# Executables
 testhelloworld
 *.exe
 
