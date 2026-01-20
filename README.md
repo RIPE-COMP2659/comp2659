@@ -17,12 +17,12 @@ this means that you are passing all tests (You're good to go :) ).
 ![alt text](assets/image-1.png)
 This means that 1 or more tests failed. To see the output of the tests that were run (and where your submission failed), click on the **actions** section,
 ![alt text](assets/image-2.png)
-Then either click on your test that failed (likely the top test) *or* the "C tests" section, 
+Then either click on your test that failed (likely the top test) *or* the *"C tests"* section, 
 ![alt text](assets/image-3.png)
 Click on either "Test" button,
 ![alt text](assets/image-4.png)
-And expand the "Run Tests" row to see detailed information on the various tests that passed/failed (code coverage report is also found in "Generate coverage report" )
-![alt text](assets/image-5.png)
+And expand the *"-> Tests & Code Coverage <-"* row to see detailed information on the various tests that passed/failed (along with code coverage)
+![alt text](assets/image5.png)
 **If no test is performed,** or nothing pops up- you are likely pushing / merging into a branch that does not require/ have the tests automated for it.
 
 
