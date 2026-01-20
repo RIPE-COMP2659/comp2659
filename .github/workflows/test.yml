@@ -2,9 +2,9 @@ name: C Tests
 
 on:
   push:
-    branches: [ main, master, development, test, issue-15 ]
+    branches: [ production, development, test ]
   pull_request:
-    branches: [ main, master, development, test, issue-15 ]
+    branches: [ production, development, test ]
 
 jobs:
   test:
