@@ -23,7 +23,7 @@ Click on either "Test" button,
 ![alt text](assets/image-4.png)
 And expand the *"-> Tests & Code Coverage <-"* row to see detailed information on the various tests that passed/failed (along with code coverage)
 ![alt text](assets/image5.png)
-**If no test is performed,** or nothing pops up- you are likely pushing / merging into a branch that does not require/ have the tests automated for it.
+**If no test is performed,** or nothing pops up- you are likely merging into a branch that does not require/ have the tests automated for it.
 
 
 Contributors: [@emykh268](https://github.com/emykh268), [@PkHutch](https://github.com/PkHutch), [@rileygramlich](https://github.com/rileygramlich), [@sudonym-i](https://github.com/sudonym-i)
