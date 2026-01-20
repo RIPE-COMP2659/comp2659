@@ -25,14 +25,15 @@ jobs:
       run: |
         cd src
         echo "=== Test & Coverage Summary ==="
-        for file in *.gcov; do
-          if [ -f "$file" ]; then
+        if ls *.gcov 1> /dev/null 2>&1; then
+          for file in *.gcov; do
             echo "--- $file ---"
             cat "$file" | head -20
             echo ""
-          fi
-        done
-        [ -z "$(ls *.gcov 2>/dev/null)" ] && echo "No coverage files found"
+          done
+        else
+          echo "No coverage files found"
+        fi
     
     - name: (process) Upload test results and coverage
       uses: actions/upload-artifact@v4
