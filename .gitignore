@@ -3,8 +3,11 @@
 __pycache__
 
 # Executables
-testhelloworld
+test*
 *.exe
+
+# Make sure to keep the files in our tests directory.
+!/src/tests/
 
 # Coverage files
 *.gcov
