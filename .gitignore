@@ -1,2 +1,15 @@
-python/.venv/
-__pycache__/
+# Python artifacts
+.venv
+__pycache__
+
+# Executables
+test*
+*.exe
+
+# Make sure to keep the files in our tests directory.
+!/src/tests/
+
+# Coverage files
+*.gcov
+*.gcda
+*.gcno
