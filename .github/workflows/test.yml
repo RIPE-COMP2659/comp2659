@@ -18,14 +18,21 @@ jobs:
       run: sudo apt-get update && sudo apt-get install -y gcc make
     
     - name: -> Tests & Code Coverage <-
-      run: cd src && make generate-coverage
+      run: cd src && make coverage
     
     - name: Code coverage summary
       if: always()
       run: |
         cd src
         echo "=== Test & Coverage Summary ==="
-        cat helloworld.c.gcov 2>/dev/null | head -20 || echo "No coverage files found"
+        for file in *.gcov; do
+          if [ -f "$file" ]; then
+            echo "--- $file ---"
+            cat "$file" | head -20
+            echo ""
+          fi
+        done
+        [ -z "$(ls *.gcov 2>/dev/null)" ] && echo "No coverage files found"
     
     - name: (process) Upload test results and coverage
       uses: actions/upload-artifact@v4
@@ -34,5 +41,3 @@ jobs:
         name: (process) test-results-and-coverage
         path: |
           src/*.gcov
-          src/*.gcda
-          src/*.gcno
