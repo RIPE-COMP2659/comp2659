@@ -21,11 +21,13 @@ jobs:
       run: cd src && make test
     
     - name: Generate coverage report
+      if: always()
       run: |
         cd src
-        gcov helloworld.c
-        echo "Coverage Summary:"
-        cat helloworld.c.gcov | head -20
+        gcov *.gcda 2>&1 || echo "Coverage generation failed"
+        echo ""
+        echo "=== Coverage Summary ==="
+        cat helloworld.c.gcov 2>/dev/null | head -20 || echo "No coverage files found"
     
     - name: Upload coverage files
       uses: actions/upload-artifact@v4
@@ -36,3 +38,4 @@ jobs:
           src/*.gcov
           src/*.gcda
           src/*.gcno
+          src/testhelloworld
