@@ -19,7 +19,7 @@ jobs:
       run: sudo apt-get update && sudo apt-get install -y gcc make valgrind
     
     - name: -> Tests & Code Coverage <-
-      run: cd .github/workflows/automations.sh && chmod +x automations.sh && ./automations.sh
+      run: cd .github/workflows && chmod +x automations.sh && ./automations.sh
     
     - name: (process) Upload test results and coverage
       uses: actions/upload-artifact@v4
