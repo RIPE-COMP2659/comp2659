@@ -12,7 +12,7 @@ set -e  # Exit on any error
 
 echo "" >> $GITHUB_STEP_SUMMARY
 echo -e "## Test & Coverage Summary \n" >> $GITHUB_STEP_SUMMARY
-cd src && make coverage >> $GITHUB_STEP_SUMMARY
+cd ../../src && make coverage >> $GITHUB_STEP_SUMMARY
 
 # ------------------------------------------------------------------------------
 # 2. Generate Coverage Report
