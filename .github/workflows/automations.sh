@@ -9,7 +9,9 @@ set -e  # Exit on any error
 # ------------------------------------------------------------------------------
 # 1. Run Tests with Coverage
 # ------------------------------------------------------------------------------
-echo "# AUTOMATIONS AND TESTS"
+echo "# AUTOMATIONS AND TESTS" >> $GITHUB_STEP_SUMMARY
+echo "" >> $GITHUB_STEP_SUMMARY
+echo "## Test Execution" >> $GITHUB_STEP_SUMMARY
 echo "" >> $GITHUB_STEP_SUMMARY
 echo '```' >> $GITHUB_STEP_SUMMARY
 cd ../../src && make coverage >> $GITHUB_STEP_SUMMARY 2>&1
@@ -20,7 +22,11 @@ echo '```' >> $GITHUB_STEP_SUMMARY
 # ------------------------------------------------------------------------------
 
 echo "" >> $GITHUB_STEP_SUMMARY
-echo "## Code Coverage Details" >> $GITHUB_STEP_SUMMARY
+echo "---" >> $GITHUB_STEP_SUMMARY
+echo "" >> $GITHUB_STEP_SUMMARY
+echo "## Code Coverage Analysis" >> $GITHUB_STEP_SUMMARY
+echo "" >> $GITHUB_STEP_SUMMARY
+echo "### Coverage Report Files" >> $GITHUB_STEP_SUMMARY
 echo "" >> $GITHUB_STEP_SUMMARY
 
 if ls *.gcov 1> /dev/null 2>&1; then
@@ -45,7 +51,11 @@ fi
 # ------------------------------------------------------------------------------
 
 echo "" >> $GITHUB_STEP_SUMMARY
-echo "## Valgrind Memory Check" >> $GITHUB_STEP_SUMMARY
+echo "---" >> $GITHUB_STEP_SUMMARY
+echo "" >> $GITHUB_STEP_SUMMARY
+echo "## Memory Leak Detection" >> $GITHUB_STEP_SUMMARY
+echo "" >> $GITHUB_STEP_SUMMARY
+echo "### Valgrind Analysis Results" >> $GITHUB_STEP_SUMMARY
 echo "" >> $GITHUB_STEP_SUMMARY
 echo '```' >> $GITHUB_STEP_SUMMARY
 make valgrind >> $GITHUB_STEP_SUMMARY 2>&1
