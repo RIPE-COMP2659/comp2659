@@ -3,6 +3,7 @@
 __pycache__
 
 # Executables
+geo_dash
 test*
 *.exe
 
