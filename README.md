@@ -4,6 +4,7 @@ Made for the final project/overall project of COMP2659 at Mount Royal University
 ## Structure
 * [documents](documents): Assignment handouts.
 * [src](src): Source code for the project.
+* [SPECIFICATIONS.md](SPECIFICATIONS.md): Specifications as requested by assignment.
 
 ## Testing
 
