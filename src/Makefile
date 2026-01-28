@@ -38,9 +38,12 @@ TEST_EXECS = $(TEST_SRC_FILES:tests/%.c=%$(EXE_EXT))
 # Default target
 all: test
 
+# Default command prefix for running tests (can be overridden)
+RUN_CMD = $(RUN_PREFIX)
+
 # Compile and run all tests
 test: $(TEST_EXECS)
-	$(foreach exec,$(TEST_EXECS),$(RUN_PREFIX)$(exec) && ) $(NOOP)
+	$(foreach exec,$(TEST_EXECS),$(RUN_CMD)$(exec) && ) $(NOOP)
 
 # Build test executables (pattern rule)
 %$(EXE_EXT): tests/%.c $(SRC) $(UNITY_FILES)
@@ -68,7 +71,7 @@ clean:
 
 # Run tests with Valgrind memory checking
 valgrind: $(TEST_EXECS)
-	$(foreach exec,$(TEST_EXECS),valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes $(RUN_PREFIX)$(exec) && ) $(NOOP)
+	$(MAKE) test RUN_CMD="valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes $(RUN_PREFIX)"
 
 # Commands to run tests, otherwise make may assume these are files.
 .PHONY: all test clean clean-coverage coverage generate-coverage valgrind
