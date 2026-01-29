@@ -9,6 +9,9 @@ Made for the final project/overall project of COMP2659 at Mount Royal University
 
 *Tests should be run automatically through GitHub action when you push / submit pull requests.*
 
+**NOTE: Valgrind memory checks are only accurate when the full game is run on your local machine.**
+**Memory leak results on GH actions may not be accurate, and do NOT substitute usage of valgrind on local**
+
 **If you get a green check-mark:**
 ![alt text](.assets/image.png)
 this means that you are passing all tests (You're good to go :) ).
