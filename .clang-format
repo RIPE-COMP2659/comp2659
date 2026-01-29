@@ -1,0 +1,22 @@
+BasedOnStyle: LLVM
+Language: Cpp # Apparently good for C as well.
+Standard: C11
+
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+
+ColumnLimit: 120
+
+BreakBeforeBraces: Attach # K&R style
+AllowShortIfStatementsOnASingleLine: true
+AllowShortLoopsOnASingleLine: true
+AllowShortFunctionsOnASingleLine: All
+
+PointerAlignment: Right # int *ptr, not int* ptr
+SpaceBeforeParens: Never # if(condition), not if (condition)
+
+IndentCaseLabels: true
+AlignAfterOpenBracket: Align
+ReflowComments: true
+SortIncludes: true

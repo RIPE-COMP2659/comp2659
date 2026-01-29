@@ -15,7 +15,7 @@ CC = gcc
 GCOV = gcov
 
 # Compiler flags
-CFLAGS = -Wall -Wextra -std=c99
+CFLAGS = -Wall -Wextra -Werror -Wpedantic -Wshadow -Wconversion -Wsign-conversion -Wstrict-prototypes -std=c89
 
 # Coverage flags for gcov
 # -fprofile-arcs: Generate arc coverage data
@@ -66,5 +66,16 @@ clean-coverage:
 clean:
 	-$(RM) *.exe *.o *.gcda *.gcno *.gcov $(TEST_EXECS)
 
+# cppcheck config for C
+CPPCHECK_FLAGS = --enable=all --inconclusive --std=c89 --quiet --language=c
+# If you get false positives on unused stuff, you can add:
+# CPPCHECK_FLAGS += --suppress=unusedFunction
+
+lint:
+	cppcheck $(CPPCHECK_FLAGS) src
+
+format:
+	clang-format -i $(shell find src -name "*.c" -o -name "*.h")
+
 # Commands to run tests, otherwise make may assume these are files.
-.PHONY: all test clean clean-coverage coverage generate-coverage
+.PHONY: all test clean clean-coverage coverage generate-coverage lint format
