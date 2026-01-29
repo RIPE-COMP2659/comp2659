@@ -10,6 +10,8 @@ Made for the final project/overall project of COMP2659 at Mount Royal University
 
 *Tests should be run automatically through GitHub action when you push / submit pull requests.*
 
+**Note:** RIPE_SPECIFICATIONS.docx will also be uploaded to the same spot as part of the workflow.
+
 **If you get a green check-mark:**
 ![alt text](assets/image.png)
 this means that you are passing all tests (You're good to go :) ).
