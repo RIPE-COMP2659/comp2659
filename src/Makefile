@@ -38,9 +38,12 @@ TEST_EXECS = $(TEST_SRC_FILES:tests/%.c=%$(EXE_EXT))
 # Default target
 all: test
 
+# Default command prefix for running tests (can be overridden)
+RUN_CMD = $(RUN_PREFIX)
+
 # Compile and run all tests
 test: $(TEST_EXECS)
-	$(foreach exec,$(TEST_EXECS),$(RUN_PREFIX)$(exec) && ) $(NOOP)
+	$(foreach exec,$(TEST_EXECS),$(RUN_CMD)$(exec) && ) $(NOOP)
 
 # Build test executables (pattern rule)
 %$(EXE_EXT): tests/%.c $(SRC) $(UNITY_FILES)
@@ -48,7 +51,7 @@ test: $(TEST_EXECS)
 
 # Build the main program
 helloworld: helloworld.c
-	$(CC) $(CFLAGS) helloworld.c -o helloworld$(EXE_EXT)
+	$(CC) $(CFLAGS) helloworld.c -o geo_dash$(EXE_EXT)
 
 # Clean up unncessary files
 coverage: generate-coverage clean-coverage
@@ -66,5 +69,9 @@ clean-coverage:
 clean:
 	-$(RM) *.exe *.o *.gcda *.gcno *.gcov $(TEST_EXECS)
 
+# Run tests with Valgrind memory checking
+valgrind: $(TEST_EXECS)
+	$(MAKE) test RUN_CMD="valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes $(RUN_PREFIX)"
+
 # Commands to run tests, otherwise make may assume these are files.
-.PHONY: all test clean clean-coverage coverage generate-coverage
+.PHONY: all test clean clean-coverage coverage generate-coverage valgrind
