@@ -60,3 +60,30 @@ echo "" >> $GITHUB_STEP_SUMMARY
 echo '```' >> $GITHUB_STEP_SUMMARY
 make valgrind >> $GITHUB_STEP_SUMMARY 2>&1
 echo '```' >> $GITHUB_STEP_SUMMARY
+
+# ------------------------------------------------------------------------------
+# 4. Generate SPECIFICATIONS.docx
+# ------------------------------------------------------------------------------
+
+repo_root="${GITHUB_WORKSPACE:-$(cd "$(dirname "$0")/../.." && pwd)}"
+spec_source="$repo_root/documents/SPECIFICATIONS.md"
+spec_html="$repo_root/SPECIFICATIONS.html"
+spec_docx="$repo_root/RIPE_SPECIFICATIONS.docx"
+
+echo "" >> $GITHUB_STEP_SUMMARY
+echo "---" >> $GITHUB_STEP_SUMMARY
+echo "" >> $GITHUB_STEP_SUMMARY
+echo "## Specifications Document" >> $GITHUB_STEP_SUMMARY
+echo "" >> $GITHUB_STEP_SUMMARY
+echo "### Generation Output" >> $GITHUB_STEP_SUMMARY
+echo "" >> $GITHUB_STEP_SUMMARY
+echo '```' >> $GITHUB_STEP_SUMMARY
+echo "Repo root: $repo_root" >> $GITHUB_STEP_SUMMARY
+if [ -f "$spec_source" ]; then
+    pandoc "$spec_source" -o "$spec_html" >> $GITHUB_STEP_SUMMARY 2>&1
+    pandoc "$spec_html" -o "$spec_docx" >> $GITHUB_STEP_SUMMARY 2>&1
+else
+    echo "SPECIFICATIONS.md not found at $spec_source" >> $GITHUB_STEP_SUMMARY
+    exit 1
+fi
+echo '```' >> $GITHUB_STEP_SUMMARY

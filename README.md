@@ -2,14 +2,14 @@
 Made for the final project/overall project of COMP2659 at Mount Royal University. The specifications will be listed [here](https://docs.google.com/document/d/1sgGgx19n0Oh4ml2uCEyvfwX6mpvj2tBK_8uIYWLluds/edit?usp=sharing) for now, but will likely be moved into another file in this directory. 
 
 ## Structure
-* [documents](documents): Assignment handouts.
+* [documents](documents): Assignment handouts and specifications.
 * [src](src): Source code for the project.
 
 ## Testing
 
-*Tests should be run automatically through GitHub action when you push / submit pull requests.*
-
-**NOTE: Valgrind memory checks are only accurate when the full game is run on your local machine.**
+*Tests should be run automatically through GitHub action when you push / submit pull requests.*  
+**Note:** RIPE_SPECIFICATIONS.docx will also be uploaded to the same spot as part of the workflow.  
+**Note:** Valgrind memory checks are only accurate when the full game is run on your local machine.**  
 **Memory leak results on GH actions may not be accurate, and do NOT substitute usage of valgrind on local**
 
 **If you get a green check-mark:**
