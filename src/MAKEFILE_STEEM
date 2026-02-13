@@ -1,0 +1,8 @@
+prog.tos: block.o main.o
+	cc68x -g block.o main.o -o prog.tos
+
+block.o: block.c block.h
+	cc68x -g -c block.c
+
+main.o: main.c block.h
+	cc68x -g -c main.c
