@@ -60,5 +60,3 @@ typedef struct {
 } Block;
 
 void block_placeholder(void);
-
-#endif
