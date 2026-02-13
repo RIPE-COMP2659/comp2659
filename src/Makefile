@@ -27,8 +27,9 @@ COVERAGE_FLAGS = -fprofile-arcs -ftest-coverage -O0
 # -Itests/unity means include from tests/unity subdirectory (for unity.h)
 INCLUDES = -I. -Itests/unity
 
-# Source files
-SRC = helloworld.c
+# Source files - automatically discover all .c files in src directory (excluding tests/)
+SRC = $(filter-out tests/%, $(wildcard *.c))
+SRC_BASENAMES = $(basename $(SRC))
 UNITY_FILES = tests/unity/unity.c
 
 # Dynamically discover test files (all .c files in tests/ excluding unity/)
@@ -46,8 +47,9 @@ test: $(TEST_EXECS)
 	$(foreach exec,$(TEST_EXECS),$(RUN_CMD)$(exec) && ) $(NOOP)
 
 # Build test executables (pattern rule)
-%$(EXE_EXT): tests/%.c $(SRC) $(UNITY_FILES)
-	$(CC) $(CFLAGS) $(COVERAGE_FLAGS) $(INCLUDES) -DTESTING $< $(SRC) $(UNITY_FILES) -o $@
+# Each test compiles with its corresponding source file: test_NAME.c compiles with NAME.c
+%$(EXE_EXT): tests/%.c $(UNITY_FILES)
+	$(CC) $(CFLAGS) $(COVERAGE_FLAGS) $(INCLUDES) -DTESTING $< $(patsubst test_%,%.c,$(basename $@)) $(UNITY_FILES) -o $@
 
 # Build the main program
 helloworld: helloworld.c
@@ -57,8 +59,9 @@ helloworld: helloworld.c
 coverage: generate-coverage clean-coverage
 
 # Generate coverage report using gcov for all test executables
+# Each test only reports coverage for its corresponding source file
 generate-coverage: clean test
-	$(foreach exec,$(TEST_EXECS:$(EXE_EXT)=),$(GCOV) $(exec)-helloworld.gcno && ) $(NOOP)
+	$(foreach exec,$(TEST_EXECS:$(EXE_EXT)=),$(GCOV) $(exec)-$(patsubst test_%,%,$(exec)).gcno && ) $(NOOP)
 	@echo Coverage report generated. Check *.gcov files for details.
 
 # Clean only coverage files (used before coverage generation)
