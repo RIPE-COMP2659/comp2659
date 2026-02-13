@@ -1,6 +1,11 @@
 #ifndef RASTER_H
 #define RASTER_H
 
+/* Type definitions for unsigned integers */
+typedef unsigned char UINT8;
+typedef unsigned short UINT16;
+typedef unsigned long UINT32;
+
 /*----- Function: clear_screen -----
 
 PURPOSE: Clears the entire screen.
@@ -115,7 +120,7 @@ void plot_square(UINT32 *base, UINT16 row, UINT16 col, UINT16 side);
 
  OUTPUT: None
 */
-void plot_triangle(UINT32 *base, UINT16 row, UINT16 col, UINT16 base, UINT16 height, UINT8 direction);
+void plot_triangle(UINT32 *base, UINT16 row, UINT16 col, UINT16 base_triangle, UINT16 height, UINT8 direction);
 
 /*----- Function: plot_bitmap_8 -----
 
