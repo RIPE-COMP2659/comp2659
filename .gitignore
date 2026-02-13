@@ -4,11 +4,11 @@ __pycache__
 
 # Executables
 geo_dash
-test*
 *.exe
 
 # Make sure to keep the files in our tests directory.
-!/src/tests/
+!test*.c
+!src/tests/
 
 # Coverage files
 *.gcov
