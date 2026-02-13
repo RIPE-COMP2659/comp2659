@@ -10,3 +10,5 @@ endfor
 
 echo 'Complete, running make...'
 make
+
+echo 'Build finished! Run rtest.tos to start the test.'

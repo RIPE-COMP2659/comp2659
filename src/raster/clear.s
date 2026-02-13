@@ -5,7 +5,7 @@
 ;
 ;  CREDIT: Comp 2659 LAB assembly code.
 ;
-;      This solution is higly optimized, do not touch.
+;     **This solution is higly optimized, do not touch.**
 
                 xdef            _clear_screen
 
