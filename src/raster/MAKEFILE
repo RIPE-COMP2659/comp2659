@@ -1,43 +1,11 @@
-# Makefile for raster test program on Atari ST
-# To build: make
-# To run: rtest.tos
-# To clean: make clean
+rtest.tos: test.o clear.o clr_reg.o
+	cc68x -g test.o clear.o clr_reg.o -o rtest.tos
 
-# Target executable
-TARGET = rtest.tos
-
-# Object files
-OBJS = test.o clear.o clear_region.o
-
-# Compiler and assembler
-CC = cc68x
-
-# Flags
-CFLAGS = -g
-
-# Default target - build the test program
-all: $(TARGET)
-
-# Link object files to create executable
-$(TARGET): $(OBJS)
-	$(CC) $(CFLAGS) $(OBJS) -o $(TARGET)
-
-# Compile test.c
 test.o: test.c raster.h
-	$(CC) $(CFLAGS) -c test.c
+	cc68x -g -c test.c
 
-# Assemble clear.s
 clear.o: clear.s
-	$(CC) $(CFLAGS) -c clear.s
+	cc68x -g -c clear.s
 
-# Assemble clear_region.s
-clear_region.o: clear_region.s
-	$(CC) $(CFLAGS) -c clear_region.s
-
-# Clean up object files and executable
-clean:
-	-del *.o
-	-del $(TARGET)
-
-# Phony targets
-.PHONY: all clean
+clr_reg.o: clr_reg.s
+	cc68x -g -c clr_reg.s

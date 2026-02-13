@@ -1,11 +1,11 @@
 ;
-; void clear_region(UINT32 *base, UINT16 row, UINT16 col, UINT16 length, UINT16 width);
+; void clear_large_region(UINT32 *base, UINT16 row, UINT16 col, UINT16 length, UINT16 width);
 ;
 ; Clear a rectangular regin of the screen.
 ; The length of this routine is due to an optimization which aims to
 ; break down the requested width into chunks that can be cleared with a single movem instruction.
 ;
-; Breaks the section into LONGWORDS (32-bit)
+;                                   Breaks the section into LONGWORDS (32-bit)
 ;
 ;  -------------------------------------------------------------------------------------------------------
 ;  | STATUS: Assembles without errors. Otherwise untested, as linking to C code needs to be figured out. |

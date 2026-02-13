@@ -2,6 +2,10 @@
 .venv
 __pycache__
 
+# Ignore all executables and object files.
+*.O
+*.TOS
+
 # Executables
 geo_dash
 *.exe

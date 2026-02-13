@@ -5,7 +5,7 @@
 ; The length of this routine is due to an optimization which aims to
 ; break down the requested width into chunks that can be cleared with a single movem instruction.
 ;
-; Breaks the section into WORDS (16-bit)
+;                                   Breaks the section into WORDS (16-bit)
 ;
 ;  -------------------------------------------------------------------------------------------------------
 ;  | STATUS: Assembles without errors. Otherwise untested, as linking to C code needs to be figured out. |
@@ -20,7 +20,7 @@ length          equ             72
 width           equ             74
 
 
-_clear_region:  movem.l         d0-7/a0-6,-(sp)
+_clear_region:  movem.l         d0-d7/a0-a6,-(sp)
 
                 movea.l         base(sp),a0
                 adda.l          col(sp),a0
@@ -49,7 +49,7 @@ _clear_region:  movem.l         d0-7/a0-6,-(sp)
 large_width:
                 ; Width > 26 bytes: use multiple movem operations per row
                 lea             zeros_13,a1
-                movem.w         (a1),d1-d7/a1-a6  ; load 13 words of zeros
+                movem   (a1),d1-d7/a1-a6  ; load 13 words of zeros
                 
                 move.w          length(sp),d0   ; d0 = row counter
                 subq.w          #1,d0           ; adjust for dbra
@@ -63,7 +63,7 @@ chunk_loop:
                 cmpi.w          #26,d0          ; can write full 26-byte chunk?
                 blt             handle_remainder
                 
-                movem.w         d1-d7/a1-a6,(a0)  ; write 26 bytes
+                movem   d1-d7/a1-a6,(a0)  ; write 26 bytes
                 lea             26(a0),a0       
                 subi.w          #26,d0          
                 bra             chunk_loop
@@ -99,7 +99,7 @@ fits_in_registers:
                 
                 ; Load zeros into required number of registers
                 ; We'll load all 13 and use only what we need in movem
-                movem.w         (a1),d1-d7/a1-a6
+                movem   (a1),d1-d7/a1-a6
                 
                 ; Calculate movem register mask based on num_words in d3
                 ; d3 = 0: no movem needed
@@ -151,7 +151,7 @@ row_done_1:     suba.l          d2,a0
                 bra             exit_clear
                 
 use_2_reg:
-row_loop_2:     movem.w         d1-d2,(a0)
+row_loop_2:     movem   d1-d2,(a0)
                 lea             4(a0),a0
                 tst.w           d6
                 beq             row_done_2
@@ -162,7 +162,7 @@ row_done_2:     suba.l          d2,a0
                 bra             exit_clear
                 
 use_3_reg:
-row_loop_3:     movem.w         d1-d3,(a0)
+row_loop_3:     movem   d1-d3,(a0)
                 lea             6(a0),a0
                 tst.w           d6
                 beq             row_done_3
@@ -173,7 +173,7 @@ row_done_3:     suba.l          d2,a0
                 bra             exit_clear
                 
 use_4_reg:
-row_loop_4:     movem.w         d1-d4,(a0)
+row_loop_4:     movem   d1-d4,(a0)
                 lea             8(a0),a0
                 tst.w           d6
                 beq             row_done_4
@@ -184,7 +184,7 @@ row_done_4:     suba.l          d2,a0
                 bra             exit_clear
                 
 use_5_reg:
-row_loop_5:     movem.w         d1-d5,(a0)
+row_loop_5:     movem   d1-d5,(a0)
                 lea             10(a0),a0
                 tst.w           d6
                 beq             row_done_5
@@ -195,7 +195,7 @@ row_done_5:     suba.l          d2,a0
                 bra             exit_clear
                 
 use_6_reg:
-row_loop_6:     movem.w         d1-d6,(a0)
+row_loop_6:     movem   d1-d6,(a0)
                 lea             12(a0),a0
                 tst.w           d6
                 beq             row_done_6
@@ -206,7 +206,7 @@ row_done_6:     suba.l          d2,a0
                 bra             exit_clear
                 
 use_7_reg:
-row_loop_7:     movem.w         d1-d7,(a0)
+row_loop_7:     movem   d1-d7,(a0)
                 lea             14(a0),a0
                 tst.w           d6
                 beq             row_done_7
@@ -217,7 +217,7 @@ row_done_7:     suba.l          d2,a0
                 bra             exit_clear
                 
 use_8_reg:
-row_loop_8:     movem.w         d1-d7/a1,(a0)
+row_loop_8:     movem   d1-d7/a1,(a0)
                 lea             16(a0),a0
                 tst.w           d6
                 beq             row_done_8
@@ -228,7 +228,7 @@ row_done_8:     suba.l          d2,a0
                 bra             exit_clear
                 
 use_9_reg:
-row_loop_9:     movem.w         d1-d7/a1-a2,(a0)
+row_loop_9:     movem   d1-d7/a1-a2,(a0)
                 lea             18(a0),a0
                 tst.w           d6
                 beq             row_done_9
@@ -239,7 +239,7 @@ row_done_9:     suba.l          d2,a0
                 bra             exit_clear
                 
 use_10_reg:
-row_loop_10:    movem.w         d1-d7/a1-a3,(a0)
+row_loop_10:    movem   d1-d7/a1-a3,(a0)
                 lea             20(a0),a0
                 tst.w           d6
                 beq             row_done_10
@@ -250,7 +250,7 @@ row_done_10:    suba.l          d2,a0
                 bra             exit_clear
                 
 use_11_reg:
-row_loop_11:    movem.w         d1-d7/a1-a4,(a0)
+row_loop_11:    movem   d1-d7/a1-a4,(a0)
                 lea             22(a0),a0
                 tst.w           d6
                 beq             row_done_11
@@ -261,7 +261,7 @@ row_done_11:    suba.l          d2,a0
                 bra             exit_clear
                 
 use_12_reg:
-row_loop_12:    movem.w         d1-d7/a1-a5,(a0)
+row_loop_12:    movem   d1-d7/a1-a5,(a0)
                 lea             24(a0),a0
                 tst.w           d6
                 beq             row_done_12
@@ -272,7 +272,7 @@ row_done_12:    suba.l          d2,a0
                 bra             exit_clear
                 
 use_13_reg:
-row_loop_13:    movem.w         d1-d7/a1-a6,(a0)
+row_loop_13:    movem   d1-d7/a1-a6,(a0)
                 lea             26(a0),a0
                 tst.w           d6
                 beq             row_done_13
@@ -296,7 +296,7 @@ row_done_tiny:
                 bra             exit_clear
 
 exit_clear:
-                movem.l         (sp)+,d0-7/a0-6
+                movem.l         (sp)+,d0-d7/a0-a6
                 rts
 
 
