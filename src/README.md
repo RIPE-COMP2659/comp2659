@@ -9,6 +9,9 @@ Ensure the following is installed:
 - **Make**: For running the Makefile build system
   - Linux/Mac: Usually pre-installed
   - Windows: [Installation Guide](https://www.youtube.com/watch?v=5TavcolACQY&t=227s)
+- **Valgrind**: For running memory leak checks
+  - Linux/Mac: ```sudo apt install valgrind```
+  - Windows: Ideally just run WSL and follow the Linux/Mac setup, otherwise you're on your own
 
 ## Building the Main Program
 ```bash
