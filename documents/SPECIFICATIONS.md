@@ -8,7 +8,7 @@
 
 ## 1. General Game Overview: ##
 &emsp; Geometry Dash is a single-player, platforming, side-scroller game that involves a square (named “Geo”) moving through an obstacle-filled level. The game is viewed from the side, and the entire screen represents a 2-D course that scrolls continuously to the right. The player controls Geo as they move through the level automatically; the player does not control their speed or direction, only when they jump. The objective of the game is to reach the end of the level without “dying”. Geo “dies” when they collide with a hazard: a spike, obstacle, or lava. At this point the attempt ends and the level restarts from the beginning.  
-![Geo-jumping](../assets/specifications/overview.png)
+![Geo-jumping](../assets/specifications/overview.png)  
 Figure 1: Shows Geo mid-jump as they clear a gap, with a spike ahead on the track that must be jumped over next.  
 Source: [1]
 
