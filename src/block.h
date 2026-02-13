@@ -1,6 +1,3 @@
-#ifndef BLOCK_H
-#define BLOCK_H
-
 #define BLOCK_SIZE 48
 
 /* TODO: Refactor BLOCK_SIZE / 16, should instead be using a generic size for integers and using size. */
