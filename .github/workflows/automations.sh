@@ -66,7 +66,7 @@ echo '```' >> $GITHUB_STEP_SUMMARY
 # ------------------------------------------------------------------------------
 
 repo_root="${GITHUB_WORKSPACE:-$(cd "$(dirname "$0")/../.." && pwd)}"
-spec_source="$repo_root/SPECIFICATIONS.md"
+spec_source="$repo_root/documents/SPECIFICATIONS.md"
 spec_html="$repo_root/SPECIFICATIONS.html"
 spec_docx="$repo_root/RIPE_SPECIFICATIONS.docx"
 

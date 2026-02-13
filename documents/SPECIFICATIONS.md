@@ -8,7 +8,7 @@
 
 ## 1. General Game Overview: ##
 &emsp; Geometry Dash is a single-player, platforming, side-scroller game that involves a square (named “Geo”) moving through an obstacle-filled level. The game is viewed from the side, and the entire screen represents a 2-D course that scrolls continuously to the right. The player controls Geo as they move through the level automatically; the player does not control their speed or direction, only when they jump. The objective of the game is to reach the end of the level without “dying”. Geo “dies” when they collide with a hazard: a spike, obstacle, or lava. At this point the attempt ends and the level restarts from the beginning.  
-![Geo-jumping](assets/specifications/overview.png)  
+![Geo-jumping](../assets/specifications/overview.png)
 Figure 1: Shows Geo mid-jump as they clear a gap, with a spike ahead on the track that must be jumped over next.  
 Source: [1]
 
@@ -21,17 +21,17 @@ Source: [1]
 &emsp; When the player dies, they restart the level.  
 &emsp; When a player restarts the level, they start at the left-most position in the world coordinates (player_x = 0 and player_y = 50, subject to change).  
 &emsp; Each level will not be detailed here, as it would be a series of hundreds of x/y values of obstacles. Furthermore, the physics will determine what sort of level design will lead to engaging gameplay. However, the levels are static.  
-![Available-objects](assets/specifications/objectivesAndRules.png)  
+![Available-objects](../assets/specifications/objectivesAndRules.png)  
 Figure 2: Annotated screenshot showing the objects present in The Impossible Game  
 Source: Adapted from [1]
 
 ### Objects: ###
 | Object Name | Properties | Behaviours | Graphical Image |
 | :---------- | :--------- | :--------- | :-------------- |
-| Block | • (int) x: The x position of the top left of the object <br> • (int) y: The y position of the top left of the object <br> • (int[]) const sprite*: The pointer for how to render this entity <br> • (int) const size: Width and height of this block | N/A | ![block](assets/specifications/block.png) <br> Source: [2] |
-| Spike | • (int) x: The x position of the top left of the object <br> • (int) y: The y position of the top left of the object <br> • (int []) const sprite*: The pointer for how to render this entity <br> • (int) const size: Width and height of this spike <br> • Note: Spikes are treated as squares in shape at the start | N/A | ![spike](assets/specifications/spike.png) <br> Source: [2] |
-| Lava | • (int) x: The x position of the starting left of the lava <br> • (int []) const sprite*: The pointer for how to render this entity <br> • (int) const size: Width of the lava | N/A | ![lava](assets/specifications/lava.png) <br> Source: [2] |
-| Geo | • (int) x: The x position of the top left of the object <br> • (int) y: The y position of the top left of the object <br> • (int) dx: The change of the x position, or horizontal velocity <br> • (int) dy: The change of the y position, or vertical velocity <br> • (int) ddy: The change of dy, or vertical acceleration, or gravity <br> • (int []) const sprite*: The pointer for how to render this entity <br> • (int) const size: Width and height of the player | • Move, constant movement towards the right (positive x) through the world. This occurs at a constant rate. <br> • Jump, sets an initial dy, positively, which is then decreased by ddy | ![geo](assets/specifications/geo.png) <br> Source: [2] |
+| Block | • (int) x: The x position of the top left of the object <br> • (int) y: The y position of the top left of the object <br> • (int[]) const sprite*: The pointer for how to render this entity <br> • (int) const size: Width and height of this block | N/A | ![block](../assets/specifications/block.png) <br> Source: [2] |
+| Spike | • (int) x: The x position of the top left of the object <br> • (int) y: The y position of the top left of the object <br> • (int []) const sprite*: The pointer for how to render this entity <br> • (int) const size: Width and height of this spike <br> • Note: Spikes are treated as squares in shape at the start | N/A | ![spike](../assets/specifications/spike.png) <br> Source: [2] |
+| Lava | • (int) x: The x position of the starting left of the lava <br> • (int []) const sprite*: The pointer for how to render this entity <br> • (int) const size: Width of the lava | N/A | ![lava](../assets/specifications/lava.png) <br> Source: [2] |
+| Geo | • (int) x: The x position of the top left of the object <br> • (int) y: The y position of the top left of the object <br> • (int) dx: The change of the x position, or horizontal velocity <br> • (int) dy: The change of the y position, or vertical velocity <br> • (int) ddy: The change of dy, or vertical acceleration, or gravity <br> • (int []) const sprite*: The pointer for how to render this entity <br> • (int) const size: Width and height of the player | • Move, constant movement towards the right (positive x) through the world. This occurs at a constant rate. <br> • Jump, sets an initial dy, positively, which is then decreased by ddy | ![geo](../assets/specifications/geo.png) <br> Source: [2] |
 
 ### Physics: ###
 &emsp; The game uses a simple physics model focused on vertical movement and collisions.  

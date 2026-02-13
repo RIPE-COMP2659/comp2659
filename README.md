@@ -2,9 +2,8 @@
 Made for the final project/overall project of COMP2659 at Mount Royal University. The specifications will be listed [here](https://docs.google.com/document/d/1sgGgx19n0Oh4ml2uCEyvfwX6mpvj2tBK_8uIYWLluds/edit?usp=sharing) for now, but will likely be moved into another file in this directory. 
 
 ## Structure
-* [documents](documents): Assignment handouts.
+* [documents](documents): Assignment handouts and specifications.
 * [src](src): Source code for the project.
-* [SPECIFICATIONS.md](SPECIFICATIONS.md): Specifications as requested by assignment.
 
 ## Testing
 
