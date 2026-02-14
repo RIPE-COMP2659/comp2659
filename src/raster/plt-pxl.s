@@ -7,9 +7,9 @@
 
                 xdef            _plot_pixel
 
-base            equ             64              ; offset from SP, not A6
-row             equ             68               
-col             equ             70
+base            equ             20              ; offset from SP, not A6
+row             equ             24               
+col             equ             28
 
 
 _plot_pixel:    
