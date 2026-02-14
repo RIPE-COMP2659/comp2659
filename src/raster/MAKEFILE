@@ -1,11 +1,14 @@
-rtest.tos: test.o clear.o clr_reg.o
-	cc68x -g test.o clear.o clr_reg.o -o rtest.tos
+rtest.tos: test.o clr_scrn.o clr_reg.o plt-pxl.o
+	cc68x -g test.o clr_scrn.o clr_reg.o plt-pxl.o -o rtest.tos
 
 test.o: test.c raster.h
 	cc68x -g -c test.c
 
-clear.o: clear.s
-	cc68x -g -c clear.s
+clr_scrn.o: clr_scrn.s
+	cc68x -g -c clr_scrn.s
 
 clr_reg.o: clr_reg.s
 	cc68x -g -c clr_reg.s
+
+plt-pxl.o: plt-pxl.s
+	cc68x -g -c plt-pxl.s
