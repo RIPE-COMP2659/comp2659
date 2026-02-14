@@ -6,6 +6,8 @@ int add_numbers(int x, int y) {
     return x + y;
 }
 
+// TODO: Delete
+
 #ifndef TESTING
 // Main function: entry point for execution
 int main() {
