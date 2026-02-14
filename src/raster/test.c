@@ -6,73 +6,129 @@
 
 void disable_cursor();
 void fill_screen(UINT32 *base, char pattern);
+void test_clear_screen(UINT8 *base);
+void test_clear_region(UINT8 *base);
+void test_plot_pixel(UINT8 *base);
 
-int main() {
-    UINT32 *base = (UINT32 *)Physbase();
-    
-    disable_cursor(); /* hide blinking text cursor */
-    
-    /* Fill screen with all black to start */
-    fill_screen(base, -1);
-    Cnecin(); /* wait for key press */
-    
-    /* Test 1: Small region - 4 bytes wide (1 long register), 10 rows */
-    /* Clears from row 10, col 5 bytes, height 10 rows, width 4 bytes */
-    clear_region(base, 10, 5, 10, 4);
+int main()
+{
+    UINT8 *base = (UINT8 *)Physbase();
+
+    disable_cursor();
+
+    /* Test 1: Clear Screen */
+    printf("Test 1: Fill screen then clear it\n");
+    fill_screen((UINT32 *)base, -1); /* fill with white */
     Cnecin();
-    
-    /* Refill screen */
-    fill_screen(base, -1);
-    
-    /* Test 2: Medium region - 20 bytes wide (5 long registers), 15 rows */
-    /* Clears from row 50, col 10 bytes, height 15 rows, width 20 bytes */
-    clear_region(base, 50, 10, 15, 20);
+    test_clear_screen(base);
     Cnecin();
-    
-    /* Refill screen */
-    fill_screen(base, -1);
-    
-    /* Test 3: Larger region - 52 bytes wide (13 long registers), 20 rows */
-    /* Clears from row 100, col 0 bytes, height 20 rows, width 52 bytes */
-    clear_region(base, 100, 0, 20, 52);
+
+    /* Test 2: Clear Region - various sizes and positions */
+    printf("\nTest 2: Clear region tests\n");
+    test_clear_region(base);
     Cnecin();
-    
-    /* Refill screen */
-    fill_screen(base, -1);
-    
-    /* Test 4: Very large region - 100 bytes wide (requires multiple movem), 30 rows */
-    /* Clears from row 200, col 0 bytes, height 30 rows, width 100 bytes */
-    clear_region(base, 200, 0, 30, 100);
+
+    /* Test 3: Plot Pixel - draw patterns */
+    printf("\nTest 3: Plot pixel tests\n");
+    test_plot_pixel(base);
     Cnecin();
-    
-    /* Refill screen */
-    fill_screen(base, -1);
-    
-    /* Test 5: Region with odd width - 13 bytes (3 longs + 1 byte), 5 rows */
-    /* Tests partial byte handling */
-    clear_region(base, 300, 10, 5, 13);
-    Cnecin();
-    
-    /* Refill screen */
-    fill_screen(base, -1);
-    
-    /* Test 6: Region with word alignment - 18 bytes (4 longs + 1 word), 8 rows */
-    /* Tests word remainder handling */
-    clear_region(base, 350, 20, 8, 18);
-    Cnecin();
-    
-    /* Refill screen */
-    fill_screen(base, -1);
-    
-    /* Test 7: Tiny region - 3 bytes (no full longs), 5 rows */
-    /* Tests no_movem_needed path */
-    clear_region(base, 380, 30, 5, 3);
-    Cnecin();
-    
-    /* Clear screen at the end */
-    fill_screen(base, 0);
-    
+
+    printf("\nAll tests complete!\n");
     return 0;
+}
+
+void test_clear_screen(UINT8 *base)
+{
+    printf("Clearing entire screen...\n");
+    clear_screen((UINT32 *)base);
+    printf("Screen cleared.\n");
+}
+
+void test_clear_region(UINT8 *base)
+{
+    int i;
+
+    /* Fill screen with white first */
+    fill_screen((UINT32 *)base, -1);
+
+    /* Test 1: 48x48 optimized path - word aligned */
+    printf("  - 48x48 region at (0,0) - optimized path\n");
+    clear_region((UINT32 *)base, 0, 0, 48, 48);
+
+    /* Test 2: 48x48 optimized path - different position */
+    printf("  - 48x48 region at (50,80) - optimized path\n");
+    clear_region((UINT32 *)base, 50, 80, 48, 48);
+
+    /* Test 3: Small region - unoptimized path */
+    printf("  - 10x10 region at (10,5) - unoptimized path\n");
+    clear_region((UINT32 *)base, 10, 5, 10, 10);
+
+    /* Test 4: Wide region - unoptimized path */
+    printf("  - 20x100 region at (100,50) - unoptimized path\n");
+    clear_region((UINT32 *)base, 100, 50, 20, 100);
+
+    /* Test 5: Tall narrow region */
+    printf("  - 50x8 region at (150,200) - unoptimized path\n");
+    clear_region((UINT32 *)base, 150, 200, 50, 8);
+
+    /* Test 6: Odd column alignment to test byte spanning */
+    printf("  - 15x4 region at (200,5) - tests byte spanning\n");
+    clear_region((UINT32 *)base, 200, 5, 15, 4);
+
+    printf("All clear_region tests complete.\n");
+}
+
+void test_plot_pixel(UINT8 *base)
+{
+    int i;
+
+    /* Clear screen first */
+    clear_screen((UINT32 *)base);
+
+    /* Test 1: Draw a horizontal line using plot_pixel */
+    printf("  - Drawing horizontal line at row 10\n");
+    for (i = 0; i < 100; i++)
+    {
+        plot_pixel(base, 10, i);
+    }
+
+    /* Test 2: Draw a vertical line */
+    printf("  - Drawing vertical line at col 50\n");
+    for (i = 20; i < 120; i++)
+    {
+        plot_pixel(base, i, 50);
+    }
+
+    /* Test 3: Draw a diagonal line */
+    printf("  - Drawing diagonal line\n");
+    for (i = 0; i < 50; i++)
+    {
+        plot_pixel(base, 30 + i, 100 + i);
+    }
+
+    /* Test 4: Draw a box outline using plot_pixel */
+    printf("  - Drawing box outline (200,200) to (250,280)\n");
+    for (i = 200; i <= 280; i++)
+    {
+        plot_pixel(base, 200, i); /* top */
+        plot_pixel(base, 250, i); /* bottom */
+    }
+    for (i = 200; i <= 250; i++)
+    {
+        plot_pixel(base, i, 200); /* left */
+        plot_pixel(base, i, 280); /* right */
+    }
+
+    /* Test 5: Test pixels at various byte boundaries */
+    printf("  - Testing pixels at byte boundaries\n");
+    for (i = 0; i < 64; i += 8)
+    {
+        plot_pixel(base, 300, i);     /* bit 7 (MSB) */
+        plot_pixel(base, 301, i + 4); /* bit 3 (middle) */
+        plot_pixel(base, 302, i + 7); /* bit 0 (LSB) */
+    }
+
+    printf("All plot_pixel tests complete.\n");
 }
 
 void disable_cursor()
@@ -85,7 +141,7 @@ void fill_screen(UINT32 *base, char pattern)
 {
     register int i = 0;
     register UINT32 *loc = base;
-    
+
     while (i++ < BYTES_PER_SCREEN / 4)
         *(loc++) = pattern;
 }
