@@ -1,5 +1,5 @@
-prog.tos: block.o spike.o lava.o main.o
-	cc68x -g block.o spike.o main.o lava.o -o prog.tos
+prog.tos: block.o spike.o lava.o geo.o main.o
+	cc68x -g block.o spike.o lava.o geo.o main.o -o prog.tos
 
 block.o: block.c block.h
 	cc68x -g -c block.c
@@ -10,5 +10,8 @@ lava.o: lava.c lava.h
 spike.o: spike.c spike.h
 	cc68x -g -c spike.c
 
-main.o: main.c block.h spike.h
+geo.o: geo.c geo.h
+	cc68x -g -c geo.c
+
+main.o: main.c block.h spike.h lava.h geo.h
 	cc68x -g -c main.c
