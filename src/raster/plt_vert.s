@@ -1,4 +1,12 @@
 ;
+; PURPOSE: Plot a hoizontal line on the screen. The vertical line is specified by the topmost pixel of the line and the length of the line.
+;
+; INPUT: Address(UINT32*): to the start of the screen
+;        Position(row,col): the coordinates of the topmost pixel of the vertical line
+;        Length: the lenth in pixels of the line
+;
+; OUTPUT: None
+;
 ; void plot_vertical_line(UINT32 *base, UINT16 row, UINT16 col, UINT16 length);
 ;________________________________________________________________
 ; Draw a vertical line of pixels

@@ -1,4 +1,11 @@
 ;
+; PURPOSE: Plots a single pixel on the screen.
+;
+; INPUT: Address(UINT32*): to the start of the screen
+;        Position(row,col): the location of the pixel to plot
+;
+; OUTPUT: None
+;
 ; void plot_pixel(UINT8 *base, UINT16 row, UINT16 col);
 ;________________________________________________________________
 ; Draw a single pixel (useless function- NEVER use this)

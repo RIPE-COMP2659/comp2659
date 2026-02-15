@@ -1,4 +1,12 @@
 ;
+; PURPOSE: Plot a hoizontal line on the screen. The horizontal line is specified by the leftmost pixel of the line and the length of the line.
+;
+; INPUT: Address(UINT8*): to the start of the screen
+;        Position(row,col): the coordinates of the leftmost pixel of the horizontal line
+;        Length: the lenth in pixels of the line
+;
+; OUTPUT: None
+;
 ; void plot_horizontal_line(UINT32 *base, UINT16 row, UINT16 col, UINT16 length);
 ;________________________________________________________________
 ; Draw a horizontal line of pixels

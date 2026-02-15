@@ -11,6 +11,7 @@ void test_clear_region(UINT8 *base);
 void test_plot_pixel(UINT8 *base);
 void test_plot_horizontal_line(UINT8 *base);
 void test_plot_vertical_line(UINT8 *base);
+void test_plot_line(UINT8 *base);
 
 int main()
 {
@@ -38,6 +39,10 @@ int main()
 
     /* Test 5: Plot Vertical Line */
     test_plot_vertical_line(base);
+    Cnecin();
+
+    /* Test 6: Plot Line - arbitrary lines */
+    test_plot_line(base);
     Cnecin();
 
     return 0;
@@ -218,6 +223,59 @@ void test_plot_vertical_line(UINT8 *base)
     plot_vertical_line((UINT32 *)base, 150, 230, 60);
     plot_vertical_line((UINT32 *)base, 150, 260, 60);
     plot_vertical_line((UINT32 *)base, 150, 290, 60);
+}
+
+void test_plot_line(UINT8 *base)
+{
+    /* Clear screen first */
+    clear_screen((UINT32 *)base);
+
+    /* Test 1: Horizontal line (should work like plot_horizontal_line) */
+    plot_line((UINT32 *)base, 10, 10, 10, 100);
+
+    /* Test 2: Vertical line (should work like plot_vertical_line) */
+    plot_line((UINT32 *)base, 20, 20, 80, 20);
+
+    /* Test 3: Diagonal line - 45 degrees down-right */
+    plot_line((UINT32 *)base, 10, 120, 60, 170);
+
+    /* Test 4: Diagonal line - 45 degrees up-right */
+    plot_line((UINT32 *)base, 60, 180, 10, 230);
+
+    /* Test 5: Steep line - more vertical than horizontal */
+    plot_line((UINT32 *)base, 100, 50, 180, 70);
+
+    /* Test 6: Shallow line - more horizontal than vertical */
+    plot_line((UINT32 *)base, 100, 100, 120, 200);
+
+    /* Test 7: Line going left (negative x direction) */
+    plot_line((UINT32 *)base, 150, 250, 150, 150);
+
+    /* Test 8: Line going up (negative y direction) */
+    plot_line((UINT32 *)base, 200, 50, 150, 50);
+
+    /* Test 9: Diagonal line - down-left */
+    plot_line((UINT32 *)base, 150, 300, 200, 250);
+
+    /* Test 10: Diagonal line - up-left */
+    plot_line((UINT32 *)base, 200, 350, 150, 300);
+
+    /* Test 11: Draw a triangle */
+    plot_line((UINT32 *)base, 250, 400, 300, 350);
+    plot_line((UINT32 *)base, 300, 350, 300, 450);
+    plot_line((UINT32 *)base, 300, 450, 250, 400);
+
+    /* Test 12: Draw a star pattern */
+    plot_line((UINT32 *)base, 320, 500, 360, 500); /* vertical center */
+    plot_line((UINT32 *)base, 340, 480, 340, 520); /* horizontal center */
+    plot_line((UINT32 *)base, 325, 485, 355, 515); /* diagonal \ */
+    plot_line((UINT32 *)base, 325, 515, 355, 485); /* diagonal / */
+
+    /* Test 13: Single pixel line (start == end) */
+    plot_line((UINT32 *)base, 380, 100, 380, 100);
+
+    /* Test 14: Very long diagonal line */
+    plot_line((UINT32 *)base, 10, 550, 380, 630);
 }
 
 void disable_cursor()

@@ -1,4 +1,12 @@
 ;
+; PURPOSE: Clears the entire screen.
+;
+; INPUT: Address(UINT32*): to the start of the screen
+;
+; OUTPUT: None
+;
+; void clear_screen(UINT32 *base);
+;________________________________________________________________
 ;  CREDIT: Comp 2659 LAB assembly code.
 ;
 ;     **This solution is higly optimized, do not touch.**
