@@ -33,40 +33,42 @@ _plot_bitmap_8: movem.l         d0-d7/a0-a6,-(sp)
                 mulu.w          #80,d0          ; screen width in bytes
                 adda.l          d0,a0           ; add row offset
                 
-                ; Calculate and add col offset: col / 8 (pixels to bytes)
-                move.w          col(sp),d0
-                lsr.w           #3,d0           ; divide by 8 (shift right 3 bits)
-                ext.l           d0              ; extend to long
-                adda.l          d0,a0           ; add col offset in bytes
+                ; Calculate col byte offset and bit shift
+                move.w          col(sp),d6      ; d6 = col (pixel column)
+                move.w          d6,d5           ; copy for bit calculation
+                lsr.w           #3,d6           ; d6 = col / 8 (byte offset)
+                ext.l           d6
+                adda.l          d6,a0           ; add col offset in bytes
                 
-                ; For word optimization, only need bitmap to be word-aligned
-                ; (Screen address doesn't matter - we're writing bytes)
-                move.l          a1,d1
-                btst            #0,d1           ; test if bitmap address is odd
-                bne             byte_copy       ; if odd, use byte copy
+                andi.w          #7,d5           ; d5 = col % 8 (bit shift amount)
+                beq             aligned_copy    ; if 0, no shifting needed
                 
-                ; Check if we have even number of rows for word optimization
-                move.w          height(sp),d7
-                btst            #0,d7           ; test if height is odd
-                bne             byte_copy       ; if odd, use byte copy
-                
-                ; Optimized word copy (2 rows at a time)
-                lsr.w           #1,d7           ; divide height by 2
+                ; Unaligned copy - need to shift bits
+                move.w          height(sp),d7   ; get height
                 subq.w          #1,d7           ; adjust for dbra
                 
-word_loop:      move.w          (a1)+,d0        ; get 2 bytes: d0 = [row0][row1]
-                move.w          d0,d1           ; copy to d1
-                lsr.w           #8,d1           ; shift right 8: d1 = [00][row0]
-                move.b          d1,(a0)         ; write row0 byte to current row
-                move.b          d0,80(a0)       ; write row1 byte (low byte) to next row
-                adda.w          #160,a0         ; move to row+2 (2 rows * 80 bytes)
-                dbra            d7,word_loop
+shift_loop:     moveq           #0,d0           ; clear d0
+                move.b          (a1)+,d0        ; get bitmap byte into low byte
+                lsl.w           #8,d0           ; shift to high byte: 0x00BB -> 0xBB00
+                lsr.w           d5,d0           ; shift right by bit offset
+                
+                ; d0 now has: high byte = bits for current screen byte
+                ;             low byte = bits for next screen byte
+                
+                ; Write to current byte (OR, don't replace)
+                move.b          d0,d1           ; get low byte (for next screen byte)
+                lsr.w           #8,d0           ; get high byte into low position
+                or.b            d0,(a0)         ; OR into current screen byte
+                or.b            d1,1(a0)        ; OR into next screen byte
+                
+                adda.w          #80,a0          ; move to next row
+                dbra            d7,shift_loop
                 
                 movem.l         (sp)+,d0-d7/a0-a6
                 rts
 
-byte_copy:      
-                ; Standard byte-by-byte copy
+aligned_copy:
+                ; Byte-aligned - can use optimized copy
                 move.w          height(sp),d7   ; get height (number of rows)
                 subq.w          #1,d7           ; adjust for dbra
                 
