@@ -1,9 +1,9 @@
 ;
 ; void plot_pixel(UINT8 *base, UINT16 row, UINT16 col);
-;
+;________________________________________________________________
 ; Draw a single pixel (useless function- NEVER use this)
 ;
-;
+; Contact @sudonym-i if you will need to use this routine. Explain yourself!
 
                 xdef            _plot_pixel
 

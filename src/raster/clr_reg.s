@@ -1,10 +1,14 @@
 ;
 ; void clear_region(UINT32 *base, UINT16 row, UINT16 col, UINT16 length, UINT16 width);
-;
+;________________________________________________________________
 ; Clear a rectangular regin of the screen.
-; The length of this routine is due to an optimization which aims to
-; break down the requested width into chunks that can be cleared with a single movem instruction.
 ;
+;                     -- Optimized for 48 bit widths ONLY (6 bytes wide). --
+;                 -- This should be the size of all sprites to begin with. --
+;
+; Contact @sudonym-i if you will need to use this routine in any other ways
+
+
 
                 xdef            _clear_region
 

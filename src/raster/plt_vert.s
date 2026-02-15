@@ -1,9 +1,13 @@
 ;
 ; void plot_vertical_line(UINT32 *base, UINT16 row, UINT16 col, UINT16 length);
-;
+;________________________________________________________________
 ; Draw a vertical line of pixels
 ;
 ;
+;                      -- This routine is unoptimized, as we shouldn't be using it ---
+;                                       DO NOT USE THIS METHOD
+;
+; Contact @sudonym-i if you will need to use this routine.
 
                 xdef            _plot_vertical_line
 
