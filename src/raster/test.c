@@ -9,6 +9,7 @@ void fill_screen(UINT32 *base, char pattern);
 void test_clear_screen(UINT8 *base);
 void test_clear_region(UINT8 *base);
 void test_plot_pixel(UINT8 *base);
+void test_plot_horizontal_line(UINT8 *base);
 
 int main()
 {
@@ -31,6 +32,11 @@ int main()
     /* Test 3: Plot Pixel - draw patterns */
     printf("\nTest 3: Plot pixel tests\n");
     test_plot_pixel(base);
+    Cnecin();
+
+    /* Test 4: Plot Horizontal Line */
+    printf("\nTest 4: Plot horizontal line tests\n");
+    test_plot_horizontal_line(base);
     Cnecin();
 
     printf("\nAll tests complete!\n");
@@ -129,6 +135,65 @@ void test_plot_pixel(UINT8 *base)
     }
 
     printf("All plot_pixel tests complete.\n");
+}
+
+void test_plot_horizontal_line(UINT8 *base)
+{
+    /* Clear screen first */
+    clear_screen((UINT32 *)base);
+
+    /* Test 1: Simple horizontal line */
+    printf("  - Drawing horizontal line at (10,10) length 50\n");
+    plot_horizontal_line((UINT32 *)base, 10, 10, 50);
+
+    /* Test 2: Line starting at byte boundary */
+    printf("  - Line at (20,0) length 100 - starts at byte boundary\n");
+    plot_horizontal_line((UINT32 *)base, 20, 0, 100);
+
+    /* Test 3: Line starting at various bit positions */
+    printf("  - Lines at different bit positions (30-37, col 1-7)\n");
+    plot_horizontal_line((UINT32 *)base, 30, 1, 40);
+    plot_horizontal_line((UINT32 *)base, 31, 2, 40);
+    plot_horizontal_line((UINT32 *)base, 32, 3, 40);
+    plot_horizontal_line((UINT32 *)base, 33, 4, 40);
+    plot_horizontal_line((UINT32 *)base, 34, 5, 40);
+    plot_horizontal_line((UINT32 *)base, 35, 6, 40);
+    plot_horizontal_line((UINT32 *)base, 36, 7, 40);
+
+    /* Test 4: Long line spanning many bytes */
+    printf("  - Long line at (50,5) length 300\n");
+    plot_horizontal_line((UINT32 *)base, 50, 5, 300);
+
+    /* Test 5: Short lines of various lengths */
+    printf("  - Short lines (1-10 pixels)\n");
+    plot_horizontal_line((UINT32 *)base, 70, 10, 1);
+    plot_horizontal_line((UINT32 *)base, 72, 10, 3);
+    plot_horizontal_line((UINT32 *)base, 74, 10, 5);
+    plot_horizontal_line((UINT32 *)base, 76, 10, 8);
+    plot_horizontal_line((UINT32 *)base, 78, 10, 10);
+
+    /* Test 6: Lines that cross multiple byte boundaries */
+    printf("  - Lines crossing byte boundaries\n");
+    plot_horizontal_line((UINT32 *)base, 100, 7, 16);  /* crosses 2-3 bytes */
+    plot_horizontal_line((UINT32 *)base, 102, 15, 16); /* crosses 2-3 bytes */
+
+    /* Test 7: Full width line */
+    printf("  - Full width line at (120,0) length 640\n");
+    plot_horizontal_line((UINT32 *)base, 120, 0, 640);
+
+    /* Test 8: Zero length line (should do nothing) */
+    printf("  - Zero length line at (130,100) - should do nothing\n");
+    plot_horizontal_line((UINT32 *)base, 130, 100, 0);
+
+    /* Test 9: Create a ladder pattern */
+    printf("  - Ladder pattern\n");
+    plot_horizontal_line((UINT32 *)base, 150, 50, 100);
+    plot_horizontal_line((UINT32 *)base, 155, 60, 100);
+    plot_horizontal_line((UINT32 *)base, 160, 70, 100);
+    plot_horizontal_line((UINT32 *)base, 165, 80, 100);
+    plot_horizontal_line((UINT32 *)base, 170, 90, 100);
+
+    printf("All plot_horizontal_line tests complete.\n");
 }
 
 void disable_cursor()

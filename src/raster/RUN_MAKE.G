@@ -12,3 +12,11 @@ echo 'Complete, running make...'
 make
 
 echo 'Build finished! Run rtest.tos to start the test.'
+
+echo 'Cleaning object files...'
+CLEAN.G
+
+echo 'Cleaning object files...'
+foreach i { *.o }
+    Rm $i
+endfor

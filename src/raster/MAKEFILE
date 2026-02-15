@@ -1,5 +1,5 @@
-rtest.tos: test.o clr_scrn.o clr_reg.o plt-pxl.o
-	cc68x -g test.o clr_scrn.o clr_reg.o plt-pxl.o -o rtest.tos
+rtest.tos: test.o clr_scrn.o clr_reg.o plt_pxl.o plt_hor.o
+	cc68x -g test.o clr_scrn.o clr_reg.o plt_pxl.o plt_hor.o -o rtest.tos
 
 test.o: test.c raster.h
 	cc68x -g -c test.c
@@ -10,5 +10,8 @@ clr_scrn.o: clr_scrn.s
 clr_reg.o: clr_reg.s
 	cc68x -g -c clr_reg.s
 
-plt-pxl.o: plt-pxl.s
-	cc68x -g -c plt-pxl.s
+plt_pxl.o: plt_pxl.s
+	cc68x -g -c plt_pxl.s
+
+plt_hor.o: plt_hor.s
+	cc68x -g -c plt_hor.s
