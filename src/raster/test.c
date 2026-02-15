@@ -12,6 +12,9 @@ void test_plot_pixel(UINT8 *base);
 void test_plot_horizontal_line(UINT8 *base);
 void test_plot_vertical_line(UINT8 *base);
 void test_plot_line(UINT8 *base);
+void test_plot_rectangle(UINT8 *base);
+void test_plot_square(UINT8 *base);
+void test_plot_triangle(UINT8 *base);
 
 int main()
 {
@@ -43,6 +46,18 @@ int main()
 
     /* Test 6: Plot Line - arbitrary lines */
     test_plot_line(base);
+    Cnecin();
+
+    /* Test 7: Plot Rectangle - filled rectangles */
+    test_plot_rectangle(base);
+    Cnecin();
+
+    /* Test 8: Plot Square - filled squares */
+    test_plot_square(base);
+    Cnecin();
+
+    /* Test 9: Plot Triangle - filled triangles */
+    test_plot_triangle(base);
     Cnecin();
 
     return 0;
@@ -276,6 +291,117 @@ void test_plot_line(UINT8 *base)
 
     /* Test 14: Very long diagonal line */
     plot_line((UINT32 *)base, 10, 550, 380, 630);
+}
+
+void test_plot_rectangle(UINT8 *base)
+{
+    /* Clear screen first */
+    clear_screen((UINT32 *)base);
+
+    /* Test 1: 48x48 optimized path - word aligned */
+    plot_rectangle((UINT32 *)base, 0, 0, 48, 48);
+
+    /* Test 2: 48x48 optimized path - different position */
+    plot_rectangle((UINT32 *)base, 50, 80, 48, 48);
+
+    /* Test 3: Small rectangle - unoptimized path */
+    plot_rectangle((UINT32 *)base, 10, 5, 10, 10);
+
+    /* Test 4: Wide rectangle - unoptimized path */
+    plot_rectangle((UINT32 *)base, 100, 50, 20, 100);
+
+    /* Test 5: Tall narrow rectangle */
+    plot_rectangle((UINT32 *)base, 150, 200, 50, 8);
+
+    /* Test 6: Odd column alignment to test byte spanning */
+    plot_rectangle((UINT32 *)base, 200, 5, 15, 4);
+
+    /* Test 7: Single pixel rectangle */
+    plot_rectangle((UINT32 *)base, 250, 10, 1, 1);
+
+    /* Test 8: Various sized rectangles */
+    plot_rectangle((UINT32 *)base, 10, 300, 30, 20);
+    plot_rectangle((UINT32 *)base, 50, 350, 25, 35);
+    plot_rectangle((UINT32 *)base, 100, 400, 40, 15);
+
+    /* Test 9: Large rectangle */
+    plot_rectangle((UINT32 *)base, 200, 300, 100, 150);
+}
+
+void test_plot_square(UINT8 *base)
+{
+    /* Clear screen first */
+    clear_screen((UINT32 *)base);
+
+    /* Test 1: 48x48 optimized path - word aligned */
+    plot_square((UINT32 *)base, 0, 0, 48);
+
+    /* Test 2: 48x48 optimized path - different position */
+    plot_square((UINT32 *)base, 50, 80, 48);
+
+    /* Test 3: Small square - unoptimized path */
+    plot_square((UINT32 *)base, 10, 5, 10);
+
+    /* Test 4: Medium square */
+    plot_square((UINT32 *)base, 100, 50, 25);
+
+    /* Test 5: Tall/narrow square */
+    plot_square((UINT32 *)base, 150, 200, 8);
+
+    /* Test 6: Odd column alignment */
+    plot_square((UINT32 *)base, 200, 5, 15);
+
+    /* Test 7: Single pixel square */
+    plot_square((UINT32 *)base, 250, 10, 1);
+
+    /* Test 8: Various sized squares */
+    plot_square((UINT32 *)base, 10, 300, 20);
+    plot_square((UINT32 *)base, 50, 350, 30);
+    plot_square((UINT32 *)base, 100, 400, 40);
+
+    /* Test 9: Large square */
+    plot_square((UINT32 *)base, 200, 300, 100);
+}
+
+void test_plot_triangle(UINT8 *base)
+{
+    /* Clear screen first */
+    clear_screen((UINT32 *)base);
+
+    /* Test 1: Direction 0 - top-left 90° angle */
+    plot_triangle((UINT32 *)base, 10, 10, 50, 50, 0);
+
+    /* Test 2: Direction 1 - top-right 90° angle */
+    plot_triangle((UINT32 *)base, 10, 150, 50, 50, 1);
+
+    /* Test 3: Direction 2 - bottom-left 90° angle */
+    plot_triangle((UINT32 *)base, 100, 10, 50, 50, 2);
+
+    /* Test 4: Direction 3 - bottom-right 90° angle */
+    plot_triangle((UINT32 *)base, 100, 150, 50, 50, 3);
+
+    /* Test 5: Various sizes - direction 0 */
+    plot_triangle((UINT32 *)base, 150, 10, 30, 40, 0);
+    plot_triangle((UINT32 *)base, 150, 60, 20, 30, 0);
+    plot_triangle((UINT32 *)base, 150, 100, 40, 20, 0);
+
+    /* Test 6: Various sizes - direction 1 */
+    plot_triangle((UINT32 *)base, 200, 100, 30, 40, 1);
+    plot_triangle((UINT32 *)base, 200, 150, 20, 30, 1);
+
+    /* Test 7: Various sizes - direction 2 */
+    plot_triangle((UINT32 *)base, 300, 10, 30, 40, 2);
+    plot_triangle((UINT32 *)base, 300, 60, 20, 30, 2);
+
+    /* Test 8: Various sizes - direction 3 */
+    plot_triangle((UINT32 *)base, 350, 100, 30, 40, 3);
+    plot_triangle((UINT32 *)base, 350, 150, 20, 30, 3);
+
+    /* Test 9: Large triangles in all directions */
+    plot_triangle((UINT32 *)base, 10, 300, 80, 100, 0);
+    plot_triangle((UINT32 *)base, 10, 500, 80, 100, 1);
+    plot_triangle((UINT32 *)base, 200, 300, 80, 100, 2);
+    plot_triangle((UINT32 *)base, 200, 500, 80, 100, 3);
 }
 
 void disable_cursor()
