@@ -15,6 +15,11 @@ void test_plot_line(UINT8 *base);
 void test_plot_rectangle(UINT8 *base);
 void test_plot_square(UINT8 *base);
 void test_plot_triangle(UINT8 *base);
+void test_plot_bitmap_8(UINT8 *base);
+void test_plot_bitmap_16(UINT8 *base);
+void test_plot_bitmap_32(UINT8 *base);
+void test_plot_character(UINT8 *base);
+void test_plot_string(UINT8 *base);
 
 int main()
 {
@@ -58,6 +63,26 @@ int main()
 
     /* Test 9: Plot Triangle - filled triangles */
     test_plot_triangle(base);
+    Cnecin();
+
+    /* Test 10: Plot Bitmap 8 - 8-pixel wide bitmaps */
+    test_plot_bitmap_8(base);
+    Cnecin();
+
+    /* Test 11: Plot Bitmap 16 - 16-pixel wide bitmaps */
+    test_plot_bitmap_16(base);
+    Cnecin();
+
+    /* Test 12: Plot Bitmap 32 - 32-pixel wide bitmaps */
+    test_plot_bitmap_32(base);
+    Cnecin();
+
+    /* Test 13: Plot Character - individual characters */
+    test_plot_character(base);
+    Cnecin();
+
+    /* Test 14: Plot String - text strings */
+    test_plot_string(base);
     Cnecin();
 
     return 0;
@@ -408,6 +433,484 @@ void disable_cursor()
 {
     printf("\033f");
     fflush(stdout);
+}
+
+void test_plot_bitmap_8(UINT8 *base)
+{
+    /* Test bitmaps - 8 pixels wide, 1 byte per row */
+
+    /* Small checkerboard pattern (8x8) */
+    const UINT8 checkerboard[] = {
+        0xAA, /* 10101010 */
+        0x55, /* 01010101 */
+        0xAA, /* 10101010 */
+        0x55, /* 01010101 */
+        0xAA, /* 10101010 */
+        0x55, /* 01010101 */
+        0xAA, /* 10101010 */
+        0x55  /* 01010101 */
+    };
+
+    /* Solid block (8x8) */
+    const UINT8 solid_block[] = {
+        0xFF, 0xFF, 0xFF, 0xFF,
+        0xFF, 0xFF, 0xFF, 0xFF};
+
+    /* Arrow pointing down (8x16) */
+    const UINT8 arrow_down[] = {
+        0x18, /* 00011000 */
+        0x18, /* 00011000 */
+        0x18, /* 00011000 */
+        0x18, /* 00011000 */
+        0x18, /* 00011000 */
+        0x18, /* 00011000 */
+        0xFF, /* 11111111 */
+        0x7E, /* 01111110 */
+        0x3C, /* 00111100 */
+        0x18, /* 00011000 */
+        0x00, /* 00000000 */
+        0x00, /* 00000000 */
+        0x00, /* 00000000 */
+        0x00, /* 00000000 */
+        0x00, /* 00000000 */
+        0x00  /* 00000000 */
+    };
+
+    /* Smiley face (8x8) */
+    const UINT8 smiley[] = {
+        0x3C, /* 00111100 */
+        0x42, /* 01000010 */
+        0xA5, /* 10100101 */
+        0x81, /* 10000001 */
+        0xA5, /* 10100101 */
+        0x99, /* 10011001 */
+        0x42, /* 01000010 */
+        0x3C  /* 00111100 */
+    };
+
+    /* Cross/Plus pattern (8x8) */
+    const UINT8 cross[] = {
+        0x18, /* 00011000 */
+        0x18, /* 00011000 */
+        0x18, /* 00011000 */
+        0xFF, /* 11111111 */
+        0xFF, /* 11111111 */
+        0x18, /* 00011000 */
+        0x18, /* 00011000 */
+        0x18  /* 00011000 */
+    };
+
+    /* Diagonal pattern (8x8) */
+    const UINT8 diagonal[] = {
+        0x80, /* 10000000 */
+        0x40, /* 01000000 */
+        0x20, /* 00100000 */
+        0x10, /* 00010000 */
+        0x08, /* 00001000 */
+        0x04, /* 00000100 */
+        0x02, /* 00000010 */
+        0x01  /* 00000001 */
+    };
+
+    /* Clear screen first */
+    clear_screen((UINT32 *)base);
+
+    /* Test 1: Word-aligned, even height (optimized path) */
+    plot_bitmap_8(base, 10, 0, checkerboard, 8);
+
+    /* Test 2: Word-aligned, even height at different position */
+    plot_bitmap_8(base, 10, 16, solid_block, 8);
+
+    /* Test 3: Odd column position (byte copy path) */
+    plot_bitmap_8(base, 10, 25, smiley, 8);
+
+    /* Test 4: Various positions across the screen */
+    plot_bitmap_8(base, 30, 0, cross, 8);
+    plot_bitmap_8(base, 30, 10, diagonal, 8);
+    plot_bitmap_8(base, 30, 20, checkerboard, 8);
+    plot_bitmap_8(base, 30, 30, smiley, 8);
+
+    /* Test 5: Larger bitmap (even height, optimized) */
+    plot_bitmap_8(base, 50, 8, arrow_down, 16);
+
+    /* Test 6: Multiple bitmaps in a row */
+    plot_bitmap_8(base, 80, 0, solid_block, 8);
+    plot_bitmap_8(base, 80, 8, checkerboard, 8);
+    plot_bitmap_8(base, 80, 16, cross, 8);
+    plot_bitmap_8(base, 80, 24, diagonal, 8);
+    plot_bitmap_8(base, 80, 32, smiley, 8);
+    plot_bitmap_8(base, 80, 40, solid_block, 8);
+
+    /* Test 7: Multiple bitmaps in a grid */
+    plot_bitmap_8(base, 100, 0, checkerboard, 8);
+    plot_bitmap_8(base, 100, 10, smiley, 8);
+    plot_bitmap_8(base, 100, 20, cross, 8);
+    plot_bitmap_8(base, 110, 0, diagonal, 8);
+    plot_bitmap_8(base, 110, 10, solid_block, 8);
+    plot_bitmap_8(base, 110, 20, checkerboard, 8);
+    plot_bitmap_8(base, 120, 0, cross, 8);
+    plot_bitmap_8(base, 120, 10, diagonal, 8);
+    plot_bitmap_8(base, 120, 20, smiley, 8);
+
+    /* Test 8: Odd height bitmap (forces byte copy path) */
+    plot_bitmap_8(base, 140, 0, arrow_down, 15);
+
+    /* Test 9: Various positions testing alignment */
+    plot_bitmap_8(base, 170, 1, smiley, 8);  /* odd col */
+    plot_bitmap_8(base, 170, 11, smiley, 8); /* odd col */
+    plot_bitmap_8(base, 170, 21, smiley, 8); /* odd col */
+    plot_bitmap_8(base, 170, 31, smiley, 8); /* odd col */
+}
+
+void test_plot_bitmap_16(UINT8 *base)
+{
+    /* Test bitmaps - 16 pixels wide, 2 bytes per row */
+
+    /* Checkerboard pattern (16x8) */
+    const UINT16 checkerboard_16[] = {
+        0xAAAA, /* 1010101010101010 */
+        0x5555, /* 0101010101010101 */
+        0xAAAA, /* 1010101010101010 */
+        0x5555, /* 0101010101010101 */
+        0xAAAA, /* 1010101010101010 */
+        0x5555, /* 0101010101010101 */
+        0xAAAA, /* 1010101010101010 */
+        0x5555  /* 0101010101010101 */
+    };
+
+    /* Solid block (16x8) */
+    const UINT16 solid_block_16[] = {
+        0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,
+        0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF};
+
+    /* Large smiley (16x16) */
+    const UINT16 smiley_16[] = {
+        0x0FF0, /* 0000111111110000 */
+        0x3FFC, /* 0011111111111100 */
+        0x7FFE, /* 0111111111111110 */
+        0x7E7E, /* 0111111001111110 */
+        0xF3CF, /* 1111001111001111 */
+        0xF3CF, /* 1111001111001111 */
+        0xFFFF, /* 1111111111111111 */
+        0xFFFF, /* 1111111111111111 */
+        0xFFFF, /* 1111111111111111 */
+        0xF3CF, /* 1111001111001111 */
+        0xF3CF, /* 1111001111001111 */
+        0x7FFE, /* 0111111111111110 */
+        0x7FFE, /* 0111111111111110 */
+        0x3FFC, /* 0011111111111100 */
+        0x0FF0, /* 0000111111110000 */
+        0x0000  /* 0000000000000000 */
+    };
+
+    /* Border frame (16x16) */
+    const UINT16 frame_16[] = {
+        0xFFFF, /* 1111111111111111 */
+        0xFFFF, /* 1111111111111111 */
+        0xC003, /* 1100000000000011 */
+        0xC003, /* 1100000000000011 */
+        0xC003, /* 1100000000000011 */
+        0xC003, /* 1100000000000011 */
+        0xC003, /* 1100000000000011 */
+        0xC003, /* 1100000000000011 */
+        0xC003, /* 1100000000000011 */
+        0xC003, /* 1100000000000011 */
+        0xC003, /* 1100000000000011 */
+        0xC003, /* 1100000000000011 */
+        0xC003, /* 1100000000000011 */
+        0xC003, /* 1100000000000011 */
+        0xFFFF, /* 1111111111111111 */
+        0xFFFF  /* 1111111111111111 */
+    };
+
+    /* Diamond pattern (16x16) */
+    const UINT16 diamond_16[] = {
+        0x0180, /* 0000000110000000 */
+        0x03C0, /* 0000001111000000 */
+        0x07E0, /* 0000011111100000 */
+        0x0FF0, /* 0000111111110000 */
+        0x1FF8, /* 0001111111111000 */
+        0x3FFC, /* 0011111111111100 */
+        0x7FFE, /* 0111111111111110 */
+        0xFFFF, /* 1111111111111111 */
+        0xFFFF, /* 1111111111111111 */
+        0x7FFE, /* 0111111111111110 */
+        0x3FFC, /* 0011111111111100 */
+        0x1FF8, /* 0001111111111000 */
+        0x0FF0, /* 0000111111110000 */
+        0x07E0, /* 0000011111100000 */
+        0x03C0, /* 0000001111000000 */
+        0x0180  /* 0000000110000000 */
+    };
+
+    /* Clear screen first */
+    clear_screen((UINT32 *)base);
+
+    /* Test 1: Long-aligned, even height (optimized path) */
+    plot_bitmap_16(base, 10, 0, checkerboard_16, 8);
+
+    /* Test 2: Long-aligned, even height at different position */
+    plot_bitmap_16(base, 10, 32, solid_block_16, 8);
+
+    /* Test 3: Word-aligned but not long-aligned */
+    plot_bitmap_16(base, 10, 48, smiley_16, 16);
+
+    /* Test 4: Various positions across the screen */
+    plot_bitmap_16(base, 30, 0, frame_16, 16);
+    plot_bitmap_16(base, 30, 20, diamond_16, 16);
+    plot_bitmap_16(base, 30, 40, checkerboard_16, 8);
+
+    /* Test 5: Multiple bitmaps in a row */
+    plot_bitmap_16(base, 60, 0, solid_block_16, 8);
+    plot_bitmap_16(base, 60, 16, checkerboard_16, 8);
+    plot_bitmap_16(base, 60, 32, frame_16, 16);
+    plot_bitmap_16(base, 60, 48, diamond_16, 16);
+
+    /* Test 6: Multiple bitmaps in a grid */
+    plot_bitmap_16(base, 100, 0, checkerboard_16, 8);
+    plot_bitmap_16(base, 100, 20, smiley_16, 16);
+    plot_bitmap_16(base, 100, 40, frame_16, 16);
+    plot_bitmap_16(base, 110, 0, diamond_16, 16);
+    plot_bitmap_16(base, 110, 20, solid_block_16, 8);
+    plot_bitmap_16(base, 110, 40, checkerboard_16, 8);
+
+    /* Test 7: Odd height bitmap (forces word copy path) */
+    plot_bitmap_16(base, 140, 0, smiley_16, 15);
+
+    /* Test 8: Various positions testing alignment */
+    plot_bitmap_16(base, 170, 0, diamond_16, 16);
+    plot_bitmap_16(base, 170, 24, diamond_16, 16);
+    plot_bitmap_16(base, 170, 48, diamond_16, 16);
+}
+
+void test_plot_bitmap_32(UINT8 *base)
+{
+    /* Test bitmaps - 32 pixels wide, 4 bytes per row */
+
+    /* Checkerboard pattern (32x8) */
+    const UINT32 checkerboard_32[] = {
+        0xAAAAAAAA, /* 10101010101010101010101010101010 */
+        0x55555555, /* 01010101010101010101010101010101 */
+        0xAAAAAAAA, /* 10101010101010101010101010101010 */
+        0x55555555, /* 01010101010101010101010101010101 */
+        0xAAAAAAAA, /* 10101010101010101010101010101010 */
+        0x55555555, /* 01010101010101010101010101010101 */
+        0xAAAAAAAA, /* 10101010101010101010101010101010 */
+        0x55555555  /* 01010101010101010101010101010101 */
+    };
+
+    /* Solid block (32x8) */
+    const UINT32 solid_block_32[] = {
+        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
+        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF};
+
+    /* Large smiley (32x16) */
+    const UINT32 smiley_32[] = {
+        0x00FFFF00, /* 00000000111111111111111100000000 */
+        0x03FFFF80, /* 00000011111111111111111110000000 */
+        0x07FFFFC0, /* 00000111111111111111111111000000 */
+        0x0FF00FF0, /* 00001111111100000000111111110000 */
+        0x1FE00FFC, /* 00011111111000000000111111111100 */
+        0x3FC003FE, /* 00111111110000000000001111111110 */
+        0x7F8001FF, /* 01111111100000000000000111111111 */
+        0x7F8001FF, /* 01111111100000000000000111111111 */
+        0xFF0000FF, /* 11111111000000000000000011111111 */
+        0xFF0000FF, /* 11111111000000000000000011111111 */
+        0xFF0000FF, /* 11111111000000000000000011111111 */
+        0x7F8001FF, /* 01111111100000000000000111111111 */
+        0x3FC003FE, /* 00111111110000000000001111111110 */
+        0x1FE00FFC, /* 00011111111000000000111111111100 */
+        0x0FF00FF0, /* 00001111111100000000111111110000 */
+        0x03FFFF80  /* 00000011111111111111111110000000 */
+    };
+
+    /* Border frame (32x16) */
+    const UINT32 frame_32[] = {
+        0xFFFFFFFF, /* 11111111111111111111111111111111 */
+        0xFFFFFFFF, /* 11111111111111111111111111111111 */
+        0xFFFFFFFF, /* 11111111111111111111111111111111 */
+        0xC0000003, /* 11000000000000000000000000000011 */
+        0xC0000003, /* 11000000000000000000000000000011 */
+        0xC0000003, /* 11000000000000000000000000000011 */
+        0xC0000003, /* 11000000000000000000000000000011 */
+        0xC0000003, /* 11000000000000000000000000000011 */
+        0xC0000003, /* 11000000000000000000000000000011 */
+        0xC0000003, /* 11000000000000000000000000000011 */
+        0xC0000003, /* 11000000000000000000000000000011 */
+        0xC0000003, /* 11000000000000000000000000000011 */
+        0xC0000003, /* 11000000000000000000000000000011 */
+        0xFFFFFFFF, /* 11111111111111111111111111111111 */
+        0xFFFFFFFF, /* 11111111111111111111111111111111 */
+        0xFFFFFFFF  /* 11111111111111111111111111111111 */
+    };
+
+    /* Arrow pattern (32x16) */
+    const UINT32 arrow_32[] = {
+        0x00018000, /* 00000000000000011000000000000000 */
+        0x0003C000, /* 00000000000000111100000000000000 */
+        0x0007E000, /* 00000000000001111110000000000000 */
+        0x000FF000, /* 00000000000011111111000000000000 */
+        0x001FF800, /* 00000000000111111111100000000000 */
+        0x003FFC00, /* 00000000001111111111110000000000 */
+        0x007FFE00, /* 00000000011111111111111000000000 */
+        0x00FFFF00, /* 00000000111111111111111100000000 */
+        0x01FFFF80, /* 00000001111111111111111110000000 */
+        0x03FFFFC0, /* 00000011111111111111111111000000 */
+        0x07FFFFE0, /* 00000111111111111111111111100000 */
+        0x0FFFFFF0, /* 00001111111111111111111111110000 */
+        0x1FFFFFF8, /* 00011111111111111111111111111000 */
+        0x3FFFFFFC, /* 00111111111111111111111111111100 */
+        0x7FFFFFFE, /* 01111111111111111111111111111110 */
+        0xFFFFFFFF  /* 11111111111111111111111111111111 */
+    };
+
+    /* Clear screen first */
+    clear_screen((UINT32 *)base);
+
+    /* Test 1: Long-aligned, even height (optimized path with movem) */
+    plot_bitmap_32(base, 10, 0, checkerboard_32, 8);
+
+    /* Test 2: Long-aligned, even height at different position */
+    plot_bitmap_32(base, 10, 64, solid_block_32, 8);
+
+    /* Test 3: Odd column position (long copy path) */
+    plot_bitmap_32(base, 10, 100, smiley_32, 16);
+
+    /* Test 4: Various positions across the screen */
+    plot_bitmap_32(base, 30, 0, frame_32, 16);
+    plot_bitmap_32(base, 30, 40, arrow_32, 16);
+    plot_bitmap_32(base, 30, 80, checkerboard_32, 8);
+
+    /* Test 5: Multiple bitmaps in a row */
+    plot_bitmap_32(base, 60, 0, solid_block_32, 8);
+    plot_bitmap_32(base, 60, 32, checkerboard_32, 8);
+    plot_bitmap_32(base, 60, 64, frame_32, 16);
+    plot_bitmap_32(base, 60, 96, arrow_32, 16);
+
+    /* Test 6: Multiple bitmaps in a grid */
+    plot_bitmap_32(base, 100, 0, checkerboard_32, 8);
+    plot_bitmap_32(base, 100, 40, smiley_32, 16);
+    plot_bitmap_32(base, 100, 80, frame_32, 16);
+    plot_bitmap_32(base, 110, 0, arrow_32, 16);
+    plot_bitmap_32(base, 110, 40, solid_block_32, 8);
+    plot_bitmap_32(base, 110, 80, checkerboard_32, 8);
+
+    /* Test 7: Odd height bitmap (forces long copy path) */
+    plot_bitmap_32(base, 140, 0, smiley_32, 15);
+
+    /* Test 8: Various positions testing alignment */
+    plot_bitmap_32(base, 170, 0, arrow_32, 16);
+    plot_bitmap_32(base, 170, 48, arrow_32, 16);
+    plot_bitmap_32(base, 170, 96, arrow_32, 16);
+}
+
+void test_plot_character(UINT8 *base)
+{
+    int i;
+
+    /* Clear screen first */
+    clear_screen((UINT32 *)base);
+
+    /* Test 1: Plot individual characters */
+    plot_character(base, 10, 10, 'A');
+    plot_character(base, 10, 20, 'B');
+    plot_character(base, 10, 30, 'C');
+    plot_character(base, 10, 40, 'D');
+
+    /* Test 2: Plot digits */
+    plot_character(base, 30, 10, '0');
+    plot_character(base, 30, 20, '1');
+    plot_character(base, 30, 30, '2');
+    plot_character(base, 30, 40, '3');
+    plot_character(base, 30, 50, '4');
+
+    /* Test 3: Plot special characters */
+    plot_character(base, 50, 10, '!');
+    plot_character(base, 50, 20, '@');
+    plot_character(base, 50, 30, '#');
+    plot_character(base, 50, 40, '$');
+    plot_character(base, 50, 50, '%');
+
+    /* Test 4: Plot all uppercase letters */
+    for (i = 0; i < 26; i++)
+    {
+        plot_character(base, 80, 10 + (i * 8), 'A' + i);
+    }
+
+    /* Test 5: Plot all lowercase letters */
+    for (i = 0; i < 26; i++)
+    {
+        plot_character(base, 100, 10 + (i * 8), 'a' + i);
+    }
+
+    /* Test 6: Plot all digits */
+    for (i = 0; i < 10; i++)
+    {
+        plot_character(base, 120, 10 + (i * 8), '0' + i);
+    }
+
+    /* Test 7: Plot various symbols */
+    plot_character(base, 140, 10, '(');
+    plot_character(base, 140, 20, ')');
+    plot_character(base, 140, 30, '[');
+    plot_character(base, 140, 40, ']');
+    plot_character(base, 140, 50, '{');
+    plot_character(base, 140, 60, '}');
+    plot_character(base, 140, 70, '<');
+    plot_character(base, 140, 80, '>');
+    plot_character(base, 140, 90, '/');
+    plot_character(base, 140, 100, '\\');
+
+    /* Test 8: Plot at different vertical positions */
+    for (i = 0; i < 10; i++)
+    {
+        plot_character(base, 170 + (i * 10), 10, '*');
+    }
+}
+
+void test_plot_string(UINT8 *base)
+{
+    /* Clear screen first */
+    clear_screen((UINT32 *)base);
+
+    /* Test 1: Simple string */
+    plot_string(base, 10, 10, "Hello, World!");
+
+    /* Test 2: Alphabet */
+    plot_string(base, 30, 10, "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+    plot_string(base, 50, 10, "abcdefghijklmnopqrstuvwxyz");
+
+    /* Test 3: Numbers */
+    plot_string(base, 70, 10, "0123456789");
+
+    /* Test 4: Special characters */
+    plot_string(base, 90, 10, "!@#$%^&*()_+-=[]{}|;:'\",.<>?/");
+
+    /* Test 5: Multiple lines */
+    plot_string(base, 110, 10, "Line 1: Testing plot_string");
+    plot_string(base, 130, 10, "Line 2: Second line of text");
+    plot_string(base, 150, 10, "Line 3: Third line of text");
+
+    /* Test 6: Different starting positions */
+    plot_string(base, 180, 50, "Offset text");
+    plot_string(base, 200, 100, "More offset");
+    plot_string(base, 220, 150, "Even more");
+
+    /* Test 7: Short strings */
+    plot_string(base, 250, 10, "A");
+    plot_string(base, 250, 30, "Hi");
+    plot_string(base, 250, 60, "OK");
+    plot_string(base, 250, 90, "Yes");
+
+    /* Test 8: Information display */
+    plot_string(base, 280, 10, "Atari ST Raster Library");
+    plot_string(base, 300, 10, "Character Test Complete");
+
+    /* Test 9: Centered text (approximate) */
+    plot_string(base, 330, 240, "CENTERED");
+
+    /* Test 10: Empty string (should do nothing) */
+    plot_string(base, 350, 10, "");
 }
 
 void fill_screen(UINT32 *base, char pattern)

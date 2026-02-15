@@ -1,6 +1,11 @@
 #ifndef RASTER_H
 #define RASTER_H
+/*
 
+ This header file contains all functions in our raster library.
+ Calling scope should only need to refer to this file for usage.
+
+*/
 /* Type definitions for unsigned integers */
 typedef unsigned char UINT8;
 typedef unsigned short UINT16;
@@ -126,37 +131,40 @@ void plot_triangle(UINT32 *base, UINT16 row, UINT16 col, UINT16 base_triangle, U
 
  PURPOSE: Plots a bitmap to the screen given by the top left pixel of the bitmap and the height of bitmap.
 
- INPUT: Address(UINT16*): to the start of the screen
+ INPUT: Address(UINT8*): to the start of the screen
         Position(row,col): the coordinates of the top left pixel of the bitmap
+        bitmap(const UINT8*): pointer to bitmap data (8 pixels wide, 1 byte per row)
         Height: the lenth (number of rows) of the height in pixels of the bitmap
 
  OUTPUT: None
 */
-void plot_bitmap_8(UINT8 *base, UINT16 row, UINT16 col, UINT16 height);
+void plot_bitmap_8(UINT8 *base, UINT16 row, UINT16 col, const UINT8 *bitmap, UINT16 height);
 
 /*----- Function: plot_bitmap_16 -----
 
  PURPOSE: Plots a bitmap to the screen given by the top left pixel of the bitmap and the height of bitmap.
 
- INPUT: Address(UINT16*): to the start of the screen
+ INPUT: Address(UINT8*): to the start of the screen
         Position(row,col): the coordinates of the top left pixel of the bitmap
+        bitmap(const UINT16*): pointer to bitmap data (16 pixels wide, 2 bytes per row)
         Height: the lenth (number of rows) of the height in pixels of the bitmap
 
  OUTPUT: None
 */
-void plot_bitmap_16(UINT16 *base, UINT16 row, UINT16 col, UINT16 height);
+void plot_bitmap_16(UINT8 *base, UINT16 row, UINT16 col, const UINT16 *bitmap, UINT16 height);
 
 /*----- Function: plot_bitmap_32 -----
 
  PURPOSE: Plots a bitmap to the screen given by the top left pixel of the bitmap and the height of bitmap.
 
- INPUT: Address(UINT32*): to the start of the screen
+ INPUT: Address(UINT8*): to the start of the screen
         Position(row,col): the coordinates of the top left pixel of the bitmap
+        bitmap(const UINT32*): pointer to bitmap data (32 pixels wide, 4 bytes per row)
         Height: the lenth (number of rows) of the height in pixels of the bitmap
 
  OUTPUT: None
 */
-void plot_bitmap_32(UINT32 *base, UINT16 row, UINT16 col, UINT16 height);
+void plot_bitmap_32(UINT8 *base, UINT16 row, UINT16 col, const UINT32 *bitmap, UINT16 height);
 
 /*----- Function: plot_character -----
 
