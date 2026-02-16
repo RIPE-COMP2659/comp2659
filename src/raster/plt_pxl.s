@@ -1,15 +1,22 @@
 ;
-; void plot_pixel(UINT8 *base, UINT16 row, UINT16 col);
+; PURPOSE: Plots a single pixel on the screen.
 ;
+; INPUT: Address(UINT32*): to the start of the screen
+;        Position(row,col): the location of the pixel to plot
+;
+; OUTPUT: None
+;
+; void plot_pixel(UINT8 *base, UINT16 row, UINT16 col);
+;________________________________________________________________
 ; Draw a single pixel (useless function- NEVER use this)
 ;
-;
+; Contact @sudonym-i if you will need to use this routine. Explain yourself!
 
                 xdef            _plot_pixel
 
-base            equ             64              ; offset from SP, not A6
-row             equ             68               
-col             equ             70
+base            equ             20              ; offset from SP
+row             equ             24              ; UINT16 (2 bytes)
+col             equ             26              ; UINT16 (2 bytes)
 
 
 _plot_pixel:    
