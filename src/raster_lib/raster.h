@@ -190,4 +190,45 @@ void plot_character(UINT8 *base, UINT16 row, UINT16 col, char ch);
 */
 void plot_string(UINT8 *base, UINT16 row, UINT16 col, char *ch);
 
+/*----- Function: init_buffers -----
+
+ PURPOSE: Initialize all three screen buffers with diagonal lines at different offsets
+          to create a scrolling effect when buffers are switched.
+
+ INPUT: None
+
+ OUTPUT: None
+*/
+void init_buffers(void);
+
+/*----- Function: get_buffer1 -----
+
+ PURPOSE: Get a pointer to buffer 1
+
+ INPUT: None
+
+ OUTPUT: Pointer to buffer 1
+*/
+UINT8 *get_buffer1(void);
+
+/*----- Function: get_buffer2 -----
+
+ PURPOSE: Get a pointer to buffer 2
+
+ INPUT: None
+
+ OUTPUT: Pointer to buffer 2
+*/
+UINT8 *get_buffer2(void);
+
+/*----- Function: get_buffer3 -----
+
+ PURPOSE: Get a pointer to buffer 3
+
+ INPUT: None
+
+ OUTPUT: Pointer to buffer 3
+*/
+UINT8 *get_buffer3(void);
+
 #endif
