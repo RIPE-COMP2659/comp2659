@@ -4,6 +4,8 @@
 
 #define BYTES_PER_SCREEN 32000
 #define BUFFER_SIZE (BYTES_PER_SCREEN + 256) /* Extra space for alignment */
+#define ANIMATION_CYCLES 100
+#define VBLANKS_PER_FRAME 2
 
 /* Three screen buffers for animation - oversized to allow for alignment */
 UINT8 buffer1_raw[BUFFER_SIZE];
@@ -14,6 +16,63 @@ UINT8 buffer3_raw[BUFFER_SIZE];
 UINT8 *buffer1;
 UINT8 *buffer2;
 UINT8 *buffer3;
+
+/*
+ * main
+ *
+ * PURPOSE: Demonstrate the scrolling background effect by cycling through
+ *          the three pre-rendered buffers using Setscreen() to switch between them
+ *
+ * INPUT: None
+ *
+ * OUTPUT: Returns 0 on successful completion
+ */
+int main(void)
+{
+    UINT8 *original_screen;
+    int i;
+    char key;
+
+    disable_cursor();
+
+    /* Save original screen base */
+    original_screen = (UINT8 *)Physbase();
+
+    /* Initialize all three buffers with background patterns - done ONCE at startup */
+    printf("Initializing buffers...\n");
+    init_buffers();
+    printf("Buffers initialized.\n\n");
+
+    /* Display instructions */
+    printf("Scrolling Background Demo\n");
+    printf("3 screen buffers pre-rendered with:\n");
+    printf("  - Diagonal line background pattern\n");
+    printf("  - Scrolling platform at bottom\n");
+    printf("Press any key to start...\n");
+    printf("Press 'q' to quit\n\n");
+    Cnecin();
+
+    /* Cycle through buffers to create scrolling effect */
+    /* We switch the display to each buffer - no copying needed! */
+    for (i = 0; i < ANIMATION_CYCLES; i++)
+    {
+        /* Switch display to buffer 1 */
+        Setscreen(buffer1, buffer1, -1);
+        wait_vblanks(VBLANKS_PER_FRAME);
+        /* Switch display to buffer 2 */
+        Setscreen(buffer2, buffer2, -1);
+        wait_vblanks(VBLANKS_PER_FRAME);
+        /* Switch display to buffer 3 */
+        Setscreen(buffer3, buffer3, -1);
+        wait_vblanks(VBLANKS_PER_FRAME);
+    }
+
+    /* Restore original screen and clear */
+    Setscreen(original_screen, original_screen, -1);
+    clear_screen((UINT32 *)original_screen);
+
+    return 0;
+}
 
 /*
  * get_buffer1
@@ -89,59 +148,4 @@ void wait_vblanks(int count)
     {
         Vsync();
     }
-}
-
-/*
- * main
- *
- * PURPOSE: Demonstrate the scrolling background effect by cycling through
- *          the three pre-rendered buffers using Setscreen() to switch between them
- *
- * INPUT: None
- *
- * OUTPUT: Returns 0 on successful completion
- */
-int main(void)
-{
-    UINT8 *original_screen;
-    int i;
-    char key;
-
-    disable_cursor();
-
-    /* Save original screen base */
-    original_screen = (UINT8 *)Physbase();
-
-    /* Initialize all three buffers with vertical lines - done ONCE at startup */
-    printf("Initializing buffers...\n");
-    init_buffers();
-    printf("Buffers initialized.\n\n");
-
-    /* Display instructions */
-    printf("Scrolling Background Demo\n");
-    printf("3 screen buffers pre-rendered with shifted vertical lines.\n");
-    printf("Press any key to cycle through buffers...\n");
-    printf("Press 'q' to quit\n\n");
-    Cnecin();
-
-    /* Cycle through buffers to create scrolling effect */
-    /* We switch the display to each buffer - no copying needed! */
-    for (i = 0; i < 100; i++) /* Show 20 cycles */
-    {
-        /* Switch display to buffer 1 */
-        Setscreen(buffer1, buffer1, -1);
-        wait_vblanks(2);
-        /* Switch display to buffer 2 */
-        Setscreen(buffer2, buffer2, -1);
-        wait_vblanks(2);
-        /* Switch display to buffer 3 */
-        Setscreen(buffer3, buffer3, -1);
-        wait_vblanks(2);
-    }
-
-    /* Restore original screen and clear */
-    Setscreen(original_screen, original_screen, -1);
-    clear_screen((UINT32 *)original_screen);
-
-    return 0;
 }

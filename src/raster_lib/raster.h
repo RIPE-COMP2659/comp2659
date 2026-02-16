@@ -55,10 +55,11 @@ void plot_pixel(UINT8 *base, UINT16 row, UINT16 col);
  INPUT: Address(UINT8*): to the start of the screen
         Position(row,col): the coordinates of the leftmost pixel of the horizontal line
         Length: the lenth in pixels of the line
+        Color: color of the line (0 = black, 1 = white)
 
  OUTPUT: None
 */
-void plot_horizontal_line(UINT32 *base, UINT16 row, UINT16 col, UINT16 length);
+void plot_horizontal_line(UINT32 *base, UINT16 row, UINT16 col, UINT16 length, UINT16 color);
 
 /*----- Function: plot_vertical_line -----
 
@@ -67,10 +68,11 @@ void plot_horizontal_line(UINT32 *base, UINT16 row, UINT16 col, UINT16 length);
  INPUT: Address(UINT32*): to the start of the screen
         Position(row,col): the coordinates of the topmost pixel of the vertical line
         Length: the lenth in pixels of the line
+        Color: color of the line (0 = black, 1 = white)
 
  OUTPUT: None
 */
-void plot_vertical_line(UINT32 *base, UINT16 row, UINT16 col, UINT16 length);
+void plot_vertical_line(UINT32 *base, UINT16 row, UINT16 col, UINT16 length, UINT16 color);
 
 /*----- Function: plot_line -----
 
@@ -79,10 +81,11 @@ void plot_vertical_line(UINT32 *base, UINT16 row, UINT16 col, UINT16 length);
  INPUT: Address(UINT32*): to the start of the screen
         Position(start_row,start_col): the coordinates of the start of the line
         Position(end_row,end_col): the coordinates of the end of the line
+        Color: color of the line (0 = black, 1 = white)
 
  OUTPUT: None
 */
-void plot_line(UINT32 *base, UINT16 start_row, UINT16 start_col, UINT16 end_row, UINT16 end_col);
+void plot_line(UINT32 *base, UINT16 start_row, UINT16 start_col, UINT16 end_row, UINT16 end_col, UINT16 color);
 
 /*----- Function: plot_rectangle -----
 

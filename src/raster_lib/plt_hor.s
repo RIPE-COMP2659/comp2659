@@ -4,10 +4,11 @@
 ; INPUT: Address(UINT8*): to the start of the screen
 ;        Position(row,col): the coordinates of the leftmost pixel of the horizontal line
 ;        Length: the lenth in pixels of the line
+;        Color: color of the line (0 = black, 1 = white)
 ;
 ; OUTPUT: None
 ;
-; void plot_horizontal_line(UINT32 *base, UINT16 row, UINT16 col, UINT16 length);
+; void plot_horizontal_line(UINT32 *base, UINT16 row, UINT16 col, UINT16 length, UINT16 color);
 ;________________________________________________________________
 ; Draw a horizontal line of pixels
 ;
@@ -23,6 +24,7 @@ base            equ             24              ; offset from SP
 row             equ             28              ; UINT16 (2 bytes)
 col             equ             30              ; UINT16 (2 bytes)
 length          equ             32              ; UINT16 (2 bytes)
+color           equ             34              ; UINT16 (2 bytes)
 
 
 _plot_horizontal_line:    
@@ -50,8 +52,13 @@ _plot_horizontal_line:
                 moveq           #7,d0
                 sub.w           d2,d0           ; d0 = 7 - (col % 8) = bit position
                 
-pixel_loop:
-                ; Set the bit
+                ; Check color parameter
+                move.w          color(sp),d1
+                tst.w           d1              ; check if color is 0
+                beq             pixel_loop_black
+                
+pixel_loop_white:
+                ; Set the bit (white)
                 bset            d0,(a0)         ; set bit d0 in byte at (a0)
                 
                 ; Decrement length counter
@@ -60,12 +67,29 @@ pixel_loop:
                 
                 ; Move to next pixel (decrement bit position)
                 subq.w          #1,d0
-                bge             pixel_loop      ; if d0 >= 0, stay in same byte
+                bge             pixel_loop_white      ; if d0 >= 0, stay in same byte
                 
                 ; Crossed byte boundary - move to next byte
                 addq.l          #1,a0           ; next byte
                 moveq           #7,d0           ; reset bit position to 7
-                bra             pixel_loop
+                bra             pixel_loop_white
+
+pixel_loop_black:
+                ; Clear the bit (black)
+                bclr            d0,(a0)         ; clear bit d0 in byte at (a0)
+                
+                ; Decrement length counter
+                subq.w          #1,d3
+                beq             done            ; if counter = 0, we're done
+                
+                ; Move to next pixel (decrement bit position)
+                subq.w          #1,d0
+                bge             pixel_loop_black      ; if d0 >= 0, stay in same byte
+                
+                ; Crossed byte boundary - move to next byte
+                addq.l          #1,a0           ; next byte
+                moveq           #7,d0           ; reset bit position to 7
+                bra             pixel_loop_black
 
 done:
                 movem.l         (sp)+,d0-d3/a0
