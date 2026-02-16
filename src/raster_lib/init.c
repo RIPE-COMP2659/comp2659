@@ -3,25 +3,32 @@
 
 #define SCREEN_WIDTH 640
 #define SCREEN_HEIGHT 400
-#define LINE_SPACING 4
+#define LINE_SPACING 5
 #define PLATFORM_HEIGHT 58
 #define PLATFORM_Y (SCREEN_HEIGHT - PLATFORM_HEIGHT)
-#define PLATFORM_LINE_SPACING 3
-#define PLATFORM_STATIC_LINE_SPACING 16
-#define BUFFER1_OFFSET 0
+#define PLATFORM_DIAGONAL_SPACING 5
+#define BUFFER1_OFFSET 4
 #define BUFFER2_OFFSET 3
 #define BUFFER3_OFFSET 2
+#define BUFFER4_OFFSET 1
+#define BUFFER5_OFFSET 0
 #define PLATFORM_BUFFER1_OFFSET 0
-#define PLATFORM_BUFFER2_OFFSET 1
-#define PLATFORM_BUFFER3_OFFSET 2
+#define PLATFORM_BUFFER2_OFFSET 3
+#define PLATFORM_BUFFER3_OFFSET 1
+#define PLATFORM_BUFFER4_OFFSET 4
+#define PLATFORM_BUFFER5_OFFSET 2
 
 /* External references to buffer pointers defined in renderer.c */
 extern UINT8 *buffer1;
 extern UINT8 *buffer2;
 extern UINT8 *buffer3;
+extern UINT8 *buffer4;
+extern UINT8 *buffer5;
 extern UINT8 buffer1_raw[];
 extern UINT8 buffer2_raw[];
 extern UINT8 buffer3_raw[];
+extern UINT8 buffer4_raw[];
+extern UINT8 buffer5_raw[];
 
 /*
  * draw_diagonal_lines
@@ -100,47 +107,94 @@ void draw_diagonal_lines(UINT8 *base, UINT16 offset)
 }
 
 /*
- * draw_platform_lines
+ * draw_platform_diagonal_forward
  *
- * PURPOSE: Draw vertical lines over the platform for a scrolling pattern effect
+ * PURPOSE: Draw diagonal lines (/) on the platform going from bottom-left to top-right
  *
  * INPUT:
  *   base - pointer to the screen buffer
- *   offset - horizontal offset for the platform line pattern (0 or 1 pixels)
+ *   offset - horizontal offset for the diagonal pattern
  *
  * OUTPUT: None
  */
-void draw_platform_lines(UINT8 *base, UINT16 offset)
+void draw_platform_diagonal_forward(UINT8 *base, UINT16 offset)
 {
-    UINT16 col;
+    int start_x;
 
-    /* Draw vertical black lines across the platform */
-    /* Lines are spaced 2 pixels apart (1 pixel line + 1 pixel gap) for faster scrolling */
-    for (col = offset; col < SCREEN_WIDTH; col += PLATFORM_LINE_SPACING)
+    /* Draw diagonal lines across the platform area */
+    /* Lines going from bottom-left to top-right (/) */
+    for (start_x = -PLATFORM_HEIGHT + offset; start_x < SCREEN_WIDTH; start_x += PLATFORM_DIAGONAL_SPACING)
     {
-        plot_vertical_line((UINT32 *)base, PLATFORM_Y, col, PLATFORM_HEIGHT, 1);
+        int x, y;
+
+        /* Adjust starting position if x would be negative */
+        if (start_x < 0)
+        {
+            x = 0;
+            y = SCREEN_HEIGHT - 1 + start_x; /* Start higher up when coming from left edge */
+        }
+        else
+        {
+            x = start_x;
+            y = SCREEN_HEIGHT - 1; /* Start from bottom */
+        }
+
+        /* Draw diagonal line upward and to the right */
+        while (y >= PLATFORM_Y && x < SCREEN_WIDTH)
+        {
+            if (x >= 0 && x < SCREEN_WIDTH && y >= PLATFORM_Y && y < SCREEN_HEIGHT)
+            {
+                plot_pixel((UINT8 *)base, y, x);
+            }
+            x++;
+            y--;
+        }
     }
 }
 
 /*
- * draw_platform_static_lines
+ * draw_platform_diagonal_backward
  *
- * PURPOSE: Draw static vertical black lines over the platform (non-scrolling)
+ * PURPOSE: Draw diagonal lines (\) on the platform going from top-left to bottom-right
  *
  * INPUT:
  *   base - pointer to the screen buffer
+ *   offset - horizontal offset for the diagonal pattern
  *
  * OUTPUT: None
  */
-void draw_platform_static_lines(UINT8 *base)
+void draw_platform_diagonal_backward(UINT8 *base, UINT16 offset)
 {
-    UINT16 col;
+    int start_x;
 
-    /* Draw static vertical black lines across the platform */
-    /* These lines do not scroll and remain fixed across all buffers */
-    for (col = 0; col < SCREEN_HEIGHT; col += PLATFORM_STATIC_LINE_SPACING)
+    /* Draw diagonal lines across the platform area */
+    /* Lines going from top-left to bottom-right (\) */
+    for (start_x = -PLATFORM_HEIGHT + offset; start_x < SCREEN_WIDTH; start_x += PLATFORM_DIAGONAL_SPACING)
     {
-        plot_horizontal_line((UINT32 *)base, PLATFORM_Y, col, PLATFORM_HEIGHT, 0);
+        int x, y;
+
+        /* Adjust starting position if x would be negative */
+        if (start_x < 0)
+        {
+            x = 0;
+            y = PLATFORM_Y - start_x; /* Compensate for negative x offset */
+        }
+        else
+        {
+            x = start_x;
+            y = PLATFORM_Y; /* Start from top of platform */
+        }
+
+        /* Draw diagonal line downward and to the right */
+        while (y < SCREEN_HEIGHT && x < SCREEN_WIDTH)
+        {
+            if (x >= 0 && x < SCREEN_WIDTH && y >= PLATFORM_Y && y < SCREEN_HEIGHT)
+            {
+                plot_pixel((UINT8 *)base, y, x);
+            }
+            x++;
+            y++;
+        }
     }
 }
 
@@ -168,12 +222,20 @@ void align_buffers(void)
     /* Align buffer3 to 256-byte boundary */
     addr = (UINT32)buffer3_raw;
     buffer3 = (UINT8 *)((addr + 255) & 0xFFFFFF00UL);
+
+    /* Align buffer4 to 256-byte boundary */
+    addr = (UINT32)buffer4_raw;
+    buffer4 = (UINT8 *)((addr + 255) & 0xFFFFFF00UL);
+
+    /* Align buffer5 to 256-byte boundary */
+    addr = (UINT32)buffer5_raw;
+    buffer5 = (UINT8 *)((addr + 255) & 0xFFFFFF00UL);
 }
 
 /*
  * init_buffers
  *
- * PURPOSE: Initialize all three screen buffers with diagonal lines at different offsets
+ * PURPOSE: Initialize all five screen buffers with diagonal lines at different offsets
  *          to create a scrolling effect when buffers are switched
  *
  * INPUT: None
@@ -189,31 +251,31 @@ void init_buffers(void)
     clear_screen((UINT32 *)buffer1);
     clear_screen((UINT32 *)buffer2);
     clear_screen((UINT32 *)buffer3);
+    clear_screen((UINT32 *)buffer4);
+    clear_screen((UINT32 *)buffer5);
 
-    /* Buffer 1: Diagonal lines at offset 0 */
+    /* Buffer 1: Diagonal lines at offset 4 */
     draw_diagonal_lines(buffer1, BUFFER1_OFFSET);
-    /* Add black platform at bottom */
-    /* Add white vertical lines on platform */
-    draw_platform_lines(buffer1, PLATFORM_BUFFER1_OFFSET);
-    /* Add static black lines over platform */
-    draw_platform_static_lines(buffer1);
+    plot_rectangle((UINT32 *)buffer1, PLATFORM_Y, 0, PLATFORM_HEIGHT, SCREEN_WIDTH);
     plot_horizontal_line((UINT32 *)buffer1, PLATFORM_Y, 0, SCREEN_WIDTH, 1);
 
-    /* Buffer 2: Diagonal lines shifted left by 1 pixel (offset 3 wraps around) */
+    /* Buffer 2: Diagonal lines shifted by 1 pixel */
     draw_diagonal_lines(buffer2, BUFFER2_OFFSET);
-    /* Add black platform at bottom */
-    /* Add white vertical lines on platform */
-    draw_platform_lines(buffer2, PLATFORM_BUFFER2_OFFSET);
-    /* Add static black lines over platform */
-    draw_platform_static_lines(buffer2);
+    plot_rectangle((UINT32 *)buffer2, PLATFORM_Y, 0, PLATFORM_HEIGHT, SCREEN_WIDTH);
     plot_horizontal_line((UINT32 *)buffer2, PLATFORM_Y, 0, SCREEN_WIDTH, 1);
 
-    /* Buffer 3: Diagonal lines shifted left by 2 pixels (offset 2 wraps around) */
+    /* Buffer 3: Diagonal lines shifted by 2 pixels */
     draw_diagonal_lines(buffer3, BUFFER3_OFFSET);
-    /* Add black platform at bottom */
-    /* Add white vertical lines on platform */
-    draw_platform_lines(buffer3, PLATFORM_BUFFER3_OFFSET);
-    /* Add static black lines over platform */
-    draw_platform_static_lines(buffer3);
+    plot_rectangle((UINT32 *)buffer3, PLATFORM_Y, 0, PLATFORM_HEIGHT, SCREEN_WIDTH);
     plot_horizontal_line((UINT32 *)buffer3, PLATFORM_Y, 0, SCREEN_WIDTH, 1);
+
+    /* Buffer 4: Diagonal lines shifted by 3 pixels */
+    draw_diagonal_lines(buffer4, BUFFER4_OFFSET);
+    plot_rectangle((UINT32 *)buffer4, PLATFORM_Y, 0, PLATFORM_HEIGHT, SCREEN_WIDTH);
+    plot_horizontal_line((UINT32 *)buffer4, PLATFORM_Y, 0, SCREEN_WIDTH, 1);
+
+    /* Buffer 5: Diagonal lines shifted by 4 pixels */
+    draw_diagonal_lines(buffer5, BUFFER5_OFFSET);
+    plot_rectangle((UINT32 *)buffer5, PLATFORM_Y, 0, PLATFORM_HEIGHT, SCREEN_WIDTH);
+    plot_horizontal_line((UINT32 *)buffer5, PLATFORM_Y, 0, SCREEN_WIDTH, 1);
 }

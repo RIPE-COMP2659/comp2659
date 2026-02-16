@@ -5,17 +5,21 @@
 #define BYTES_PER_SCREEN 32000
 #define BUFFER_SIZE (BYTES_PER_SCREEN + 256) /* Extra space for alignment */
 #define ANIMATION_CYCLES 100
-#define VBLANKS_PER_FRAME 2
+#define VBLANKS_PER_FRAME 1
 
-/* Three screen buffers for animation - oversized to allow for alignment */
+/* Five screen buffers for animation - oversized to allow for alignment */
 UINT8 buffer1_raw[BUFFER_SIZE];
 UINT8 buffer2_raw[BUFFER_SIZE];
 UINT8 buffer3_raw[BUFFER_SIZE];
+UINT8 buffer4_raw[BUFFER_SIZE];
+UINT8 buffer5_raw[BUFFER_SIZE];
 
 /* Aligned buffer pointers */
 UINT8 *buffer1;
 UINT8 *buffer2;
 UINT8 *buffer3;
+UINT8 *buffer4;
+UINT8 *buffer5;
 
 /*
  * main
@@ -45,7 +49,7 @@ int main(void)
 
     /* Display instructions */
     printf("Scrolling Background Demo\n");
-    printf("3 screen buffers pre-rendered with:\n");
+    printf("5 screen buffers pre-rendered with:\n");
     printf("  - Diagonal line background pattern\n");
     printf("  - Scrolling platform at bottom\n");
     printf("Press any key to start...\n");
@@ -64,6 +68,12 @@ int main(void)
         wait_vblanks(VBLANKS_PER_FRAME);
         /* Switch display to buffer 3 */
         Setscreen(buffer3, buffer3, -1);
+        wait_vblanks(VBLANKS_PER_FRAME);
+        /* Switch display to buffer 4 */
+        Setscreen(buffer4, buffer4, -1);
+        wait_vblanks(VBLANKS_PER_FRAME);
+        /* Switch display to buffer 5 */
+        Setscreen(buffer5, buffer5, -1);
         wait_vblanks(VBLANKS_PER_FRAME);
     }
 
@@ -114,6 +124,34 @@ UINT8 *get_buffer2(void)
 UINT8 *get_buffer3(void)
 {
     return buffer3;
+}
+
+/*
+ * get_buffer4
+ *
+ * PURPOSE: Get a pointer to buffer 4
+ *
+ * INPUT: None
+ *
+ * OUTPUT: Pointer to buffer 4
+ */
+UINT8 *get_buffer4(void)
+{
+    return buffer4;
+}
+
+/*
+ * get_buffer5
+ *
+ * PURPOSE: Get a pointer to buffer 5
+ *
+ * INPUT: None
+ *
+ * OUTPUT: Pointer to buffer 5
+ */
+UINT8 *get_buffer5(void)
+{
+    return buffer5;
 }
 
 /*
