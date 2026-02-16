@@ -1,16 +1,16 @@
 ;
-; PURPOSE: Clear a region of the screen. The section is specified by the coordinates of the top left corner, and the height and width of the region.
+; PURPOSE: Plots a rectangle on the screen given by the top left pixel, and the length and width of the rectangle.
 ;
 ; INPUT: Address(UINT32*): to the start of the screen
-;        Position(row,col): the coordinates of the top left pixel of the region
-;        Length: the lenth (number of rows) in pixels of the region
-;        Width: the width (number of columns) in pixels of the region
+;        Position(row,col): the coordinates of the top left pixel of the rectangle
+;        Length: the lenth (number of rows) in pixels of the rectangle
+;        Width: the width (number of columns) in pixels of the rectangle
 ;
 ; OUTPUT: None
 ;
-; void clear_region(UINT32 *base, UINT16 row, UINT16 col, UINT16 length, UINT16 width);
+; void plot_rectangle(UINT32 *base, UINT16 row, UINT16 col, UINT16 length, UINT16 width);
 ;________________________________________________________________
-; Clear a rectangular regin of the screen.
+; Draw a rectangular region on the screen.
 ;
 ;                     -- Optimized for 48 bit widths ONLY (6 bytes wide). --
 ;                 -- This should be the size of all sprites to begin with. --
@@ -19,7 +19,7 @@
 
 
 
-                xdef            _clear_region
+                xdef            _plot_rectangle
 
 base            equ             64              ; offset from SP, not A6
 row             equ             68               
@@ -28,7 +28,7 @@ length          equ             72
 width           equ             74
 
 
-_clear_region:  movem.l         d0-d7/a0-a6,-(sp)
+_plot_rectangle: movem.l         d0-d7/a0-a6,-(sp)
 
                 movea.l         base(sp),a0     ; get base address
                 
@@ -56,11 +56,11 @@ _clear_region:  movem.l         d0-d7/a0-a6,-(sp)
 
 opt_48x48:      
                 ; Optimized for 48x48 sprites (6 bytes = 3 words wide)
-                ; Uses movem.w to clear 3 words at once
+                ; Uses movem.w to draw 3 words at once
                 
-                moveq           #0,d1           ; clear registers to zero
-                moveq           #0,d2
-                moveq           #0,d3
+                move.w          #$FFFF,d1       ; set registers to all 1s
+                move.w          #$FFFF,d2
+                move.w          #$FFFF,d3
                 
                 move.w          length(sp),d7   ; get height (number of rows in pixels)
                 subq.w          #1,d7           ; adjust for dbra
@@ -73,7 +73,7 @@ row_loop_48:    movem.w         d1-d3,(a0)      ; write 3 words (6 bytes)
                 rts
 
 unoptimized:    
-                ; Generic clear region - calculate bytes needed for col through col+width-1
+                ; Generic plot rectangle - calculate bytes needed for col through col+width-1
                 ; Formula: ceiling((col+width)/8) - floor(col/8)
                 
                 move.w          col(sp),d6      ; get col in pixels
@@ -93,7 +93,7 @@ unoptimized:
 row_loop:       movea.l         a0,a1           ; save row start position
                 move.w          d6,d5           ; restore column counter
                 
-col_loop:       clr.b           (a1)+           ; clear one byte, advance
+col_loop:       move.b          #$FF,(a1)+      ; set one byte (all pixels), advance
                 dbra            d5,col_loop
                 
                 adda.w          #80,a0          ; move to next row
@@ -101,3 +101,4 @@ col_loop:       clr.b           (a1)+           ; clear one byte, advance
                 
                 movem.l         (sp)+,d0-d7/a0-a6
                 rts
+
