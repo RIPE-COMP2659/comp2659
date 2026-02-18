@@ -155,14 +155,3 @@ void align_buffers(void)
     addr = (UINT32)buffer4_raw;
     buffer4 = (UINT8 *)((addr + 255) & 0xFFFFFF00UL);
 }
-
-/*
- * init_buffers
- *
- * PURPOSE: Initialize all four screen buffers with diagonal lines at different offsets
- *          to create a scrolling effect when buffers are switched
- *
- * INPUT: None
- *
- * OUTPUT: None
- */
