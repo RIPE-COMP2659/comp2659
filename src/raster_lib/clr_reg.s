@@ -10,25 +10,24 @@
 ;
 ; void clear_region(UINT32 *base, UINT16 row, UINT16 col, UINT16 length, UINT16 width);
 ;________________________________________________________________
-; Clear a rectangular regin of the screen.
+; Clear a rectangular region of the screen.
 ;
-;                     -- Optimized for 48 bit widths ONLY (6 bytes wide). --
-;                 -- This should be the size of all sprites to begin with. --
-;
-; Contact @sudonym-i if you will need to use this routine in any other ways
+; OPTIMIZATION: For best performance, use 32-pixel (4-byte) width with word-aligned starting address.
+; Falls back to generic byte-by-byte clearing for other widths or odd addresses.
 
 
 
                 xdef            _clear_region
 
-base            equ             64              ; offset from SP, not A6
+base            equ             64              
 row             equ             68               
 col             equ             70             
 length          equ             72
 width           equ             74
 
 
-_clear_region:  movem.l         d0-d7/a0-a6,-(sp)
+_clear_region:  
+                movem.l         d0-d7/a0-a6,-(sp)
 
                 movea.l         base(sp),a0     ; get base address
                 
@@ -43,38 +42,36 @@ _clear_region:  movem.l         d0-d7/a0-a6,-(sp)
                 ext.l           d0              ; extend to long
                 adda.l          d0,a0           ; add col offset in bytes
 
-                ; Check if width == 48 pixels (6 bytes) for optimization
+                ; Check if width == 32 pixels (4 bytes) for optimization
                 move.w          width(sp),d0
-                cmpi.w          #48,d0          ; check if exactly 48 pixels
+                cmpi.w          #32,d0          ; check if exactly 32 pixels
                 bne             unoptimized
                 
-                ; Ensure word alignment for movem.w (address must be even)
+                ; Ensure word alignment for move.l (address must be even)
                 move.l          a0,d1
                 btst            #0,d1           ; test if address is odd
                 bne             unoptimized     ; if odd, use unoptimized version
-                bra             opt_48x48
+                bra             opt_32
 
-opt_48x48:      
-                ; Optimized for 48x48 sprites (6 bytes = 3 words wide)
-                ; Uses movem.w to clear 3 words at once
+opt_32:      
+                ; Optimized for 32-pixel width (4 bytes = 1 long)
+                ; Uses move.l to clear 1 long at once
                 
-                moveq           #0,d1           ; clear registers to zero
-                moveq           #0,d2
-                moveq           #0,d3
+                moveq           #0,d1           ; clear register to zero
                 
                 move.w          length(sp),d7   ; get height (number of rows in pixels)
                 subq.w          #1,d7           ; adjust for dbra
                 
-row_loop_48:    movem.w         d1-d3,(a0)      ; write 3 words (6 bytes)
+row_loop_32:    move.l          d1,(a0)         ; write 1 long (4 bytes)
                 adda.w          #80,a0          ; move to next row (80 bytes per row)
-                dbra            d7,row_loop_48
+                dbra            d7,row_loop_32
                 
                 movem.l         (sp)+,d0-d7/a0-a6
                 rts
 
 unoptimized:    
                 ; Generic clear region - calculate bytes needed for col through col+width-1
-                ; Formula: ceiling((col+width)/8) - floor(col/8)
+                ; Formula: ceil((col+width)/8) - floor(col/8)
                 
                 move.w          col(sp),d6      ; get col in pixels
                 add.w           width(sp),d6    ; d6 = col + width

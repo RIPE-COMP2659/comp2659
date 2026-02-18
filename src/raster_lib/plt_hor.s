@@ -52,44 +52,31 @@ _plot_horizontal_line:
                 moveq           #7,d0
                 sub.w           d2,d0           ; d0 = 7 - (col % 8) = bit position
                 
-                ; Check color parameter
+                ; Get color parameter (0 = black/bclr, non-zero = white/bset)
                 move.w          color(sp),d1
-                tst.w           d1              ; check if color is 0
-                beq             pixel_loop_black
                 
-pixel_loop_white:
-                ; Set the bit (white)
-                bset            d0,(a0)         ; set bit d0 in byte at (a0)
+pixel_loop:
+                ; Set or clear bit based on color
+                tst.w           d1              ; check color
+                beq             clear_bit
+                bset            d0,(a0)         ; white: set bit
+                bra             next_pixel
+clear_bit:
+                bclr            d0,(a0)         ; black: clear bit
                 
+next_pixel:
                 ; Decrement length counter
                 subq.w          #1,d3
                 beq             done            ; if counter = 0, we're done
                 
                 ; Move to next pixel (decrement bit position)
                 subq.w          #1,d0
-                bge             pixel_loop_white      ; if d0 >= 0, stay in same byte
+                bge             pixel_loop      ; if d0 >= 0, stay in same byte
                 
                 ; Crossed byte boundary - move to next byte
                 addq.l          #1,a0           ; next byte
                 moveq           #7,d0           ; reset bit position to 7
-                bra             pixel_loop_white
-
-pixel_loop_black:
-                ; Clear the bit (black)
-                bclr            d0,(a0)         ; clear bit d0 in byte at (a0)
-                
-                ; Decrement length counter
-                subq.w          #1,d3
-                beq             done            ; if counter = 0, we're done
-                
-                ; Move to next pixel (decrement bit position)
-                subq.w          #1,d0
-                bge             pixel_loop_black      ; if d0 >= 0, stay in same byte
-                
-                ; Crossed byte boundary - move to next byte
-                addq.l          #1,a0           ; next byte
-                moveq           #7,d0           ; reset bit position to 7
-                bra             pixel_loop_black
+                bra             pixel_loop
 
 done:
                 movem.l         (sp)+,d0-d3/a0

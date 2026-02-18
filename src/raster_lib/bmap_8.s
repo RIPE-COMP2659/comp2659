@@ -12,8 +12,9 @@
 ;________________________________________________________________
 ; Plot an 8-pixel wide bitmap.
 ;
-; Bitmap format: 1 byte per row, 8 pixels wide (1 bit per pixel)
-
+;                               Optimal for byte-aligned start addresses. (col % 8 == 0)
+;
+;
                 xdef            _plot_bitmap_8
 
 base            equ             64              ; offset from SP, not A6
@@ -23,10 +24,11 @@ bitmap          equ             72              ; pointer to bitmap data
 height          equ             76
 
 
-_plot_bitmap_8: movem.l         d0-d7/a0-a6,-(sp)
+_plot_bitmap_8: 
+                movem.l         d0-d7/a0-a6,-(sp)
 
-                movea.l         base(sp),a0     ; get base address (screen)
-                movea.l         bitmap(sp),a1   ; get bitmap data address
+                movea.l         base(sp),a0     ; get base address (screen starting pointer)
+                movea.l         bitmap(sp),a1   ; get bitmap start address
                 
                 ; Calculate and add row offset: row * 80 bytes
                 move.w          row(sp),d0
@@ -36,26 +38,28 @@ _plot_bitmap_8: movem.l         d0-d7/a0-a6,-(sp)
                 ; Calculate col byte offset and bit shift
                 move.w          col(sp),d6      ; d6 = col (pixel column)
                 move.w          d6,d5           ; copy for bit calculation
-                lsr.w           #3,d6           ; d6 = col / 8 (byte offset)
+                lsr.w           #3,d6           ; d6 = col / 8 ( bit shift )
                 ext.l           d6
                 adda.l          d6,a0           ; add col offset in bytes
                 
-                andi.w          #7,d5           ; d5 = col % 8 (bit shift amount)
-                beq             aligned_copy    ; if 0, no shifting needed
+                andi.w          #7,d5           ; d5 = col % 8 (bit shift amount).
+                                                ; Don't really understand it, but its from the labs. 
+                beq             aligned_copy    ; if 0, no shifting needed ( happy )
                 
-                ; Unaligned copy - need to shift bits
+                ; Unaligned copy - need to shift bits ( not happy )
                 move.w          height(sp),d7   ; get height
                 subq.w          #1,d7           ; adjust for dbra
                 
+                ; Double bit-shift is basically same as (#8 - bit_offset). Potential for optimizations here.
 shift_loop:     moveq           #0,d0           ; clear d0
                 move.b          (a1)+,d0        ; get bitmap byte into low byte
-                lsl.w           #8,d0           ; shift to high byte: 0x00BB -> 0xBB00
+                lsl.w           #8,d0           ; shift to high byte: 0x00FF --> 0xFF00
                 lsr.w           d5,d0           ; shift right by bit offset
                 
                 ; d0 now has: high byte = bits for current screen byte
                 ;             low byte = bits for next screen byte
                 
-                ; Write to current byte (OR, don't replace)
+                ; Write to current byte
                 move.b          d0,d1           ; get low byte (for next screen byte)
                 lsr.w           #8,d0           ; get high byte into low position
                 or.b            d0,(a0)         ; OR into current screen byte

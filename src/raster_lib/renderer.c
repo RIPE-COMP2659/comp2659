@@ -7,29 +7,27 @@
 #define ANIMATION_CYCLES 100
 #define VBLANKS_PER_FRAME 1
 
-/* Five screen buffers for animation - oversized to allow for alignment */
+/* Four screen buffers for animation - oversized to allow for alignment */
 UINT8 buffer1_raw[BUFFER_SIZE];
 UINT8 buffer2_raw[BUFFER_SIZE];
 UINT8 buffer3_raw[BUFFER_SIZE];
 UINT8 buffer4_raw[BUFFER_SIZE];
-UINT8 buffer5_raw[BUFFER_SIZE];
 
 /* Aligned buffer pointers */
 UINT8 *buffer1;
 UINT8 *buffer2;
 UINT8 *buffer3;
 UINT8 *buffer4;
-UINT8 *buffer5;
 
 /*
  * main
  *
- * PURPOSE: Demonstrate the scrolling background effect by cycling through
- *          the three pre-rendered buffers using Setscreen() to switch between them
+ *      EXPERIMENTAL: Uses 4 fram buffers to create scrolling background/platfom with no additional compute
+ *       aside from the cost of a more complex `clear_region()` function- the costs of which are yet to be determined.
+ *                                                 ^^ @sudonym-i will have to look into this.
  *
- * INPUT: None
+ *      Estimated memory cost: 4 * 32000 bytes = 128KB (a bit more, for 256-byte alignment padding)
  *
- * OUTPUT: Returns 0 on successful completion
  */
 int main(void)
 {
@@ -49,11 +47,8 @@ int main(void)
 
     /* Display instructions */
     printf("Scrolling Background Demo\n");
-    printf("5 screen buffers pre-rendered with:\n");
-    printf("  - Diagonal line background pattern\n");
-    printf("  - Scrolling platform at bottom\n");
-    printf("Press any key to start...\n");
-    printf("Press 'q' to quit\n\n");
+    printf("4 screen buffers pre-rendered.\n");
+    printf("Press any key to start.\n");
     Cnecin();
 
     /* Cycle through buffers to create scrolling effect */
@@ -62,19 +57,19 @@ int main(void)
     {
         /* Switch display to buffer 1 */
         Setscreen(buffer1, buffer1, -1);
-        wait_vblanks(VBLANKS_PER_FRAME);
+        Vsync();
+
         /* Switch display to buffer 2 */
         Setscreen(buffer2, buffer2, -1);
-        wait_vblanks(VBLANKS_PER_FRAME);
+        Vsync();
+
         /* Switch display to buffer 3 */
         Setscreen(buffer3, buffer3, -1);
-        wait_vblanks(VBLANKS_PER_FRAME);
+        Vsync();
+
         /* Switch display to buffer 4 */
         Setscreen(buffer4, buffer4, -1);
-        wait_vblanks(VBLANKS_PER_FRAME);
-        /* Switch display to buffer 5 */
-        Setscreen(buffer5, buffer5, -1);
-        wait_vblanks(VBLANKS_PER_FRAME);
+        Vsync();
     }
 
     /* Restore original screen and clear */
@@ -141,20 +136,6 @@ UINT8 *get_buffer4(void)
 }
 
 /*
- * get_buffer5
- *
- * PURPOSE: Get a pointer to buffer 5
- *
- * INPUT: None
- *
- * OUTPUT: Pointer to buffer 5
- */
-UINT8 *get_buffer5(void)
-{
-    return buffer5;
-}
-
-/*
  * disable_cursor
  *
  * PURPOSE: Disable the cursor on the screen
@@ -167,23 +148,4 @@ void disable_cursor(void)
 {
     printf("\033f");
     fflush(stdout);
-}
-
-/*
- * wait_vblanks
- *
- * PURPOSE: Wait for a specified number of vertical blank intervals
- *
- * INPUT:
- *   count - number of vertical blanks to wait for
- *
- * OUTPUT: None
- */
-void wait_vblanks(int count)
-{
-    int i;
-    for (i = 0; i < count; i++)
-    {
-        Vsync();
-    }
 }

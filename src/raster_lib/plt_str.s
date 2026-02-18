@@ -12,7 +12,8 @@
 ;________________________________________________________________
 ; Plot a null-terminated string using plot_character.
 ;
-; Each character is 8 pixels wide, so col advances by 8 for each char.
+; Uses the plt_character() method to print an entire string.
+;
 
                 xdef            _plot_string
                 xref            _plot_character

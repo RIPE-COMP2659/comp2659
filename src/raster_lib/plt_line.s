@@ -11,6 +11,12 @@
 ; void plot_line(UINT32 *base, UINT16 start_row, UINT16 start_col, UINT16 end_row, UINT16 end_col, UINT16 color);
 ;________________________________________________________________
 ; Implements Bresenham's line drawing algorithm
+;
+;                                   --- Using the routine is not recommended. ---
+;
+; Source: https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
+;
+; Contact @sudonym-i if you will need to use this routine.
 
                 xdef            _plot_line
 

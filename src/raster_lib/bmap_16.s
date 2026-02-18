@@ -12,19 +12,23 @@
 ; void plot_bitmap_16(UINT8 *base, UINT16 row, UINT16 col, const UINT16 *bitmap, UINT16 height);
 ;________________________________________________________________
 ; Plot a 16-pixel wide bitmap.
+; 
+; For optimal performance:
+;   - Bitmap address is long-word aligned (divisible by 4) -- may be achievable
+;   - Height is even
 ;
-; Bitmap format: 2 bytes (1 word) per row, 16 pixels wide (1 bit per pixel)
 
                 xdef            _plot_bitmap_16
 
-base            equ             64              ; offset from SP, not A6
+base            equ             64             
 row             equ             68               
 col             equ             70
-bitmap          equ             72              ; pointer to bitmap data
+bitmap          equ             72
 height          equ             76
 
 
-_plot_bitmap_16: movem.l        d0-d7/a0-a6,-(sp)
+_plot_bitmap_16: 
+                movem.l         d0-d7/a0-a6,-(sp)
 
                 movea.l         base(sp),a0     ; get base address (screen)
                 movea.l         bitmap(sp),a1   ; get bitmap data address
@@ -42,9 +46,11 @@ _plot_bitmap_16: movem.l        d0-d7/a0-a6,-(sp)
                 
                 ; Check long word alignment for optimization
                 move.l          a0,d1
-                btst            #0,d1           ; test if screen address is odd
+                btst            #0,d1           ; test if start address is odd
                 bne             word_copy       ; if odd, use word copy
-                btst            #1,d1           ; test if screen address is word-aligned but not long-aligned
+                btst            #1,d1           ; test if screen address is word-aligned but not long-aligned,
+                                                ; as 00 implies the value is divisible by 4
+
                 bne             word_copy       ; if not long-aligned, use word copy
                 
                 move.l          a1,d1
@@ -66,7 +72,7 @@ long_loop:      move.l          (a1)+,d0        ; get 2 words (4 bytes) of bitma
                 move.w          d0,80(a0)       ; plot second row (low word)
                 swap            d0              ; get high word
                 move.w          d0,(a0)         ; plot first row (high word)
-                adda.w          #160,a0         ; move to row+2 (2 rows * 80 bytes)
+                adda.w          #160,a0         ; move to current_row + 2 (2 rows * 80 bytes)
                 dbra            d7,long_loop
                 
                 movem.l         (sp)+,d0-d7/a0-a6

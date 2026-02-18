@@ -234,4 +234,14 @@ UINT8 *get_buffer2(void);
 */
 UINT8 *get_buffer3(void);
 
+/*----- Function: get_buffer4 -----
+
+ PURPOSE: Get a pointer to buffer 4
+
+ INPUT: None
+
+ OUTPUT: Pointer to buffer 4
+*/
+UINT8 *get_buffer4(void);
+
 #endif

@@ -13,6 +13,7 @@
 ;
 ;                     -- Optimized for 48 bit widths ONLY (6 bytes wide). --
 ;                 -- This should be the size of all sprites to begin with. --
+;                     *Based off our old plan to make sprites 48 pixels wide
 ;
 ; Contact @sudonym-i if you will need to use this routine in any other ways
 
@@ -26,7 +27,8 @@ col             equ             70
 side            equ             72              ; UINT16 (2 bytes)
 
 
-_plot_square:   movem.l         d0-d7/a0-a6,-(sp)
+_plot_square:   
+                movem.l         d0-d7/a0-a6,-(sp)
 
                 movea.l         base(sp),a0     ; get base address
                 

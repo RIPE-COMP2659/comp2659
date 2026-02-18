@@ -6,29 +6,25 @@
 #define LINE_SPACING 5
 #define PLATFORM_HEIGHT 58
 #define PLATFORM_Y (SCREEN_HEIGHT - PLATFORM_HEIGHT)
-#define PLATFORM_DIAGONAL_SPACING 5
-#define BUFFER1_OFFSET 4
-#define BUFFER2_OFFSET 3
-#define BUFFER3_OFFSET 2
-#define BUFFER4_OFFSET 1
-#define BUFFER5_OFFSET 0
+#define PLATFORM_DIAGONAL_SPACING 4
+#define BUFFER1_OFFSET 3
+#define BUFFER2_OFFSET 2
+#define BUFFER3_OFFSET 1
+#define BUFFER4_OFFSET 0
 #define PLATFORM_BUFFER1_OFFSET 0
-#define PLATFORM_BUFFER2_OFFSET 3
-#define PLATFORM_BUFFER3_OFFSET 1
-#define PLATFORM_BUFFER4_OFFSET 4
-#define PLATFORM_BUFFER5_OFFSET 2
+#define PLATFORM_BUFFER2_OFFSET 2
+#define PLATFORM_BUFFER3_OFFSET 0
+#define PLATFORM_BUFFER4_OFFSET 2
 
 /* External references to buffer pointers defined in renderer.c */
 extern UINT8 *buffer1;
 extern UINT8 *buffer2;
 extern UINT8 *buffer3;
 extern UINT8 *buffer4;
-extern UINT8 *buffer5;
 extern UINT8 buffer1_raw[];
 extern UINT8 buffer2_raw[];
 extern UINT8 buffer3_raw[];
 extern UINT8 buffer4_raw[];
-extern UINT8 buffer5_raw[];
 
 /*
  * draw_diagonal_lines
@@ -226,16 +222,12 @@ void align_buffers(void)
     /* Align buffer4 to 256-byte boundary */
     addr = (UINT32)buffer4_raw;
     buffer4 = (UINT8 *)((addr + 255) & 0xFFFFFF00UL);
-
-    /* Align buffer5 to 256-byte boundary */
-    addr = (UINT32)buffer5_raw;
-    buffer5 = (UINT8 *)((addr + 255) & 0xFFFFFF00UL);
 }
 
 /*
  * init_buffers
  *
- * PURPOSE: Initialize all five screen buffers with diagonal lines at different offsets
+ * PURPOSE: Initialize all four screen buffers with diagonal lines at different offsets
  *          to create a scrolling effect when buffers are switched
  *
  * INPUT: None
@@ -252,30 +244,28 @@ void init_buffers(void)
     clear_screen((UINT32 *)buffer2);
     clear_screen((UINT32 *)buffer3);
     clear_screen((UINT32 *)buffer4);
-    clear_screen((UINT32 *)buffer5);
 
-    /* Buffer 1: Diagonal lines at offset 4 */
+    /* Buffer 1: Diagonal lines at offset 3, platform at offset 0 */
     draw_diagonal_lines(buffer1, BUFFER1_OFFSET);
-    plot_rectangle((UINT32 *)buffer1, PLATFORM_Y, 0, PLATFORM_HEIGHT, SCREEN_WIDTH);
+    draw_platform_diagonal_forward(buffer1, PLATFORM_BUFFER1_OFFSET);
+    draw_platform_diagonal_backward(buffer1, PLATFORM_BUFFER1_OFFSET);
     plot_horizontal_line((UINT32 *)buffer1, PLATFORM_Y, 0, SCREEN_WIDTH, 1);
 
-    /* Buffer 2: Diagonal lines shifted by 1 pixel */
+    /* Buffer 2: Diagonal lines shifted by 1 pixel, platform moved 2 pixels */
     draw_diagonal_lines(buffer2, BUFFER2_OFFSET);
-    plot_rectangle((UINT32 *)buffer2, PLATFORM_Y, 0, PLATFORM_HEIGHT, SCREEN_WIDTH);
+    draw_platform_diagonal_forward(buffer2, PLATFORM_BUFFER2_OFFSET);
+    draw_platform_diagonal_backward(buffer2, PLATFORM_BUFFER2_OFFSET);
     plot_horizontal_line((UINT32 *)buffer2, PLATFORM_Y, 0, SCREEN_WIDTH, 1);
 
-    /* Buffer 3: Diagonal lines shifted by 2 pixels */
+    /* Buffer 3: Diagonal lines shifted by 2 pixels, platform moved 4 pixels (wraps to 0) */
     draw_diagonal_lines(buffer3, BUFFER3_OFFSET);
-    plot_rectangle((UINT32 *)buffer3, PLATFORM_Y, 0, PLATFORM_HEIGHT, SCREEN_WIDTH);
+    draw_platform_diagonal_forward(buffer3, PLATFORM_BUFFER3_OFFSET);
+    draw_platform_diagonal_backward(buffer3, PLATFORM_BUFFER3_OFFSET);
     plot_horizontal_line((UINT32 *)buffer3, PLATFORM_Y, 0, SCREEN_WIDTH, 1);
 
-    /* Buffer 4: Diagonal lines shifted by 3 pixels */
+    /* Buffer 4: Diagonal lines shifted by 3 pixels, platform moved 6 pixels (wraps to 2) */
     draw_diagonal_lines(buffer4, BUFFER4_OFFSET);
-    plot_rectangle((UINT32 *)buffer4, PLATFORM_Y, 0, PLATFORM_HEIGHT, SCREEN_WIDTH);
+    draw_platform_diagonal_forward(buffer4, PLATFORM_BUFFER4_OFFSET);
+    draw_platform_diagonal_backward(buffer4, PLATFORM_BUFFER4_OFFSET);
     plot_horizontal_line((UINT32 *)buffer4, PLATFORM_Y, 0, SCREEN_WIDTH, 1);
-
-    /* Buffer 5: Diagonal lines shifted by 4 pixels */
-    draw_diagonal_lines(buffer5, BUFFER5_OFFSET);
-    plot_rectangle((UINT32 *)buffer5, PLATFORM_Y, 0, PLATFORM_HEIGHT, SCREEN_WIDTH);
-    plot_horizontal_line((UINT32 *)buffer5, PLATFORM_Y, 0, SCREEN_WIDTH, 1);
 }

@@ -22,7 +22,6 @@
                 xdef            _plot_triangle
                 xref            _plot_horizontal_line
 
-; Stack offsets AFTER movem.l d0-d7/a0-a6,-(sp) which pushes 60 bytes
 base            equ             64              ; UINT32* (4 bytes)
 row             equ             68              ; UINT16 (2 bytes)
 col             equ             70              ; UINT16 (2 bytes)
