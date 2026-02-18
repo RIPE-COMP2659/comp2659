@@ -26,6 +26,30 @@ extern UINT8 buffer2_raw[];
 extern UINT8 buffer3_raw[];
 extern UINT8 buffer4_raw[];
 
+void init_buffers(void)
+{
+    /* First, align the buffers to 256-byte boundaries */
+    align_buffers();
+
+    /* Clear all buffers first */
+    clear_screen((UINT32 *)buffer1);
+    clear_screen((UINT32 *)buffer2);
+    clear_screen((UINT32 *)buffer3);
+    clear_screen((UINT32 *)buffer4);
+
+    /* To be added once @sudonym-i implemnents a compatible clear function
+
+    draw_diagonal_lines(buffer1, BUFFER1_OFFSET);
+
+    draw_diagonal_lines(buffer2, BUFFER2_OFFSET);
+
+    draw_diagonal_lines(buffer3, BUFFER3_OFFSET);
+
+    draw_diagonal_lines(buffer4, BUFFER4_OFFSET);
+
+    */
+}
+
 /*
  * draw_diagonal_lines
  *
@@ -103,98 +127,6 @@ void draw_diagonal_lines(UINT8 *base, UINT16 offset)
 }
 
 /*
- * draw_platform_diagonal_forward
- *
- * PURPOSE: Draw diagonal lines (/) on the platform going from bottom-left to top-right
- *
- * INPUT:
- *   base - pointer to the screen buffer
- *   offset - horizontal offset for the diagonal pattern
- *
- * OUTPUT: None
- */
-void draw_platform_diagonal_forward(UINT8 *base, UINT16 offset)
-{
-    int start_x;
-
-    /* Draw diagonal lines across the platform area */
-    /* Lines going from bottom-left to top-right (/) */
-    for (start_x = -PLATFORM_HEIGHT + offset; start_x < SCREEN_WIDTH; start_x += PLATFORM_DIAGONAL_SPACING)
-    {
-        int x, y;
-
-        /* Adjust starting position if x would be negative */
-        if (start_x < 0)
-        {
-            x = 0;
-            y = SCREEN_HEIGHT - 1 + start_x; /* Start higher up when coming from left edge */
-        }
-        else
-        {
-            x = start_x;
-            y = SCREEN_HEIGHT - 1; /* Start from bottom */
-        }
-
-        /* Draw diagonal line upward and to the right */
-        while (y >= PLATFORM_Y && x < SCREEN_WIDTH)
-        {
-            if (x >= 0 && x < SCREEN_WIDTH && y >= PLATFORM_Y && y < SCREEN_HEIGHT)
-            {
-                plot_pixel((UINT8 *)base, y, x);
-            }
-            x++;
-            y--;
-        }
-    }
-}
-
-/*
- * draw_platform_diagonal_backward
- *
- * PURPOSE: Draw diagonal lines (\) on the platform going from top-left to bottom-right
- *
- * INPUT:
- *   base - pointer to the screen buffer
- *   offset - horizontal offset for the diagonal pattern
- *
- * OUTPUT: None
- */
-void draw_platform_diagonal_backward(UINT8 *base, UINT16 offset)
-{
-    int start_x;
-
-    /* Draw diagonal lines across the platform area */
-    /* Lines going from top-left to bottom-right (\) */
-    for (start_x = -PLATFORM_HEIGHT + offset; start_x < SCREEN_WIDTH; start_x += PLATFORM_DIAGONAL_SPACING)
-    {
-        int x, y;
-
-        /* Adjust starting position if x would be negative */
-        if (start_x < 0)
-        {
-            x = 0;
-            y = PLATFORM_Y - start_x; /* Compensate for negative x offset */
-        }
-        else
-        {
-            x = start_x;
-            y = PLATFORM_Y; /* Start from top of platform */
-        }
-
-        /* Draw diagonal line downward and to the right */
-        while (y < SCREEN_HEIGHT && x < SCREEN_WIDTH)
-        {
-            if (x >= 0 && x < SCREEN_WIDTH && y >= PLATFORM_Y && y < SCREEN_HEIGHT)
-            {
-                plot_pixel((UINT8 *)base, y, x);
-            }
-            x++;
-            y++;
-        }
-    }
-}
-
-/*
  * align_buffers
  *
  * PURPOSE: Align the buffer pointers to 256-byte boundaries as required by Atari ST
@@ -234,38 +166,3 @@ void align_buffers(void)
  *
  * OUTPUT: None
  */
-void init_buffers(void)
-{
-    /* First, align the buffers to 256-byte boundaries */
-    align_buffers();
-
-    /* Clear all buffers first */
-    clear_screen((UINT32 *)buffer1);
-    clear_screen((UINT32 *)buffer2);
-    clear_screen((UINT32 *)buffer3);
-    clear_screen((UINT32 *)buffer4);
-
-    /* Buffer 1: Diagonal lines at offset 3, platform at offset 0 */
-    draw_diagonal_lines(buffer1, BUFFER1_OFFSET);
-    draw_platform_diagonal_forward(buffer1, PLATFORM_BUFFER1_OFFSET);
-    draw_platform_diagonal_backward(buffer1, PLATFORM_BUFFER1_OFFSET);
-    plot_horizontal_line((UINT32 *)buffer1, PLATFORM_Y, 0, SCREEN_WIDTH, 1);
-
-    /* Buffer 2: Diagonal lines shifted by 1 pixel, platform moved 2 pixels */
-    draw_diagonal_lines(buffer2, BUFFER2_OFFSET);
-    draw_platform_diagonal_forward(buffer2, PLATFORM_BUFFER2_OFFSET);
-    draw_platform_diagonal_backward(buffer2, PLATFORM_BUFFER2_OFFSET);
-    plot_horizontal_line((UINT32 *)buffer2, PLATFORM_Y, 0, SCREEN_WIDTH, 1);
-
-    /* Buffer 3: Diagonal lines shifted by 2 pixels, platform moved 4 pixels (wraps to 0) */
-    draw_diagonal_lines(buffer3, BUFFER3_OFFSET);
-    draw_platform_diagonal_forward(buffer3, PLATFORM_BUFFER3_OFFSET);
-    draw_platform_diagonal_backward(buffer3, PLATFORM_BUFFER3_OFFSET);
-    plot_horizontal_line((UINT32 *)buffer3, PLATFORM_Y, 0, SCREEN_WIDTH, 1);
-
-    /* Buffer 4: Diagonal lines shifted by 3 pixels, platform moved 6 pixels (wraps to 2) */
-    draw_diagonal_lines(buffer4, BUFFER4_OFFSET);
-    draw_platform_diagonal_forward(buffer4, PLATFORM_BUFFER4_OFFSET);
-    draw_platform_diagonal_backward(buffer4, PLATFORM_BUFFER4_OFFSET);
-    plot_horizontal_line((UINT32 *)buffer4, PLATFORM_Y, 0, SCREEN_WIDTH, 1);
-}
