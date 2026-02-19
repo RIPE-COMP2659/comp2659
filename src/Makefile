@@ -36,8 +36,12 @@ UNITY_FILES = tests/unity/unity.c
 TEST_SRC_FILES = $(filter-out tests/unity/%, $(wildcard tests/*.c))
 TEST_EXECS = $(TEST_SRC_FILES:tests/%.c=%$(EXE_EXT))
 
+# Main program sources
+MAIN_EXE = main$(EXE_EXT)
+MAIN_SRC = main.c block.c spike.c lava.c geo.c level.c world.c
+
 # Default target
-all: test
+all: main
 
 # Default command prefix for running tests (can be overridden)
 RUN_CMD = $(RUN_PREFIX)
@@ -52,8 +56,10 @@ test: $(TEST_EXECS)
 	$(CC) $(CFLAGS) $(COVERAGE_FLAGS) $(INCLUDES) -DTESTING $< $(patsubst test_%,%.c,$(basename $@)) $(UNITY_FILES) -o $@
 
 # Build the main program
-helloworld: helloworld.c
-	$(CC) $(CFLAGS) helloworld.c -o geo_dash$(EXE_EXT)
+main: clean $(MAIN_EXE)
+
+$(MAIN_EXE): $(MAIN_SRC)
+	$(CC) $(CFLAGS) $(INCLUDES) $(MAIN_SRC) -o $(MAIN_EXE)
 
 # Clean up unncessary files
 coverage: generate-coverage clean-coverage
@@ -77,4 +83,4 @@ valgrind: $(TEST_EXECS)
 	$(MAKE) test RUN_CMD="valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes $(RUN_PREFIX)"
 
 # Commands to run tests, otherwise make may assume these are files.
-.PHONY: all test clean clean-coverage coverage generate-coverage valgrind
+.PHONY: all main test clean clean-coverage coverage generate-coverage valgrind
