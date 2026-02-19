@@ -1,19 +1,12 @@
 #include "unity.h"
 #include "level.h"
 
-Level level;
-static Block level_blocks[1] = {
-    { 0, 0, BLOCK_SIZE, BLOCK_SPRITE }
-};
-static Spike level_spikes[1] = {
-    { 0, 0, SPIKE_SIZE, SPIKE_SPRITE }
-};
-static Lava level_lava[1] = {
-    { 0, 0, LAVA_SIZE, LAVA_SPRITE }
-};
+Level level1;
+Level level2;
 
 void setUp(void) {
-    level = create_level(level_blocks, level_spikes, level_lava, 1000);
+    level1 = create_level1();
+    level2 = create_level2();
 }
 
 void tearDown(void) {
