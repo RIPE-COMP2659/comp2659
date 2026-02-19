@@ -25,7 +25,7 @@ void setUp(void) {
         (Geo) {
             GEO_DDY, GEO_DX, -20, 100, 200, GEO_SIZE, GEO_SPRITE
         },
-        300 // ground_y
+        300
     };
 }
 

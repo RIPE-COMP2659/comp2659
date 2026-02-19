@@ -12,3 +12,6 @@ typedef struct {
     unsigned int current_lava;
     unsigned int end_x;
 } Level;
+
+Level create_level(Block* blocks, Spike* spikes, Lava* lava, unsigned int end_x);
+void level_placeholder(void);

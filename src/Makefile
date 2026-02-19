@@ -15,7 +15,7 @@ CC = gcc
 GCOV = gcov
 
 # Compiler flags
-CFLAGS = -Wall -Wextra -std=c99
+CFLAGS = -Wall -Wextra -std=c89
 
 # Coverage flags for gcov
 # -fprofile-arcs: Generate arc coverage data

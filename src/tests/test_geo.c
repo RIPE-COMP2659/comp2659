@@ -80,9 +80,10 @@ void test_geo_jump_works_with_move_until_apex_and_back(void) {
 
     signed int current_y = geo.y;
     signed int current_dy = geo.dy;
-    signed int iterations_to_apex = GEO_JUMP_DY / -GEO_DDY;
+    unsigned int iterations_to_apex = GEO_JUMP_DY / -GEO_DDY;
+    unsigned int i;
 
-    for (int i = 0; i < iterations_to_apex; i++) {
+    for (i = 0; i < iterations_to_apex; i++) {
         geo_move(&geo);
 
         TEST_ASSERT_EQUAL_INT(current_dy + GEO_DDY, geo.dy);
