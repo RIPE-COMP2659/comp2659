@@ -74,6 +74,35 @@ void test_geo_jump_sets_dy_to_constant(void) {
     TEST_ASSERT_EQUAL_INT(GEO_JUMP_DY, geo.dy);
 }
 
+void test_geo_update_landed_false_when_above_ground(void) {
+    geo.y = geo.ground_y + geo.size + 10;
+    geo.is_landed = TRUE;
+
+    geo_update_landed(&geo);
+
+    TEST_ASSERT_EQUAL_INT(FALSE, geo.is_landed);
+    TEST_ASSERT_EQUAL_INT(geo.ground_y + geo.size + 10, geo.y);
+}
+
+void test_geo_update_landed_true_when_at_ground(void) {
+    geo.y = geo.ground_y + geo.size;
+    geo.is_landed = FALSE;
+
+    geo_update_landed(&geo);
+
+    TEST_ASSERT_EQUAL_INT(TRUE, geo.is_landed);
+}
+
+void test_geo_update_landed_true_when_below_ground(void) {
+    geo.y = geo.ground_y + geo.size - 5;
+    geo.is_landed = FALSE;
+
+    geo_update_landed(&geo);
+
+    TEST_ASSERT_EQUAL_INT(TRUE, geo.is_landed);
+    TEST_ASSERT_EQUAL_INT(geo.ground_y + geo.size, geo.y);
+}
+
 /* Make sure falling after jumping works properly, ideally to the point of an apex, using move */
 void test_geo_jump_works_with_move_until_apex_and_back(void) {
     geo.y = 0;
@@ -113,6 +142,9 @@ int main(void) {
     RUN_TEST(test_geo_move_decreases_dy_by_constant_ddy);
     RUN_TEST(test_geo_move_decreases_y_by_constant_ddy);
     RUN_TEST(test_geo_jump_sets_dy_to_constant);
+    RUN_TEST(test_geo_update_landed_false_when_above_ground);
+    RUN_TEST(test_geo_update_landed_true_when_at_ground);
+    RUN_TEST(test_geo_update_landed_true_when_below_ground);
     RUN_TEST(test_geo_jump_works_with_move_until_apex_and_back);
 
     return UNITY_END();

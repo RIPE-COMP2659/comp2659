@@ -22,4 +22,5 @@ typedef struct {
 
 void geo_move(Geo *geo);
 void geo_jump(Geo *geo);
+void geo_update_landed(Geo *geo);
 Geo create_geo(unsigned int x, unsigned int y, unsigned int ground_y);

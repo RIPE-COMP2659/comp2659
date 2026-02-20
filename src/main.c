@@ -16,7 +16,12 @@ int main(void) {
     printf("Geo dx: %d\n", world.geo.dx);
     printf("Geo dy: %d\n", world.geo.dy);
     printf("Geo ddy: %d\n", world.geo.ddy);
+    printf("Geo is_landed: %d\n", world.geo.is_landed);
 
+    geo_move(&world.geo);
+    printf("Geo is_landed: %d\n", world.geo.is_landed);
+    geo_move(&world.geo);
+    printf("Geo is_landed: %d\n", world.geo.is_landed);
     geo_move(&world.geo);
 
     printf("Geo x: %d\n", world.geo.x);
@@ -24,6 +29,7 @@ int main(void) {
     printf("Geo dx: %d\n", world.geo.dx);
     printf("Geo dy: %d\n", world.geo.dy);
     printf("Geo ddy: %d\n", world.geo.ddy);
+    printf("Geo is_landed: %d\n", world.geo.is_landed);
 
     geo_jump(&world.geo);
     geo_move(&world.geo);
@@ -33,11 +39,13 @@ int main(void) {
     printf("Geo dx: %d\n", world.geo.dx);
     printf("Geo dy: %d\n", world.geo.dy);
     printf("Geo ddy: %d\n", world.geo.ddy);
+    printf("Geo is_landed: %d\n", world.geo.is_landed);
 
     geo_move(&world.geo);
 
     printf("Geo x after move: %d\n", world.geo.x);
     printf("Geo y after move: %d\n", world.geo.y);
+    printf("Geo is_landed: %d\n", world.geo.is_landed);
 
     return 0;
 }
