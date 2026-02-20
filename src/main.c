@@ -3,18 +3,11 @@
 
 int main(void) {
     /* For now, just a placeholder */
-    Level levels[1];
-    Geo geo = { GEO_DDY, GEO_DX, 0, 100, 200, GEO_SIZE, GEO_SPRITE };
-    World world;
-
-    levels[0] = get_level1();
-    world.levels = levels;
-    world.geo = geo;
-    world.ground_y = 0;
+    World world = get_world();
 
     printf("Running main!\n");
 
-    printf("Level has %d block size \n", 
+    printf("Level has %u block size \n", 
         world.levels[0].blocks[0].size
     );
 

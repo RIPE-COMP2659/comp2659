@@ -4,21 +4,15 @@
 World world;
 
 void setUp(void) {
-    Level levels[1];
-    Geo geo = { GEO_DDY, GEO_DX, 0, 100, 200, GEO_SIZE, GEO_SPRITE };
-
-    levels[0] = get_level1();
-    world.levels = levels;
-    world.geo = geo;
-    world.ground_y = 0;
+    world = get_world();
 }
 
 void tearDown(void) {
 }
 
 void test_world(void) {
-    world_placeholder();
     printf("Realistically nothing to test\n");
+    world_placeholder();
 }
 
 int main(void) {
