@@ -1,7 +1,8 @@
+# include "dtypes.h"
+
 #define BLOCK_SIZE 32
 
-/* TODO: Refactor BLOCK_SIZE / 16, should instead be using a generic size for integers and using size. */
-static const unsigned int BLOCK_SPRITE[BLOCK_SIZE][BLOCK_SIZE / 16] = {
+static const unsigned int BLOCK_SPRITE[BLOCK_SIZE][BLOCK_SIZE / WORD] = {
     {0x0000, 0x0000},/* 1 */
     {0x7FFF, 0xFFFE},
     {0x7FFF, 0xFFFE},
@@ -40,7 +41,7 @@ typedef struct {
     unsigned int x;
     unsigned int y;
     unsigned int size;
-    const unsigned int (*sprite)[BLOCK_SIZE / 16];
+    const unsigned int (*sprite)[BLOCK_SIZE / WORD];
 } Block;
 
 void block_placeholder(void);

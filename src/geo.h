@@ -1,10 +1,11 @@
+# include "dtypes.h"
+
 #define GEO_DDY -1
 #define GEO_DX 1
 #define GEO_JUMP_DY 10 /*change for smaller size later*/
 #define GEO_SIZE 32
 
-/* TODO: Refactor GEO_SIZE / 16, should instead be using a generic size for integers and using size. */
-static const unsigned int GEO_SPRITE[GEO_SIZE][GEO_SIZE / 16] = {
+static const unsigned int GEO_SPRITE[GEO_SIZE][GEO_SIZE / WORD] = {
     {0x800C, 0x3001}, /* 1 */
     {0x3FC9, 0x93FC},
     {0x7FEB, 0xD7FE},
@@ -46,7 +47,7 @@ typedef struct {
     unsigned int x;
     unsigned int y;
     unsigned int size;
-    const unsigned int (*sprite)[GEO_SIZE / 16];
+    const unsigned int (*sprite)[GEO_SIZE / WORD];
 } Geo;
 
 void geo_move(Geo *geo);

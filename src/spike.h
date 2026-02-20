@@ -1,7 +1,8 @@
+# include "dtypes.h"
+
 #define SPIKE_SIZE 32
 
-/* TODO: Refactor SPIKE_SIZE / 16, should instead be using a generic size for integers and using size. */
-static const unsigned int SPIKE_SPRITE[SPIKE_SIZE][SPIKE_SIZE / 16] = {
+static const unsigned int SPIKE_SPRITE[SPIKE_SIZE][SPIKE_SIZE / WORD] = {
     {0xFFFE, 0x7FFF},/* 1 */
     {0xFFFE, 0x7FFF},
     {0xFFFC, 0x3FFF},
@@ -40,7 +41,7 @@ typedef struct {
     unsigned int x;
     unsigned int y;
     unsigned int size;
-    const unsigned int (*sprite)[SPIKE_SIZE / 16];
+    const unsigned int (*sprite)[SPIKE_SIZE / WORD];
 } Spike;
 
 void spike_placeholder(void);

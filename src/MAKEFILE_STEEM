@@ -1,23 +1,27 @@
 prog.tos: block.o spike.o lava.o geo.o level.o world.o main.o
 	cc68x -g block.o spike.o lava.o geo.o level.o world.o main.o -o prog.tos
 
-block.o: block.c block.h
+dtypes.h:
+	echo 'ERROR: dtypes.h is missing. Copy dtypes.h into the Atari build folder.'
+	exit 1
+
+block.o: block.c block.h dtypes.h
 	cc68x -g -c block.c
 
-lava.o: lava.c lava.h
+lava.o: lava.c lava.h dtypes.h
 	cc68x -g -c lava.c
 
-spike.o: spike.c spike.h
+spike.o: spike.c spike.h dtypes.h
 	cc68x -g -c spike.c
 
-geo.o: geo.c geo.h
+geo.o: geo.c geo.h dtypes.h
 	cc68x -g -c geo.c
 
-level.o: level.c level.h
+level.o: level.c level.h dtypes.h
 	cc68x -g -c level.c
 
-world.o: world.c world.h
+world.o: world.c world.h dtypes.h
 	cc68x -g -c world.c
 
-main.o: main.c block.h spike.h lava.h geo.h level.h world.h
+main.o: main.c block.h spike.h lava.h geo.h level.h world.h dtypes.h
 	cc68x -g -c main.c

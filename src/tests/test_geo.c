@@ -27,7 +27,7 @@ void test_geo_sprite_size(void) {
     int num_rows = sizeof(GEO_SPRITE) / sizeof(GEO_SPRITE[0]);
     TEST_ASSERT_EQUAL_INT(geo.size, num_rows);
 
-    int bits_per_row = (GEO_SIZE / 16) * 16;
+    int bits_per_row = (GEO_SIZE / WORD) * WORD;
     TEST_ASSERT_EQUAL_INT(geo.size, bits_per_row);
 }
 

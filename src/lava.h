@@ -1,7 +1,8 @@
+# include "dtypes.h"
+
 #define LAVA_SIZE 32
 
-/* TODO: Refactor LAVA_SIZE / 16, should instead be using a generic size for integers and using size. */
-static const unsigned int LAVA_SPRITE[LAVA_SIZE][LAVA_SIZE / 16] = {
+static const unsigned int LAVA_SPRITE[LAVA_SIZE][LAVA_SIZE / WORD] = {
     /* 1–4: full white */
     {0x0000, 0x0000}, /* 1 */
     {0x0000, 0x0000},
@@ -45,7 +46,7 @@ typedef struct {
     unsigned int x;
     unsigned int y;
     unsigned int size;
-    const unsigned int (*sprite)[LAVA_SIZE / 16];
+    const unsigned int (*sprite)[LAVA_SIZE / WORD];
 } Lava;
 
 void lava_placeholder(void);

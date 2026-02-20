@@ -67,7 +67,7 @@ void test_block_sprite_size(void) {
     TEST_ASSERT_EQUAL_INT(block1.size, num_rows);
     
     /* Verify the first row is correct in size */
-    int bits_per_row = (BLOCK_SIZE / 16) * 16;
+    int bits_per_row = (BLOCK_SIZE / WORD) * WORD;
     TEST_ASSERT_EQUAL_INT(block1.size, bits_per_row);
 }
 /* Main function to run all tests */
