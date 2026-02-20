@@ -41,6 +41,9 @@ int main(void) {
     printf("Geo ddy: %d\n", world.geo.ddy);
     printf("Geo is_landed: %d\n", world.geo.is_landed);
 
+    geo_jump(&world.geo);
+    geo_jump(&world.geo);
+    geo_jump(&world.geo);
     geo_move(&world.geo);
 
     printf("Geo x after move: %d\n", world.geo.x);

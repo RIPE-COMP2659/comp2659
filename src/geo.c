@@ -60,9 +60,10 @@ void geo_move(Geo *geo) {
     geo_update_landed(geo);
 }
 
-/* TODO: Should probably check geo is on the ground, coming later */
 void geo_jump(Geo *geo) {
-    geo->dy = GEO_JUMP_DY;
+    if (geo->is_landed == TRUE) {
+        geo->dy = GEO_JUMP_DY;
+    }
 }
 
 /* TODO: This currently snaps geo up to the position of landed even if they're much lower, might be weird in practice. */
