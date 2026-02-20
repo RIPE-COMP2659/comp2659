@@ -44,6 +44,7 @@ typedef struct {
     signed int ddy;
     signed int dx;
     signed int dy;
+    signed int is_landed;
     unsigned int x;
     unsigned int y;
     unsigned int size;

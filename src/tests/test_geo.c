@@ -4,7 +4,7 @@
 Geo geo;
 
 void setUp(void) {
-    geo = (Geo){ GEO_DDY, GEO_DX, -20, 100, 200, GEO_SIZE, GEO_SPRITE };
+    geo = (Geo){ GEO_DDY, GEO_DX, -20, FALSE, 100, 200, GEO_SIZE, GEO_SPRITE };
 }
 
 void tearDown(void) {
@@ -13,6 +13,7 @@ void tearDown(void) {
 void test_geo_init(void) {
     TEST_ASSERT_EQUAL_INT(100, geo.x);
     TEST_ASSERT_EQUAL_INT(200, geo.y);
+    TEST_ASSERT_EQUAL_INT(FALSE, geo.is_landed);
 }
 
 void test_geo_init_size(void) {
