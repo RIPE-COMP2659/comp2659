@@ -13,6 +13,7 @@ typedef struct {
     signed int dx;
     signed int dy;
     signed int is_landed;
+    unsigned int ground_y;
     unsigned int x;
     unsigned int y;
     unsigned int size;
@@ -21,4 +22,4 @@ typedef struct {
 
 void geo_move(Geo *geo);
 void geo_jump(Geo *geo);
-Geo create_geo(unsigned int x, unsigned int y);
+Geo create_geo(unsigned int x, unsigned int y, unsigned int ground_y);

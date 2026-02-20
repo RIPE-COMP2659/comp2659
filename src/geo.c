@@ -35,13 +35,14 @@ const unsigned int GEO_SPRITE[GEO_SIZE][GEO_SIZE / WORD] = {
     {0x800C, 0x3001} /* 32 */
 };
 
-Geo create_geo(unsigned int x, unsigned int y) {
+Geo create_geo(unsigned int x, unsigned int y, unsigned int ground_y) {
     Geo geo;
 
     geo.ddy = GEO_DDY;
     geo.dx = GEO_DX;
     geo.dy = GEO_DY;
     geo.is_landed = FALSE;
+    geo.ground_y = ground_y;
     geo.x = x;
     geo.y = y;
     geo.size = GEO_SIZE;

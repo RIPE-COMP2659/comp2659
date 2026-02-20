@@ -4,7 +4,7 @@
 Geo geo;
 
 void setUp(void) {
-    geo = create_geo(100, 200);
+    geo = create_geo(100, 200, 32);
     geo.dy = -20;
 }
 

@@ -12,11 +12,12 @@ World create_world(Level* levels, Geo geo, unsigned int ground_y) {
 
 World get_world(void) {
 	Level* levels;
-	Geo geo = create_geo(100, 200);
+	unsigned int ground_y = 0;
+	Geo geo = create_geo(100, 200, ground_y);
 
 	levels = get_levels();
 
-	return create_world(levels, geo, 0);
+	return create_world(levels, geo, ground_y);
 }
 
 void world_placeholder(void) {
