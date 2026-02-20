@@ -12,7 +12,7 @@ World create_world(Level* levels, Geo geo, unsigned int ground_y) {
 
 World get_world(void) {
 	Level* levels;
-	Geo geo = { GEO_DDY, GEO_DX, 0, FALSE, 100, 200, GEO_SIZE, GEO_SPRITE };
+	Geo geo = create_geo(100, 200);
 
 	levels = get_levels();
 

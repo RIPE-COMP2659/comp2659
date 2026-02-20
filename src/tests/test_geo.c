@@ -4,7 +4,8 @@
 Geo geo;
 
 void setUp(void) {
-    geo = (Geo){ GEO_DDY, GEO_DX, -20, FALSE, 100, 200, GEO_SIZE, GEO_SPRITE };
+    geo = create_geo(100, 200);
+    geo.dy = -20;
 }
 
 void tearDown(void) {
