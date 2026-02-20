@@ -5,8 +5,8 @@ Level level1;
 Level level2;
 
 void setUp(void) {
-    level1 = create_level1();
-    level2 = create_level2();
+    level1 = get_level1();
+    level2 = get_level2();
 }
 
 void tearDown(void) {

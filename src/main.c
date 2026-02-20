@@ -1,45 +1,50 @@
 #include <stdio.h> /* Temporary printf import */
-#include "geo.h"
-#include "level.h"
+#include "world.h"
 
 int main(void) {
     /* For now, just a placeholder */
-    Level level = create_level1();
-    Geo test_geo = { GEO_DDY, GEO_DX, 0, 100, 200, GEO_SIZE, GEO_SPRITE };
+    Level levels[1];
+    Geo geo = { GEO_DDY, GEO_DX, 0, 100, 200, GEO_SIZE, GEO_SPRITE };
+    World world;
+
+    levels[0] = get_level1();
+    world.levels = levels;
+    world.geo = geo;
+    world.ground_y = 0;
 
     printf("Running main!\n");
 
     printf("Level has %d block size \n", 
-        level.blocks[0].size
+        world.levels[0].blocks[0].size
     );
 
-    printf("Geo x: %d\n", test_geo.x);
-    printf("Geo y: %d\n", test_geo.y);
-    printf("Geo dx: %d\n", test_geo.dx);
-    printf("Geo dy: %d\n", test_geo.dy);
-    printf("Geo ddy: %d\n", test_geo.ddy);
+    printf("Geo x: %d\n", world.geo.x);
+    printf("Geo y: %d\n", world.geo.y);
+    printf("Geo dx: %d\n", world.geo.dx);
+    printf("Geo dy: %d\n", world.geo.dy);
+    printf("Geo ddy: %d\n", world.geo.ddy);
 
-    geo_move(&test_geo);
+    geo_move(&world.geo);
 
-    printf("Geo x: %d\n", test_geo.x);
-    printf("Geo y: %d\n", test_geo.y);
-    printf("Geo dx: %d\n", test_geo.dx);
-    printf("Geo dy: %d\n", test_geo.dy);
-    printf("Geo ddy: %d\n", test_geo.ddy);
+    printf("Geo x: %d\n", world.geo.x);
+    printf("Geo y: %d\n", world.geo.y);
+    printf("Geo dx: %d\n", world.geo.dx);
+    printf("Geo dy: %d\n", world.geo.dy);
+    printf("Geo ddy: %d\n", world.geo.ddy);
 
-    geo_jump(&test_geo);
-    geo_move(&test_geo);
+    geo_jump(&world.geo);
+    geo_move(&world.geo);
 
-    printf("Geo x after jump and move: %d\n", test_geo.x);
-    printf("Geo y after jump and move: %d\n", test_geo.y);
-    printf("Geo dx: %d\n", test_geo.dx);
-    printf("Geo dy: %d\n", test_geo.dy);
-    printf("Geo ddy: %d\n", test_geo.ddy);
+    printf("Geo x after jump and move: %d\n", world.geo.x);
+    printf("Geo y after jump and move: %d\n", world.geo.y);
+    printf("Geo dx: %d\n", world.geo.dx);
+    printf("Geo dy: %d\n", world.geo.dy);
+    printf("Geo ddy: %d\n", world.geo.ddy);
 
-    geo_move(&test_geo);
+    geo_move(&world.geo);
 
-    printf("Geo x after move: %d\n", test_geo.x);
-    printf("Geo y after move: %d\n", test_geo.y);
+    printf("Geo x after move: %d\n", world.geo.x);
+    printf("Geo y after move: %d\n", world.geo.y);
 
     return 0;
 }

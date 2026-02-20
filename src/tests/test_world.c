@@ -4,29 +4,13 @@
 World world;
 
 void setUp(void) {
-    world = (World) {
-        (Level[]) {
-            (Level) {
-                (Block[]) {
-                    (Block){ 0, 0, BLOCK_SIZE, BLOCK_SPRITE }
-                },
-                (Spike[]) {
-                    (Spike){ 0, 0, SPIKE_SIZE, SPIKE_SPRITE }
-                },
-                (Lava[]) {
-                    (Lava){ 0, 0, LAVA_SIZE, LAVA_SPRITE }
-                },
-                0,
-                0,
-                0,
-                1000
-            }
-        },
-        (Geo) {
-            GEO_DDY, GEO_DX, -20, 100, 200, GEO_SIZE, GEO_SPRITE
-        },
-        300
-    };
+    Level levels[1];
+    Geo geo = { GEO_DDY, GEO_DX, 0, 100, 200, GEO_SIZE, GEO_SPRITE };
+
+    levels[0] = get_level1();
+    world.levels = levels;
+    world.geo = geo;
+    world.ground_y = 0;
 }
 
 void tearDown(void) {

@@ -14,7 +14,7 @@ Level create_level(Block* blocks, Spike* spikes, Lava* lava, unsigned int end_x)
 	return level;
 }
 
-Level create_level1(void) {
+Level get_level1(void) {
     Block level_blocks[2] = {
         {0, 0, BLOCK_SIZE, BLOCK_SPRITE},
         {100, 200, BLOCK_SIZE, BLOCK_SPRITE}
@@ -28,7 +28,7 @@ Level create_level1(void) {
     return create_level(level_blocks, level_spikes, level_lava, 1000);
 }
 
-Level create_level2(void) {
+Level get_level2(void) {
     Block level_blocks[2] = {
         {0, 0, BLOCK_SIZE, BLOCK_SPRITE},
         {100, 200, BLOCK_SIZE, BLOCK_SPRITE}

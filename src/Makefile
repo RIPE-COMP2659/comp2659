@@ -31,6 +31,7 @@ INCLUDES = -I. -Itests/unity
 SRC = $(filter-out tests/%, $(wildcard *.c))
 SRC_BASENAMES = $(basename $(SRC))
 UNITY_FILES = tests/unity/unity.c
+TEST_SUPPORT_SRC = $(filter-out main.c,$(SRC))
 
 # Dynamically discover test files (all .c files in tests/ excluding unity/)
 TEST_SRC_FILES = $(filter-out tests/unity/%, $(wildcard tests/*.c))
@@ -52,8 +53,9 @@ test: $(TEST_EXECS)
 
 # Build test executables (pattern rule)
 # Each test compiles with its corresponding source file: test_NAME.c compiles with NAME.c
-%$(EXE_EXT): tests/%.c $(UNITY_FILES)
-	$(CC) $(CFLAGS) $(COVERAGE_FLAGS) $(INCLUDES) -DTESTING $< $(patsubst test_%,%.c,$(basename $@)) $(UNITY_FILES) -o $@
+#%$(EXE_EXT): tests/%.c $(UNITY_FILES) $(TEST_SUPPORT_SRC)
+%$(EXE_EXT): tests/%.c $(UNITY_FILES) $(TEST_SUPPORT_SRC)
+	$(CC) $(CFLAGS) $(COVERAGE_FLAGS) $(INCLUDES) -DTESTING $< $(TEST_SUPPORT_SRC) $(UNITY_FILES) -o $@
 
 # Build the main program
 main: clean $(MAIN_EXE)
