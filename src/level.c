@@ -42,5 +42,14 @@ Level get_level2(void) {
     return create_level(level_blocks, level_spikes, level_lava, 1000);
 }
 
+Level* get_levels(void) {
+    static Level levels[2];
+
+    levels[0] = get_level1();
+    levels[1] = get_level2();
+
+    return levels;
+}
+
 void level_placeholder(void) {
 }
