@@ -13,6 +13,7 @@ typedef struct {
     signed int dx;
     signed int dy;
     signed int is_landed;
+    signed int is_dead;
     unsigned int ground_y;
     unsigned int x;
     unsigned int y;
