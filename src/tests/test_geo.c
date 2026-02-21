@@ -41,11 +41,11 @@ void test_geo_sprite_size(void) {
 void test_geo_move_increases_x_by_constant_dx(void) {
     unsigned int current_x = geo.x;
 
-    geo_move(&geo);
+    geo_update(&geo);
     TEST_ASSERT_EQUAL_INT(current_x + GEO_DX, geo.x);
     current_x = geo.x;
 
-    geo_move(&geo);
+    geo_update(&geo);
     TEST_ASSERT_EQUAL_INT(current_x + GEO_DX, geo.x);
 }
 
@@ -55,11 +55,11 @@ void test_geo_move_decreases_dy_by_constant_ddy(void) {
     unsigned int offset = current_dy >= 0 ? current_dy * 3 : (-current_dy) * 3;
     geo.y = geo.ground_y + geo.size + offset;
 
-    geo_move(&geo);
+    geo_update(&geo);
     TEST_ASSERT_EQUAL_INT(current_dy + GEO_DDY, geo.dy);
     current_dy = geo.dy;
 
-    geo_move(&geo);
+    geo_update(&geo);
     TEST_ASSERT_EQUAL_INT(current_dy + GEO_DDY, geo.dy);
 }
 
@@ -70,19 +70,19 @@ void test_geo_move_decreases_y_by_constant_ddy(void) {
     geo.y = geo.ground_y + geo.size + offset;
     signed int current_y = geo.y;
 
-    geo_move(&geo);
+    geo_update(&geo);
     TEST_ASSERT_EQUAL_INT(current_y + current_dy + GEO_DDY, geo.y);
     current_y = geo.y;
     current_dy = geo.dy;
 
-    geo_move(&geo);
+    geo_update(&geo);
     TEST_ASSERT_EQUAL_INT(current_y + current_dy + GEO_DDY, geo.y);
 }
 
 /* TODO: Add test to make sure can't jump if not landed */
 void test_geo_jump_sets_dy_to_constant(void) {
     geo.dy = -20; /* Set to something other than the jump value to make sure it's being set, not added to */
-    geo_move(&geo); /* Move to update landed status based on initial position and ground_y */
+    geo_update(&geo); /* Move to update landed status based on initial position and ground_y */
     geo_jump(&geo);
     TEST_ASSERT_EQUAL_INT(GEO_JUMP_DY, geo.dy);
 }
@@ -118,7 +118,7 @@ void test_geo_update_landed_true_when_below_ground(void) {
 
 /* Make sure falling after jumping works properly, ideally to the point of an apex, using move */
 void test_geo_jump_works_with_move_until_apex_and_back(void) {
-    geo_move(&geo); /* Move to update landed status based on initial position and ground_y */
+    geo_update(&geo); /* Move to update landed status based on initial position and ground_y */
     geo_jump(&geo);
 
     signed int current_y = geo.y;
@@ -127,7 +127,7 @@ void test_geo_jump_works_with_move_until_apex_and_back(void) {
     unsigned int i;
 
     for (i = 0; i < iterations_to_apex; i++) {
-        geo_move(&geo);
+        geo_update(&geo);
 
         TEST_ASSERT_EQUAL_INT(current_dy + GEO_DDY, geo.dy);
         TEST_ASSERT_EQUAL_INT(current_y + current_dy + GEO_DDY, geo.y);
@@ -138,7 +138,7 @@ void test_geo_jump_works_with_move_until_apex_and_back(void) {
 
     TEST_ASSERT_EQUAL_INT(0, geo.dy);
 
-    geo_move(&geo);
+    geo_update(&geo);
     TEST_ASSERT_EQUAL_INT(current_dy + GEO_DDY, geo.dy);
     TEST_ASSERT_EQUAL_INT(current_y + current_dy + GEO_DDY, geo.y);
 }

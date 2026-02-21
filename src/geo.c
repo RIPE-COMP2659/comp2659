@@ -52,7 +52,7 @@ Geo create_geo(unsigned int x, unsigned int y, unsigned int ground_y) {
     return geo;
 }
 
-void geo_move(Geo *geo) {
+void geo_update(Geo *geo) {
     geo->x += geo->dx;
 
     geo->dy += geo->ddy;
