@@ -10,4 +10,4 @@ typedef struct {
 
 World create_world(Level* levels, Geo geo, unsigned int ground_y);
 World get_world(void);
-void world_placeholder(void);
+void world_collision_geo_block(World *world, Block *block);
