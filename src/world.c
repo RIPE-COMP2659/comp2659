@@ -48,3 +48,17 @@ void world_collision_geo_spike(World *world, Spike *spike) {
         world->geo.is_dead = TRUE;
     }
 }
+
+/* TODO: Implement proper lava collision detection once we refactor to better lava objects */
+void world_collision_geo_lava(World *world, Lava *lava) {
+    signed int collision = geo_check_square_collision(
+        &world->geo,
+        lava->x,
+        lava->y,
+        lava->size
+    );
+
+    if (collision != COLLISION_NONE && collision != COLLISION_ERROR) {
+        world->geo.is_dead = TRUE;
+    }
+}
