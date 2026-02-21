@@ -34,3 +34,17 @@ void world_collision_geo_block(World *world, Block *block) {
         world->geo.is_dead = TRUE;
     }
 }
+
+/* TODO: Implement proper spike collision detection */
+void world_collision_geo_spike(World *world, Spike *spike) {
+    signed int collision = geo_check_square_collision(
+        &world->geo,
+        spike->x,
+        spike->y,
+        spike->size
+    );
+
+    if (collision != COLLISION_NONE && collision != COLLISION_ERROR) {
+        world->geo.is_dead = TRUE;
+    }
+}
