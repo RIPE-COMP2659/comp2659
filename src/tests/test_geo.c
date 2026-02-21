@@ -211,7 +211,6 @@ void test_geo_check_square_collision_bottom_collision(void) {
 void test_geo_check_square_collision_left_collision(void) {
     signed int collision_result;
     unsigned int object_size = 32;
-    unsigned int big_offset = object_size / 2;
     unsigned int small_offset = object_size / 4;
     geo.x = 100;
     geo.y = 100;

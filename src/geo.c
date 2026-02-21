@@ -42,6 +42,7 @@ Geo create_geo(unsigned int x, unsigned int y, unsigned int ground_y) {
     geo.dx = GEO_DX;
     geo.dy = GEO_DY;
     geo.is_landed = FALSE;
+    geo.is_dead = FALSE;
     geo.ground_y = ground_y;
     geo.x = x;
     geo.y = y;

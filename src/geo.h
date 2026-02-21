@@ -12,15 +12,16 @@
 extern const unsigned int GEO_SPRITE[GEO_SIZE][GEO_SIZE / WORD];
 
 typedef struct {
-  signed int ddy;
-  signed int dx;
-  signed int dy;
-  signed int is_landed;
-  unsigned int ground_y;
-  unsigned int x;
-  unsigned int y;
-  unsigned int size;
-  const unsigned int (*sprite)[GEO_SIZE / WORD];
+    signed int ddy;
+    signed int dx;
+    signed int dy;
+    signed int is_landed;
+    signed int is_dead;
+    unsigned int ground_y;
+    unsigned int x;
+    unsigned int y;
+    unsigned int size;
+    const unsigned int (*sprite)[GEO_SIZE / WORD];
 } Geo;
 
 void geo_move(Geo *geo);
