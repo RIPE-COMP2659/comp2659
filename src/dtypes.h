@@ -1,3 +1,6 @@
+#ifndef DTYPES_H
+#define DTYPES_H
+
 /* Data sizes */
 #define WORD 16
 
@@ -12,3 +15,5 @@
 #define COLLISION_BOTTOM -1
 #define COLLISION_LEFT -2
 #define COLLISION_ERROR -404
+
+#endif /* DTYPES_H */
