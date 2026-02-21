@@ -2,9 +2,14 @@
 #include "geo.h"
 
 Geo geo;
+const signed int INITIAL_X = 64;
+const signed int INITIAL_Y = 32;
+const signed int INITIAL_GROUND_Y = 32;
+
+/* TODO: Add tests for update_landed */
 
 void setUp(void) {
-    geo = create_geo(100, 200, 32);
+    geo = create_geo(INITIAL_X, INITIAL_Y, INITIAL_GROUND_Y);
     geo.dy = -20;
 }
 
@@ -12,8 +17,8 @@ void tearDown(void) {
 }
 
 void test_geo_init(void) {
-    TEST_ASSERT_EQUAL_INT(100, geo.x);
-    TEST_ASSERT_EQUAL_INT(200, geo.y);
+    TEST_ASSERT_EQUAL_INT(INITIAL_X, geo.x);
+    TEST_ASSERT_EQUAL_INT(INITIAL_Y, geo.y);
     TEST_ASSERT_EQUAL_INT(FALSE, geo.is_landed);
 }
 
@@ -46,6 +51,9 @@ void test_geo_move_increases_x_by_constant_dx(void) {
 
 void test_geo_move_decreases_dy_by_constant_ddy(void) {
     signed int current_dy = geo.dy;
+    /* Need to make sure geo is above the ground */
+    unsigned int offset = current_dy >= 0 ? current_dy * 3 : (-current_dy) * 3;
+    geo.y = geo.ground_y + geo.size + offset;
 
     geo_move(&geo);
     TEST_ASSERT_EQUAL_INT(current_dy + GEO_DDY, geo.dy);
@@ -56,8 +64,11 @@ void test_geo_move_decreases_dy_by_constant_ddy(void) {
 }
 
 void test_geo_move_decreases_y_by_constant_ddy(void) {
-    signed int current_y = geo.y;
     signed int current_dy = geo.dy;
+    /* Need to make sure geo is above the ground */
+    unsigned int offset = current_dy >= 0 ? current_dy * 3 : (-current_dy) * 3;
+    geo.y = geo.ground_y + geo.size + offset;
+    signed int current_y = geo.y;
 
     geo_move(&geo);
     TEST_ASSERT_EQUAL_INT(current_y + current_dy + GEO_DDY, geo.y);
@@ -68,8 +79,10 @@ void test_geo_move_decreases_y_by_constant_ddy(void) {
     TEST_ASSERT_EQUAL_INT(current_y + current_dy + GEO_DDY, geo.y);
 }
 
+/* TODO: Add test to make sure can't jump if not landed */
 void test_geo_jump_sets_dy_to_constant(void) {
-    geo.dy = -100; /* Set to something other than the jump value to make sure it's being set, not added to */
+    geo.dy = -20; /* Set to something other than the jump value to make sure it's being set, not added to */
+    geo_move(&geo); /* Move to update landed status based on initial position and ground_y */
     geo_jump(&geo);
     TEST_ASSERT_EQUAL_INT(GEO_JUMP_DY, geo.dy);
 }
@@ -105,8 +118,7 @@ void test_geo_update_landed_true_when_below_ground(void) {
 
 /* Make sure falling after jumping works properly, ideally to the point of an apex, using move */
 void test_geo_jump_works_with_move_until_apex_and_back(void) {
-    geo.y = 0;
-
+    geo_move(&geo); /* Move to update landed status based on initial position and ground_y */
     geo_jump(&geo);
 
     signed int current_y = geo.y;
@@ -131,6 +143,92 @@ void test_geo_jump_works_with_move_until_apex_and_back(void) {
     TEST_ASSERT_EQUAL_INT(current_y + current_dy + GEO_DDY, geo.y);
 }
 
+void test_geo_check_square_collision_no_collision(void) {
+    signed int collision_result;
+    unsigned int object_size = 32;
+    geo.x = 100;
+    geo.y = 100;
+
+    /* No overlap, square to the right */
+    collision_result = geo_check_square_collision(&geo, geo.x + geo.size + object_size, geo.y, object_size);
+    TEST_ASSERT_EQUAL_INT(COLLISION_NONE, collision_result);
+
+    /* No overlap, square to the left */
+    collision_result = geo_check_square_collision(&geo, geo.x - (object_size + object_size), geo.y, object_size);
+    TEST_ASSERT_EQUAL_INT(COLLISION_NONE, collision_result);
+
+    /* No overlap, square above */
+    collision_result = geo_check_square_collision(&geo, geo.x, geo.y + object_size + object_size, object_size);
+    TEST_ASSERT_EQUAL_INT(COLLISION_NONE, collision_result);
+
+    /* No overlap, square below */
+    collision_result = geo_check_square_collision(&geo, geo.x, geo.y - (object_size + object_size), object_size);
+    TEST_ASSERT_EQUAL_INT(COLLISION_NONE, collision_result);
+}
+
+void test_geo_check_square_collision_top_collision(void) {
+    signed int collision_result;
+    unsigned int object_size = 32;
+    unsigned int big_offset = object_size / 2;
+    unsigned int small_offset = object_size / 4;
+    geo.x = 100;
+    geo.y = 100;
+
+    /* Object below geo and to the right */
+    collision_result = geo_check_square_collision(&geo, geo.x + big_offset, geo.y - geo.size + small_offset, object_size);
+    TEST_ASSERT_EQUAL_INT(COLLISION_TOP, collision_result);
+
+    /* Object directly below geo with */
+    collision_result = geo_check_square_collision(&geo, geo.x, geo.y - geo.size + small_offset, object_size);
+    TEST_ASSERT_EQUAL_INT(COLLISION_TOP, collision_result);
+
+    /* Object below geo and to the left */
+    collision_result = geo_check_square_collision(&geo, geo.x - big_offset, geo.y - geo.size + small_offset, object_size);
+    TEST_ASSERT_EQUAL_INT(COLLISION_TOP, collision_result);
+}
+
+void test_geo_check_square_collision_bottom_collision(void) {
+    signed int collision_result;
+    unsigned int object_size = 32;
+    unsigned int big_offset = object_size / 2;
+    unsigned int small_offset = object_size / 4;
+    geo.x = 100;
+    geo.y = 100;
+
+    /* Object above geo and to the right */
+    collision_result = geo_check_square_collision(&geo, geo.x + big_offset, geo.y + object_size - small_offset, object_size);
+    TEST_ASSERT_EQUAL_INT(COLLISION_BOTTOM, collision_result);
+
+    /* Object directly above geo */
+    collision_result = geo_check_square_collision(&geo, geo.x, geo.y + object_size - small_offset, object_size);
+    TEST_ASSERT_EQUAL_INT(COLLISION_BOTTOM, collision_result);
+
+    /* Object above geo and to the left */
+    collision_result = geo_check_square_collision(&geo, geo.x - big_offset, geo.y + object_size - small_offset, object_size);
+    TEST_ASSERT_EQUAL_INT(COLLISION_BOTTOM, collision_result);
+}
+
+void test_geo_check_square_collision_left_collision(void) {
+    signed int collision_result;
+    unsigned int object_size = 32;
+    unsigned int big_offset = object_size / 2;
+    unsigned int small_offset = object_size / 4;
+    geo.x = 100;
+    geo.y = 100;
+
+    /* Object to the right and geo slightly above  */
+    collision_result = geo_check_square_collision(&geo, geo.x + geo.size - small_offset, geo.y - small_offset, object_size);
+    TEST_ASSERT_EQUAL_INT(COLLISION_LEFT, collision_result);
+
+    /* Object directly to the right of geo */
+    collision_result = geo_check_square_collision(&geo, geo.x + geo.size - small_offset, geo.y, object_size);
+    TEST_ASSERT_EQUAL_INT(COLLISION_LEFT, collision_result);
+
+    /* Object to the right and geo slightly below */
+    collision_result = geo_check_square_collision(&geo, geo.x + geo.size - small_offset, geo.y + small_offset, object_size);
+    TEST_ASSERT_EQUAL_INT(COLLISION_LEFT, collision_result);
+}
+
 int main(void) {
     UNITY_BEGIN();
 
@@ -146,6 +244,10 @@ int main(void) {
     RUN_TEST(test_geo_update_landed_true_when_at_ground);
     RUN_TEST(test_geo_update_landed_true_when_below_ground);
     RUN_TEST(test_geo_jump_works_with_move_until_apex_and_back);
+    RUN_TEST(test_geo_check_square_collision_no_collision);
+    RUN_TEST(test_geo_check_square_collision_top_collision);
+    RUN_TEST(test_geo_check_square_collision_bottom_collision);
+    RUN_TEST(test_geo_check_square_collision_left_collision);
 
     return UNITY_END();
 }

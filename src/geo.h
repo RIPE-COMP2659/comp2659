@@ -1,4 +1,4 @@
-# include "dtypes.h"
+#include "dtypes.h"
 
 #define GEO_DDY -1
 #define GEO_DX 1
@@ -23,4 +23,5 @@ typedef struct {
 void geo_move(Geo *geo);
 void geo_jump(Geo *geo);
 void geo_update_landed(Geo *geo);
+signed int geo_check_square_collision(Geo *geo, unsigned int object_x, unsigned int object_y, unsigned int object_size);
 Geo create_geo(unsigned int x, unsigned int y, unsigned int ground_y);
