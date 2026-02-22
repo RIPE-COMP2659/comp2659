@@ -24,7 +24,7 @@
  *
  * OUTPUT:  None (modifies geo in place)
  *
- * ASSUMPTIONS: geo and level are not NULL
+ * ASSUMPTIONS: geo and level are not NULL.
  */
 void on_clock_tick(Geo *geo, Level *level);
 
