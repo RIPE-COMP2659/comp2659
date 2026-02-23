@@ -7,8 +7,14 @@ Spike spike2;
 
 /* Setup spikes for testing */
 void setUp(void) {
-    spike1 = (Spike){ 0, 0, SPIKE_SIZE, SPIKE_SPRITE };
-    spike2 = (Spike){ 100, 200, SPIKE_SIZE, SPIKE_SPRITE };
+    spike1.x = 0;
+    spike1.y = 0;
+    spike1.size = SPIKE_SIZE;
+    spike1.sprite = SPIKE_SPRITE;
+    spike2.x = 100;
+    spike2.y = 200;
+    spike2.size = SPIKE_SIZE;
+    spike2.sprite = SPIKE_SPRITE;
     spike_placeholder();
 }
 
@@ -64,10 +70,9 @@ void test_spike_init_global_sprite(void) {
 void test_spike_sprite_size(void) {
     /* Verify sprite array has spike.size rows */
     int num_rows = sizeof(SPIKE_SPRITE) / sizeof(SPIKE_SPRITE[0]);
-    TEST_ASSERT_EQUAL_INT(spike1.size, num_rows);
-    
-    /* Verify the first row is correct in size */
     int bits_per_row = (SPIKE_SIZE / WORD) * WORD;
+
+    TEST_ASSERT_EQUAL_INT(spike1.size, num_rows);
     TEST_ASSERT_EQUAL_INT(spike1.size, bits_per_row);
 }
 /* Main function to run all tests */
