@@ -4,6 +4,12 @@
 ; void plot_clipped_bitmap(UINT8 *base, UINT16 row, UINT16 col, const void *bitmap, UINT16 height, UINT16 width, UINT16 status, UINT16 new_width);
 ;________________________________________________________________
 
+;--------------------------------------------------------------------------------------------
+;                       !MIGRATE to pass-by-register for faster performance in the future!
+;                       This will avoid read/writes to memory, which costs us clock cycles
+;--------------------------------------------------------------------------------------------
+
+
     xdef          _plot_clipped_bitmap
 
 base            equ             64 

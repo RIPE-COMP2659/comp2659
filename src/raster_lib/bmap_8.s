@@ -19,17 +19,23 @@
                 xref            _check_bounds
                 xref            _plot_clipped_bitmap
 
-base            equ             64             
-row             equ             68               
+base            equ             64
+row             equ             68
 col             equ             70
-bitmap          equ             72              ; pointer to bitmap data
+bitmap          equ             72
 height          equ             76
 
 
 _plot_bitmap_8: 
                 movem.l         d0-d7/a0-a6,-(sp)
 
-                ; Check bounds first
+;--------------------------------------------------------------------------------------------
+;                       !MIGRATE to pass-by-register for faster performance in the future!
+;                       This will avoid read/writes to memory, which costs us clock cycles
+;--------------------------------------------------------------------------------------------
+
+                ; Check bounds using the _check_bounds routine.
+
                 move.w          #8,-(sp)           ; push width (8 pixels)
                 move.w          height(sp),-(sp)   ; push height
                 move.w          col(sp),-(sp)      ; push col
@@ -38,13 +44,13 @@ _plot_bitmap_8:
                 adda.l             #8,sp           ; clean parameters from  stack
                 
                 ; Check return status
-                cmpi.b          #3,d0               ; check if entirely out of bounds
+                cmpi.b          #3,d0               ; check if entirely out of bounds (nothing to draw)
                 beq             done                ; if so, return immediately
                 
                 tst.b           d0                  ; check if any clipping needed
                 bne             use_clipped         ; if status != 0 (but not 3), use clipped version
                 
-                ; No clipping needed, continue with optimized routine
+                ; No clipping needed, continue with normal routine
                 movea.l         base(sp),a0     ; get base address (screen starting pointer)
                 movea.l         bitmap(sp),a1   ; get bitmap start address
                 
@@ -68,7 +74,7 @@ _plot_bitmap_8:
                 move.w          height(sp),d7   ; get height
                 subq.w          #1,d7           ; adjust for dbra
                 
-                ; Double bit-shift is basically same as (#8 - bit_offset). Potential for optimizations here.
+                ; Double bit-shift is basically same as (#8 - bit_offset). Potential for optimizations here, but this might be best.
 shift_loop:     moveq           #0,d0           ; clear d0
                 move.b          (a1)+,d0        ; get bitmap byte into low byte
                 lsl.w           #8,d0           ; shift to high byte: 0x00FF --> 0xFF00
@@ -90,7 +96,7 @@ shift_loop:     moveq           #0,d0           ; clear d0
                 rts
 
 aligned_copy:
-                ; Byte-aligned - can use optimized copy
+                ; CASE: Byte-aligned - can use optimized copy
                 move.w          height(sp),d7   ; get height (number of rows)
                 subq.w          #1,d7           ; adjust for dbra
                 
@@ -119,6 +125,12 @@ use_clipped:
                 move.w          (sp)+,d6            ; d6 = new_width
                 move.w          (sp)+,d7            ; d7 = status
                 
+
+;--------------------------------------------------------------------------------------------
+;                       !MIGRATE to pass-by-register for faster performance in the future!
+;                       This will avoid read/writes to memory, which costs us clock cycles
+;--------------------------------------------------------------------------------------------
+
                 ; Now push parameters for _plot_clipped_bitmap
                 move.w          d6,-(sp)            ; push new_width
                 move.w          d7,-(sp)            ; push status
@@ -129,5 +141,5 @@ use_clipped:
                 move.w          row+8(sp),-(sp)     ; push row
                 move.l          base+10(sp),-(sp)   ; push base
                 jsr             _plot_clipped_bitmap
-                lea             18(sp),sp           ; clean up (4+2+4+2+2+2+2 = 18 bytes)
+                adda.l          #18,sp           ; clean up (4+2+4+2+2+2+2 = 18 bytes)
                 rts

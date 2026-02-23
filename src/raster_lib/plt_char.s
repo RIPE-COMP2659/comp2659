@@ -74,7 +74,7 @@ done:
 ; Hardcoded 8x16 Font Data
 ; Format: Contiguous - each character is 16 consecutive bytes
 ; Each byte represents one row of 8 pixels (MSB = leftmost pixel)
-; Range: ASCII 32-127 (printable characters only, control chars omitted)
+; Range: ASCII 32-127 (printable characters only, control chars not included)
 ;________________________________________________________________
 
 font_data:

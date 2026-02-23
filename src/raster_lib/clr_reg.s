@@ -14,6 +14,7 @@
 ;
 ; OPTIMIZATION: For best performance, use 32-pixel (4-byte) width with word-aligned starting address.
 ; Falls back to generic byte-by-byte clearing for other widths or odd addresses.
+;
 
 
 

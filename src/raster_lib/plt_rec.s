@@ -13,7 +13,6 @@
 ; Draw a rectangular region on the screen.
 ;
 ;                     -- Optimized for 48 bit widths ONLY (6 bytes wide). --
-;                 -- This should be the size of all sprites to begin with. --
 ;                     *Based off our old plan to make sprites 48 pixels wide
 ;
 ; Contact @sudonym-i if you will need to use this routine in any other ways

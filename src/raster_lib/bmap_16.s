@@ -32,13 +32,18 @@ height          equ             76
 _plot_bitmap_16: 
                 movem.l         d0-d7/a0-a6,-(sp)
 
+
+;--------------------------------------------------------------------------------------------
+;                       !MIGRATE to pass-by-register for faster performance in the future!
+;                       This will avoid read/writes to memory, which costs us clock cycles
+;--------------------------------------------------------------------------------------------
                 ; Check bounds first
                 move.w          #16,-(sp)           ; push width (16 pixels)
                 move.w          height+2(sp),-(sp)  ; push height
                 move.w          col+4(sp),-(sp)     ; push col
                 move.w          row+6(sp),-(sp)     ; push row
                 jsr             _check_bounds
-                lea             8(sp),sp            ; clean up stack
+                adda.l             #8,sp            ; clean up stack
                 
                 ; Check return status
                 cmpi.b          #3,d0               ; check if entirely out of bounds
@@ -149,6 +154,11 @@ use_clipped:
                 move.w          (sp)+,d6            ; d6 = new_width
                 move.w          (sp)+,d7            ; d7 = status
                 
+;--------------------------------------------------------------------------------------------
+;                       !MIGRATE to pass-by-register for faster performance in the future!
+;                       This will avoid read/writes to memory, which costs us clock cycles
+;--------------------------------------------------------------------------------------------
+
                 ; Now push parameters for _plot_clipped_bitmap
                 move.w          d6,-(sp)            ; push new_width
                 move.w          d7,-(sp)            ; push status

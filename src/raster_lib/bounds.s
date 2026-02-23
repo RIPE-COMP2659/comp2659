@@ -15,6 +15,14 @@
 ; // `char` is a 1 byte integer. This is so that calling scope can do switch cases (returns 2 values because its assembly, and I can do that)
 ;________________________________________________________________
 
+;--------------------------------------------------------------------------------------------
+;                       !MIGRATE to pass-by-register for faster performance in the future!
+;                       This will avoid read/writes to memory, which costs us clock cycles
+;--------------------------------------------------------------------------------------------
+
+
+
+
     xdef           _check_bounds
 
 row             equ             56

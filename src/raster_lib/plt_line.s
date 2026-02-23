@@ -20,16 +20,21 @@
 
                 xdef            _plot_line
 
-base            equ             40              
-start_row       equ             44              
-start_col       equ             46              
-end_row         equ             48              
-end_col         equ             50              
-color           equ             52             
+base            equ             44              
+start_row       equ             48              
+start_col       equ             50              
+end_row         equ             52              
+end_col         equ             54              
+color           equ             56             
 
 
 _plot_line:
-                movem.l         d0-d7/a0,-(sp)
+                movem.l         d0-d7/a0-a1,-(sp)
+                
+                ; Save color in a1 (using address register to free up data registers)
+                move.w          color(sp),d0
+                andi.w          #1,d0                   ; ensure color is 0 or 1
+                movea.w         d0,a1                   ; a1 = color (preserved)
                 
                 ; Initialize current position
                 move.w          start_row(sp),d4       ; current_row
@@ -74,6 +79,7 @@ step_y_positive:
                 
 init_bresenham:
                 ; Register allocation:
+                ; a1 = color (preserved)
                 ; d1 = error
                 ; d2 = step_x, d3 = step_y
                 ; d4 = current_row, d5 = current_col
@@ -83,18 +89,13 @@ init_bresenham:
                 cmp.w           d7,d6
                 bge             horiz_line              ; if dx >= dy, horizontal-ish
                 
-                ; Check color for vertical-ish line
-                move.w          color(sp),d0
-                tst.w           d0
-                beq             vert_line_black
-                
-                ; Vertical-ish line (dy > dx) - WHITE
+                ; Vertical-ish line (dy > dx)
                 ; error = dx - dy
                 move.w          d6,d1
                 sub.w           d7,d1                   ; d1 = error
                 
-vert_loop_white:
-                ; Plot pixel at (d4, d5)
+vert_loop:
+                ; Plot pixel at (d4, d5) with color in a1
                 movea.l         base(sp),a0
                 
                 ; Calculate row offset: row * 80
@@ -111,18 +112,25 @@ vert_loop_white:
                 move.w          d5,d0
                 andi.w          #7,d0
                 neg.w           d0
-                addi.w          #7,d0                   ; d0 = 7 - (col % 8)
+                addi.w          #7,d0                   ; d0 = bit position
                 
-                ; Set the bit (white)
-                bset            d0,(a0)
+                ; Plot the pixel with the stored color
+                move.w          a1,-(sp)                ; push color onto stack
+                tst.w           (sp)+                   ; test and pop
+                beq.s           vert_plot_black
+                bset            d0,(a0)                 ; white
+                bra.s           vert_check_end
+vert_plot_black:
+                bclr            d0,(a0)                 ; black
                 
+vert_check_end:
                 ; Check if we've reached the end
                 cmp.w           end_row(sp),d4
                 beq             line_done
                 
                 ; Update error and position
                 tst.w           d1
-                bmi.s           vert_no_x_step_white
+                bmi.s           vert_no_x_step
                 
                 ; error >= 0: step in x direction
                 add.w           d2,d5                   ; current_col += step_x
@@ -130,76 +138,21 @@ vert_loop_white:
                 lsl.w           #1,d0
                 sub.w           d0,d1                   ; error -= 2*dy
                 
-vert_no_x_step_white:
+vert_no_x_step:
                 add.w           d3,d4                   ; current_row += step_y
                 move.w          d6,d0
                 lsl.w           #1,d0
                 add.w           d0,d1                   ; error += 2*dx
-                bra             vert_loop_white
-                
-vert_line_black:
-                ; Vertical-ish line (dy > dx) - BLACK
-                ; error = dx - dy
-                move.w          d6,d1
-                sub.w           d7,d1                   ; d1 = error
-                
-vert_loop_black:
-                ; Plot pixel at (d4, d5)
-                movea.l         base(sp),a0
-                
-                ; Calculate row offset: row * 80
-                move.w          d4,d0
-                mulu.w          #80,d0
-                adda.l          d0,a0
-                
-                ; Calculate col byte offset: col / 8
-                move.w          d5,d0
-                lsr.w           #3,d0
-                adda.w          d0,a0
-                
-                ; Calculate bit position: 7 - (col % 8)
-                move.w          d5,d0
-                andi.w          #7,d0
-                neg.w           d0
-                addi.w          #7,d0                   ; d0 = 7 - (col % 8)
-                
-                ; Clear the bit (black)
-                bclr            d0,(a0)
-                
-                ; Check if we've reached the end
-                cmp.w           end_row(sp),d4
-                beq             line_done
-                
-                ; Update error and position
-                tst.w           d1
-                bmi.s           vert_no_x_step_black
-                
-                ; error >= 0: step in x direction
-                add.w           d2,d5                   ; current_col += step_x
-                move.w          d7,d0
-                lsl.w           #1,d0
-                sub.w           d0,d1                   ; error -= 2*dy
-                
-vert_no_x_step_black:
-                add.w           d3,d4                   ; current_row += step_y
-                move.w          d6,d0
-                lsl.w           #1,d0
-                add.w           d0,d1                   ; error += 2*dx
-                bra             vert_loop_black
+                bra             vert_loop
                 
 horiz_line:
-                ; Check color for horizontal-ish line
-                move.w          color(sp),d0
-                tst.w           d0
-                beq             horiz_line_black
-                
-                ; Horizontal-ish line (dx >= dy) - WHITE
+                ; Horizontal-ish line (dx >= dy)
                 ; error = dy - dx
                 move.w          d7,d1
                 sub.w           d6,d1                   ; d1 = error
                 
-horiz_loop_white:
-                ; Plot pixel at (d4, d5)
+horiz_loop:
+                ; Plot pixel at (d4, d5) with color in a1
                 movea.l         base(sp),a0
                 
                 ; Calculate row offset: row * 80
@@ -216,18 +169,25 @@ horiz_loop_white:
                 move.w          d5,d0
                 andi.w          #7,d0
                 neg.w           d0
-                addi.w          #7,d0                   ; d0 = 7 - (col % 8)
+                addi.w          #7,d0                   ; d0 = bit position
                 
-                ; Set the bit (white)
-                bset            d0,(a0)
+                ; Plot the pixel with the stored color
+                move.w          a1,-(sp)                ; push color onto stack
+                tst.w           (sp)+                   ; test and pop
+                beq.s           horiz_plot_black
+                bset            d0,(a0)                 ; white
+                bra.s           horiz_check_end
+horiz_plot_black:
+                bclr            d0,(a0)                 ; black
                 
+horiz_check_end:
                 ; Check if we've reached the end
                 cmp.w           end_col(sp),d5
                 beq.s           line_done
                 
                 ; Update error and position
                 tst.w           d1
-                bmi.s           horiz_no_y_step_white
+                bmi.s           horiz_no_y_step
                 
                 ; error >= 0: step in y direction
                 add.w           d3,d4                   ; current_row += step_y
@@ -235,63 +195,13 @@ horiz_loop_white:
                 lsl.w           #1,d0
                 sub.w           d0,d1                   ; error -= 2*dx
                 
-horiz_no_y_step_white:
+horiz_no_y_step:
                 add.w           d2,d5                   ; current_col += step_x
                 move.w          d7,d0
                 lsl.w           #1,d0
                 add.w           d0,d1                   ; error += 2*dy
-                bra.s           horiz_loop_white
-                
-horiz_line_black:
-                ; Horizontal-ish line (dx >= dy) - BLACK
-                ; error = dy - dx
-                move.w          d7,d1
-                sub.w           d6,d1                   ; d1 = error
-                
-horiz_loop_black:
-                ; Plot pixel at (d4, d5)
-                movea.l         base(sp),a0
-                
-                ; Calculate row offset: row * 80
-                move.w          d4,d0
-                mulu.w          #80,d0
-                adda.l          d0,a0
-                
-                ; Calculate col byte offset: col / 8
-                move.w          d5,d0
-                lsr.w           #3,d0
-                adda.w          d0,a0
-                
-                ; Calculate bit position: 7 - (col % 8)
-                move.w          d5,d0
-                andi.w          #7,d0
-                neg.w           d0
-                addi.w          #7,d0                   ; d0 = 7 - (col % 8)
-                
-                ; Clear the bit (black)
-                bclr            d0,(a0)
-                
-                ; Check if we've reached the end
-                cmp.w           end_col(sp),d5
-                beq.s           line_done
-                
-                ; Update error and position
-                tst.w           d1
-                bmi.s           horiz_no_y_step_black
-                
-                ; error >= 0: step in y direction
-                add.w           d3,d4                   ; current_row += step_y
-                move.w          d6,d0
-                lsl.w           #1,d0
-                sub.w           d0,d1                   ; error -= 2*dx
-                
-horiz_no_y_step_black:
-                add.w           d2,d5                   ; current_col += step_x
-                move.w          d7,d0
-                lsl.w           #1,d0
-                add.w           d0,d1                   ; error += 2*dy
-                bra.s           horiz_loop_black
+                bra.s           horiz_loop
                 
 line_done:
-                movem.l         (sp)+,d0-d7/a0
+                movem.l         (sp)+,d0-d7/a0-a1
                 rts
