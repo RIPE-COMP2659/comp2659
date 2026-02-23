@@ -78,7 +78,7 @@ clean-coverage:
 
 # Clean up build files
 clean:
-	-$(RM) *.exe *.o *.gcda *.gcno *.gcov $(TEST_EXECS)
+	-$(RM) *.exe *.o *.gcda *.gcno *.gcov *.ut $(TEST_EXECS)
 
 # Run tests with Valgrind memory checking
 valgrind: $(TEST_EXECS)
