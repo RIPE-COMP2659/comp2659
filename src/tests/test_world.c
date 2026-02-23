@@ -381,6 +381,33 @@ void test_world_collision_geo_lava_none(void) {
     TEST_ASSERT_EQUAL_INT(original_ground_y, world.geo.ground_y);
 }
 
+/* TODO: This overall logic doesn't make much sense, it needs a refactor */
+void test_world_collision_ground_resets_when_leaving_block(void) {
+    /* Setup: geo lands on a block */
+    block.x = world.geo.x;
+    world.geo.y = block.y + world.geo.size;
+
+    /* Geo collides with block and ground_y updates */
+    world_collision_geo_block(&world, &block);
+    TEST_ASSERT_EQUAL_INT(block.y, world.geo.ground_y);
+
+    /* Geo is landed on the block */
+    geo_update_landed(&world.geo);
+    TEST_ASSERT_EQUAL_INT(TRUE, world.geo.is_landed);
+
+    /* Geo moves right (away from block) and falls due to gravity/no support */
+    world.geo.x += block.size * 2;
+    
+    /* world_collision_geo_ground resets ground_y to world default when geo has no collision support */
+    world_collision_geo_block(&world, &block);
+    world_collision_geo_ground(&world);
+    TEST_ASSERT_EQUAL_INT(world.ground_y, world.geo.ground_y);
+    
+    /* Now geo_update_landed checks with the reset ground_y and determines geo is falling */
+    geo_update_landed(&world.geo);
+    TEST_ASSERT_EQUAL_INT(FALSE, world.geo.is_landed);
+}
+
 int main(void) {
     UNITY_BEGIN();
 
@@ -396,6 +423,7 @@ int main(void) {
     RUN_TEST(test_world_collision_geo_lava_bottom);
     RUN_TEST(test_world_collision_geo_lava_left);
     RUN_TEST(test_world_collision_geo_lava_none);
+    RUN_TEST(test_world_collision_ground_resets_when_leaving_block);
 
     return UNITY_END();
 }

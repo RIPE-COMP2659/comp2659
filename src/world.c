@@ -30,8 +30,11 @@ void world_collision_geo_block(World *world, Block *block) {
 
     if (collision == COLLISION_TOP) {
         world->geo.ground_y = block->y;
+		world->geo.is_landed = TRUE;
     } else if (collision == COLLISION_BOTTOM || collision == COLLISION_LEFT) {
         world->geo.is_dead = TRUE;
+    } else if (collision == COLLISION_NONE) {
+        world->geo.is_landed = FALSE;
     }
 }
 
@@ -60,5 +63,11 @@ void world_collision_geo_lava(World *world, Lava *lava) {
 
     if (collision != COLLISION_NONE && collision != COLLISION_ERROR) {
         world->geo.is_dead = TRUE;
+    }
+}
+
+void world_collision_geo_ground(World *world) {
+    if (world->geo.is_landed == FALSE) {
+        world->geo.ground_y = world->ground_y;
     }
 }
