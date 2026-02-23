@@ -101,8 +101,9 @@ signed int geo_check_square_collision(Geo *geo, unsigned int object_x, unsigned 
         collision_result = COLLISION_NONE;
     } else {
         /* Collision must have occured */
-
         unsigned int horizontal_overlap;
+        unsigned int vertical_overlap;
+
         /* case1: geo right is less than object right, in which case difference is geo right minus object left */
         if (geo_right < object_right) {
             horizontal_overlap = geo_right - object_left;
@@ -111,7 +112,6 @@ signed int geo_check_square_collision(Geo *geo, unsigned int object_x, unsigned 
             horizontal_overlap = object_right - geo_left;
         }
 
-        unsigned int vertical_overlap;
         /* case1: geo top is less than object top, in which case difference is geo top minus object bottom */
         if (geo_top < object_top) {
             vertical_overlap = geo_top - object_bottom;

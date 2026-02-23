@@ -7,8 +7,14 @@ Block block2;
 
 /* Setup blocks for testing */
 void setUp(void) {
-    block1 = (Block){ 0, 0, BLOCK_SIZE, BLOCK_SPRITE };
-    block2 = (Block){ 100, 200, BLOCK_SIZE, BLOCK_SPRITE };
+    block1.x = 0;
+    block1.y = 0;
+    block1.size = BLOCK_SIZE;
+    block1.sprite = BLOCK_SPRITE;
+    block2.x = 100;
+    block2.y = 200;
+    block2.size = BLOCK_SIZE;
+    block2.sprite = BLOCK_SPRITE;
     block_placeholder();
 }
 
@@ -64,10 +70,9 @@ void test_block_init_global_sprite(void) {
 void test_block_sprite_size(void) {
     /* Verify sprite array has block.size rows */
     int num_rows = sizeof(BLOCK_SPRITE) / sizeof(BLOCK_SPRITE[0]);
-    TEST_ASSERT_EQUAL_INT(block1.size, num_rows);
-    
-    /* Verify the first row is correct in size */
     int bits_per_row = (BLOCK_SIZE / WORD) * WORD;
+
+    TEST_ASSERT_EQUAL_INT(block1.size, num_rows);
     TEST_ASSERT_EQUAL_INT(block1.size, bits_per_row);
 }
 /* Main function to run all tests */

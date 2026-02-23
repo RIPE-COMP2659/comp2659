@@ -8,9 +8,18 @@ World world;
 
 void setUp(void) {
     world = get_world();
-    block = (Block){world.geo.x, world.ground_y + BLOCK_SIZE, BLOCK_SIZE, BLOCK_SPRITE};
-    spike = (Spike){world.geo.x, world.ground_y + SPIKE_SIZE, SPIKE_SIZE, SPIKE_SPRITE};
-    lava = (Lava){world.geo.x, world.ground_y + LAVA_SIZE, LAVA_SIZE, LAVA_SPRITE};
+    block.x = world.geo.x;
+    block.y = world.ground_y + BLOCK_SIZE;
+    block.size = BLOCK_SIZE;
+    block.sprite = BLOCK_SPRITE;
+    spike.x = world.geo.x;
+    spike.y = world.ground_y + SPIKE_SIZE;
+    spike.size = SPIKE_SIZE;
+    spike.sprite = SPIKE_SPRITE;
+    lava.x = world.geo.x;
+    lava.y = world.ground_y + LAVA_SIZE;
+    lava.size = LAVA_SIZE;
+    lava.sprite = LAVA_SPRITE;
 }
 
 void tearDown(void) {
@@ -79,9 +88,9 @@ void test_world_collision_geo_block_left(void) {
 }
 
 void test_world_collision_geo_block_none(void) {
+    unsigned int original_ground_y = world.geo.ground_y;
     block.x = world.geo.x + world.geo.size + 1;
     world.geo.is_dead = FALSE;
-    unsigned int original_ground_y = world.geo.ground_y;
 
     /* Test that geo is not colliding with a block to the right and above */
     block.y = world.geo.y + block.size / 2;
@@ -202,9 +211,9 @@ void test_world_collision_geo_spike_left(void) {
 }
 
 void test_world_collision_geo_spike_none(void) {
+    unsigned int original_ground_y = world.geo.ground_y;
     spike.x = world.geo.x + world.geo.size + 1;
     world.geo.is_dead = FALSE;
-    unsigned int original_ground_y = world.geo.ground_y;
 
     /* Test that geo is not colliding with a spike to the right and above */
     spike.y = world.geo.y + spike.size / 2;
@@ -326,9 +335,9 @@ void test_world_collision_geo_lava_left(void) {
 }
 
 void test_world_collision_geo_lava_none(void) {
+    unsigned int original_ground_y = world.geo.ground_y;
     lava.x = world.geo.x + world.geo.size + 1;
     world.geo.is_dead = FALSE;
-    unsigned int original_ground_y = world.geo.ground_y;
 
     /* Test that geo is not colliding with lava to the right and above */
     lava.y = world.geo.y + lava.size / 2;
