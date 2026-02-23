@@ -22,7 +22,7 @@
 
                 xdef            _plot_rectangle
 
-base            equ             64              ; offset from SP, not A6
+base            equ             64              
 row             equ             68               
 col             equ             70             
 length          equ             72

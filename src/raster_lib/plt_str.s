@@ -18,7 +18,7 @@
                 xdef            _plot_string
                 xref            _plot_character
 
-base            equ             8               ; offset from A6
+base            equ             8              
 row             equ             12              
 col             equ             14
 str             equ             16              ; pointer to string

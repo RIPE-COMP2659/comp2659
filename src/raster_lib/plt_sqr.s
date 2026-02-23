@@ -21,7 +21,7 @@
 
                 xdef            _plot_square
 
-base            equ             64              ; offset from SP, not A6
+base            equ             64              
 row             equ             68               
 col             equ             70             
 side            equ             72              ; UINT16 (2 bytes)

@@ -20,12 +20,12 @@
 
                 xdef            _plot_line
 
-base            equ             40              ; UINT32* (4 bytes)
-start_row       equ             44              ; UINT16 (2 bytes)
-start_col       equ             46              ; UINT16 (2 bytes)
-end_row         equ             48              ; UINT16 (2 bytes)
-end_col         equ             50              ; UINT16 (2 bytes)
-color           equ             52              ; UINT16 (2 bytes)
+base            equ             40              
+start_row       equ             44              
+start_col       equ             46              
+end_row         equ             48              
+end_col         equ             50              
+color           equ             52             
 
 
 _plot_line:

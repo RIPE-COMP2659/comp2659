@@ -5,7 +5,6 @@
 #define BYTES_PER_SCREEN 32000
 #define BUFFER_SIZE (BYTES_PER_SCREEN + 256) /* Extra space for alignment */
 #define ANIMATION_CYCLES 100
-#define VBLANKS_PER_FRAME 1
 
 /* Four screen buffers for animation - oversized to allow for alignment */
 UINT8 buffer1_raw[BUFFER_SIZE];
