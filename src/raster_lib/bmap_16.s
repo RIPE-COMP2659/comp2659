@@ -19,6 +19,8 @@
 ;
 
                 xdef            _plot_bitmap_16
+                xref            _check_bounds
+                xref            _plot_clipped_bitmap
 
 base            equ             64             
 row             equ             68               
@@ -30,6 +32,27 @@ height          equ             76
 _plot_bitmap_16: 
                 movem.l         d0-d7/a0-a6,-(sp)
 
+
+;--------------------------------------------------------------------------------------------
+;                       !MIGRATE to pass-by-register for faster performance in the future!
+;                       This will avoid read/writes to memory, which costs us clock cycles
+;--------------------------------------------------------------------------------------------
+                ; Check bounds first
+                move.w          #16,-(sp)           ; push width (16 pixels)
+                move.w          height+2(sp),-(sp)  ; push height
+                move.w          col+4(sp),-(sp)     ; push col
+                move.w          row+6(sp),-(sp)     ; push row
+                jsr             _check_bounds
+                adda.l             #8,sp            ; clean up stack
+                
+                ; Check return status
+                cmpi.b          #3,d0               ; check if entirely out of bounds
+                beq             done                ; if so, return immediately
+                
+                tst.b           d0                  ; check if any clipping needed
+                bne             use_clipped         ; if status != 0 (but not 3), use clipped version
+                
+                ; No clipping needed, continue with optimized routine
                 movea.l         base(sp),a0     ; get base address (screen)
                 movea.l         bitmap(sp),a1   ; get bitmap data address
                 
@@ -111,4 +134,40 @@ byte_loop:      move.b          (a1)+,(a0)+     ; copy first byte
                 dbra            d7,byte_loop
                 
                 movem.l         (sp)+,d0-d7/a0-a6
+                rts
+
+done:
+                movem.l         (sp)+,d0-d7/a0-a6
+                rts
+
+use_clipped:
+                ; Save status and new_width before restoring registers
+                ; Create space and store them
+                subq.l          #4,sp               ; Make room for 2 words
+                move.w          d0,2(sp)            ; Store status
+                move.w          d1,(sp)             ; Store new_width
+                
+                ; Restore registers from offset (skipping our saved values)
+                movem.l         4(sp),d0-d7/a0-a6   ; Restore from sp+4
+                
+                ; Pop our saved values into d6/d7
+                move.w          (sp)+,d6            ; d6 = new_width
+                move.w          (sp)+,d7            ; d7 = status
+                
+;--------------------------------------------------------------------------------------------
+;                       !MIGRATE to pass-by-register for faster performance in the future!
+;                       This will avoid read/writes to memory, which costs us clock cycles
+;--------------------------------------------------------------------------------------------
+
+                ; Now push parameters for _plot_clipped_bitmap
+                move.w          d6,-(sp)            ; push new_width
+                move.w          d7,-(sp)            ; push status
+                move.w          #16,-(sp)           ; push width (16 pixels)
+                move.w          height(sp),-(sp)    ; push height
+                move.l          bitmap(sp),-(sp)    ; push bitmap
+                move.w          col+6(sp),-(sp)     ; push col
+                move.w          row+8(sp),-(sp)     ; push row
+                move.l          base+10(sp),-(sp)   ; push base
+                jsr             _plot_clipped_bitmap
+                lea             18(sp),sp           ; clean up (4+2+4+2+2+2+2 = 18 bytes)
                 rts

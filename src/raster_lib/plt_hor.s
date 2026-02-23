@@ -20,11 +20,11 @@
 
                 xdef            _plot_horizontal_line
 
-base            equ             24              ; offset from SP
-row             equ             28              ; UINT16 (2 bytes)
-col             equ             30              ; UINT16 (2 bytes)
-length          equ             32              ; UINT16 (2 bytes)
-color           equ             34              ; UINT16 (2 bytes)
+base            equ             24              
+row             equ             28             
+col             equ             30            
+length          equ             32             
+color           equ             34            
 
 
 _plot_horizontal_line:    

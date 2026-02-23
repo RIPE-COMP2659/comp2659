@@ -20,7 +20,7 @@
 
                 xdef            _plot_vertical_line
 
-base            equ             24              ; offset from SP  
+base            equ             24              
 row             equ             28              ; UINT16 (2 bytes)
 col             equ             30              ; UINT16 (2 bytes)  
 length          equ             32              ; UINT16 (2 bytes)
