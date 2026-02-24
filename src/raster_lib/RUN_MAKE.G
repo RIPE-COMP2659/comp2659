@@ -9,7 +9,7 @@ foreach i { *.tos }
 endfor
 
 echo 'Complete, running make...'
-make
+make -f tmake
 
 echo 'Build finished! Run rtest.tos to start the test.'
 
