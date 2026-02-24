@@ -1,5 +1,8 @@
 #ifndef RASTER_H
 #define RASTER_H
+
+#define BYTES_PER_SCREEN 32000
+
 /*
 
  This header file contains all functions in our raster library.
@@ -14,6 +17,39 @@ typedef long INT32;
 typedef unsigned char UINT8;
 typedef unsigned short UINT16;
 typedef unsigned long UINT32;
+
+/*----- Type: BoundsCheckResult -----
+
+PURPOSE: Structure to hold the result of a bounds check operation.
+         Contains both the status code and the adjusted width.
+
+FIELDS:
+    status: INT8 - Status of bounds check
+            0 = within bounds
+            1 = exceeds left edge
+            2 = exceeds right edge
+            3 = entirely out of bounds
+    new_width: INT32 - Clipped width (for out-of-bounds cases)
+*/
+typedef struct {
+    INT8 status;
+    INT32 new_width;
+} BoundsCheckResult;
+
+/*----- Function: check_bounds -----
+
+PURPOSE: Check whether a rectangular region is within screen bounds and calculate clipping.
+
+ INPUT: row: top-most row coordinate
+       col: left-most column coordinate
+       height: height of the region in pixels
+       width: width of the region in pixels
+
+ OUTPUT: BoundsCheckResult structure containing:
+        - status: 0 (within), 1 (left edge), 2 (right edge), 3 (out of bounds)
+        - new_width: clipped width for drawing
+*/
+BoundsCheckResult check_bounds(INT16 row, INT16 col, INT16 height, INT16 width);
 
 /*----- Function: clear_screen -----
 
