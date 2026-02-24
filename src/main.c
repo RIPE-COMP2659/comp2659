@@ -1,5 +1,5 @@
 #include <stdio.h> /* Temporary printf import */
-#include "world.h"
+#include "entities/world.h"
 
 int main(void) {
     /* For now, just a placeholder */

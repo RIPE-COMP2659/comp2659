@@ -1,6 +1,6 @@
-# include "block.h"
-# include "spike.h"
-# include "lava.h"
+#include "block.h"
+#include "spike.h"
+#include "lava.h"
 
 /* TODO: Can turn some of this into constants, somehow */
 typedef struct {

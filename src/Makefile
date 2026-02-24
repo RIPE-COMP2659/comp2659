@@ -25,21 +25,22 @@ COVERAGE_FLAGS = -fprofile-arcs -ftest-coverage -O0
 # Include directories
 # -I. means include from current directory (for helloworld.h)
 # -Itests/unity means include from tests/unity subdirectory (for unity.h)
-INCLUDES = -I. -Itests/unity
+# -Ientities means include from entities subdirectory (for entity headers)
+INCLUDES = -I. -Itests/unity -Ientities
 
 # Source files - automatically discover all .c files in src directory (excluding tests/)
-SRC = $(filter-out tests/%, $(wildcard *.c))
+SRC = $(filter-out tests/%, $(wildcard *.c entities/*.c))
 SRC_BASENAMES = $(basename $(SRC))
 UNITY_FILES = tests/unity/unity.c
 TEST_SUPPORT_SRC = $(filter-out main.c,$(SRC))
 
-# Dynamically discover test files (all .c files in tests/ excluding unity/)
-TEST_SRC_FILES = $(filter-out tests/unity/%, $(wildcard tests/*.c))
-TEST_EXECS = $(TEST_SRC_FILES:tests/%.c=%$(EXE_EXT))
+# Dynamically discover test files (all .c files in tests/entities/)
+TEST_SRC_FILES = $(wildcard tests/entities/*.c)
+TEST_EXECS = $(TEST_SRC_FILES:tests/entities/%.c=%$(EXE_EXT))
 
 # Main program sources
 MAIN_EXE = main$(EXE_EXT)
-MAIN_SRC = main.c block.c spike.c lava.c geo.c level.c world.c
+MAIN_SRC = main.c entities/block.c entities/spike.c entities/lava.c entities/geo.c entities/level.c entities/world.c
 
 # Default target
 all: main
@@ -53,8 +54,8 @@ test: $(TEST_EXECS)
 
 # Build test executables (pattern rule)
 # Each test compiles with its corresponding source file: test_NAME.c compiles with NAME.c
-#%$(EXE_EXT): tests/%.c $(UNITY_FILES) $(TEST_SUPPORT_SRC)
-%$(EXE_EXT): tests/%.c $(UNITY_FILES) $(TEST_SUPPORT_SRC)
+#%$(EXE_EXT): tests/entities/%.c $(UNITY_FILES) $(TEST_SUPPORT_SRC)
+%$(EXE_EXT): tests/entities/%.c $(UNITY_FILES) $(TEST_SUPPORT_SRC)
 	$(CC) $(CFLAGS) $(COVERAGE_FLAGS) $(INCLUDES) -DTESTING $< $(TEST_SUPPORT_SRC) $(UNITY_FILES) -o $@
 
 # Build the main program
@@ -78,7 +79,7 @@ clean-coverage:
 
 # Clean up build files
 clean:
-	-$(RM) *.exe *.o *.gcda *.gcno *.gcov *.ut $(TEST_EXECS)
+	-$(RM) *.exe *.o *.gcda *.gcno *.gcov *.ut *.tos $(TEST_EXECS)
 
 # Run tests with Valgrind memory checking
 valgrind: $(TEST_EXECS)
