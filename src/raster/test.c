@@ -21,7 +21,7 @@ void test_plot_bitmap_32(UINT8 *base);
 void test_plot_character(UINT8 *base);
 void test_plot_string(UINT8 *base);
 
-int main()
+
 {
     UINT8 *base = (UINT8 *)Physbase();
 

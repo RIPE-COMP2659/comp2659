@@ -1,9 +1,75 @@
 #include <stdio.h> /* Temporary printf import */
+#include <osbind.h>
 #include "entities/world.h"
+#include "raster/raster.h"
+
+#define BYTES_PER_SCREEN 32000
+
+/* Only works on Atari ST, comment out starting here */
+/* End commenting out here */
+
+void disable_cursor()
+{
+    printf("\033f");
+    fflush(stdout);
+}
+
+void fill_screen(UINT32 *base, char pattern)
+{
+    register int i = 0;
+    register UINT32 *loc = base;
+
+    while (i++ < BYTES_PER_SCREEN / 4)
+        *(loc++) = pattern;
+}
+
+void test_clear_screen(UINT8 *base)
+{
+    clear_screen((UINT32 *)base);
+}
+
+void test_clear_region(UINT8 *base)
+{
+    int i;
+
+    /* Fill screen with white first */
+    fill_screen((UINT32 *)base, -1);
+
+    /* Test 1: 48x48 optimized path - word aligned */
+    clear_region((UINT32 *)base, 0, 0, 48, 48);
+
+    /* Test 2: 48x48 optimized path - different position */
+    clear_region((UINT32 *)base, 50, 80, 48, 48);
+
+    /* Test 3: Small region - unoptimized path */
+    clear_region((UINT32 *)base, 10, 5, 10, 10);
+
+    /* Test 4: Wide region - unoptimized path */
+    clear_region((UINT32 *)base, 100, 50, 20, 100);
+
+    /* Test 5: Tall narrow region */
+    clear_region((UINT32 *)base, 150, 200, 50, 8);
+
+    /* Test 6: Odd column alignment to test byte spanning */
+    clear_region((UINT32 *)base, 200, 5, 15, 4);
+}
 
 int main(void) {
     /* For now, just a placeholder */
+    UINT8 *base = (UINT8 *)Physbase();
     World world = get_world();
+
+    disable_cursor();
+
+    /* Test 1: Clear Screen */
+    fill_screen((UINT32 *)base, -1); /* fill with white */
+    Cnecin();
+    test_clear_screen(base);
+    Cnecin();
+
+    /* Test 2: Clear Region - various sizes and positions */
+    test_clear_region(base);
+    Cnecin();
 
     printf("Running main!\n");
 
