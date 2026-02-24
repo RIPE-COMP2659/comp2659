@@ -51,3 +51,12 @@ bounds.o: bounds.s
 
 plt_clip.o: plt_clip.s
 	cc68x -g -c plt_clip.s
+
+
+rastdrv.tos: rastdrv.o clr_scrn.o clr_reg.o plt_pxl.o plt_hor.o plt_vert.o plt_line.o plt_rec.o plt_sqr.o plt_tri.o bmap_8.o bmap_16.o bmap_32.o plt_char.o plt_str.o bounds.o plt_clip.o
+	cc68x -g rastdrv.o clr_scrn.o clr_reg.o plt_pxl.o plt_hor.o plt_vert.o plt_line.o plt_rec.o plt_sqr.o plt_tri.o bmap_8.o bmap_16.o bmap_32.o plt_char.o plt_str.o bounds.o plt_clip.o -o rastdrv.tos
+
+rastdrv.o: rastdrv.c raster.h
+	cc68x -g -c rastdrv.c
+
+CC=cc68x

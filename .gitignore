@@ -19,3 +19,6 @@ geo_dash
 *.gcov
 *.gcda
 *.gcno
+
+# Test Logs:
+.driver_logs

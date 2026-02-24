@@ -1,56 +1,39 @@
-# Detect OS for cross-platform compatibility
-ifeq ($(OS),Windows_NT)
-    EXE_EXT = .exe
-    RM = del /Q
-    RUN_PREFIX = 
-    NOOP = exit /b 0
-else
-    EXE_EXT =
-    RM = rm -f
-    RUN_PREFIX = ./
-    NOOP = true
-endif
+prog.tos: block.o spike.o lava.o geo.o level.o world.o main.o
+	cc68x -g block.o spike.o lava.o geo.o level.o world.o main.o -o prog.tos
 
-CC = gcc
-GCOV = gcov
+dtypes.h:
+	echo 'ERROR: dtypes.h is missing. Copy dtypes.h into the Atari build folder.'
+	exit 1
 
-# Compiler flags
-CFLAGS = -Wall -Wextra -std=c89
+block.o: block.c block.h dtypes.h
+	cc68x -g -c block.c
 
-# Coverage flags for gcov
-# -fprofile-arcs: Generate arc coverage data
-# -ftest-coverage: Generate .gcno notes files
-COVERAGE_FLAGS = -fprofile-arcs -ftest-coverage -O0
+lava.o: lava.c lava.h dtypes.h
+	cc68x -g -c lava.c
 
-# Include directories
-# -I. means include from current directory (for helloworld.h)
-# -Itests/unity means include from tests/unity subdirectory (for unity.h)
-INCLUDES = -I. -Itests/unity
+spike.o: spike.c spike.h dtypes.h
+	cc68x -g -c spike.c
 
-# Source files - automatically discover all .c files in src directory (excluding tests/)
-SRC = $(filter-out tests/%, $(wildcard *.c))
-SRC_BASENAMES = $(basename $(SRC))
-UNITY_FILES = tests/unity/unity.c
-TEST_SUPPORT_SRC = $(filter-out main.c,$(SRC))
+geo.o: geo.c geo.h dtypes.h
+	cc68x -g -c geo.c
 
-# Dynamically discover test files (all .c files in tests/ excluding unity/)
-TEST_SRC_FILES = $(filter-out tests/unity/%, $(wildcard tests/*.c))
-TEST_EXECS = $(TEST_SRC_FILES:tests/%.c=%$(EXE_EXT))
+level.o: level.c level.h dtypes.h
+	cc68x -g -c level.c
 
-# Main program sources
-MAIN_EXE = main$(EXE_EXT)
-MAIN_SRC = main.c block.c spike.c lava.c geo.c level.c world.c
+world.o: world.c world.h dtypes.h
+	cc68x -g -c world.c
 
-# Default target
-all: main
+main.o: main.c block.h spike.h lava.h geo.h level.h world.h dtypes.h
+	cc68x -g -c main.c
 
-# Default command prefix for running tests (can be overridden)
-RUN_CMD = $(RUN_PREFIX)
+# Raster driver test (Checkpoint 2)
+rastdrv.tos: rastdrv.o renderer.o
+	cc68x -g rastdrv.o renderer.o -o rastdrv.tos
 
-# Compile and run all tests
-test: $(TEST_EXECS)
-	$(foreach exec,$(TEST_EXECS),$(RUN_CMD)$(exec) && ) $(NOOP)
+rastdrv.o: raster_lib/rastdrv.c raster_lib/raster.h dtypes.h
+	cc68x -g -c raster_lib/rastdrv.c
 
+<<<<<<< Updated upstream
 # Build test executables (pattern rule)
 # Each test compiles with its corresponding source file: test_NAME.c compiles with NAME.c
 #%$(EXE_EXT): tests/%.c $(UNITY_FILES) $(TEST_SUPPORT_SRC)
@@ -86,3 +69,7 @@ valgrind: $(TEST_EXECS)
 
 # Commands to run tests, otherwise make may assume these are files.
 .PHONY: all main test clean clean-coverage coverage generate-coverage valgrind
+=======
+renderer.o: raster_lib/renderer.c raster_lib/raster.h dtypes.h
+	cc68x -g -c raster_lib/renderer.c
+>>>>>>> Stashed changes
