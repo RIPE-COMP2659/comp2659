@@ -28,13 +28,13 @@ CHAR_WIDTH      equ             8               ; characters are 8 pixels wide
 
 _plot_string:
                 link            a6,#0
-                movem.l         d0-d7/a0-a6,-(sp)
+                movem.l         d0-d7/a0-a5,-(sp)
 
-                move.l          str(a6),a0      ; get string pointer
+                move.l          str(a6),a5      ; get string pointer into preserved register
                 move.w          col(a6),d6      ; current column position
                 
 char_loop:
-                move.b          (a0)+,d7        ; get next character
+                move.b          (a5)+,d7        ; get next character
                 beq             done            ; if null terminator, we're done
                 
                 ; Call plot_character(base, row, current_col, ch)
@@ -54,7 +54,7 @@ char_loop:
                 bra             char_loop
                 
 done:
-                movem.l         (sp)+,d0-d7/a0-a6
+                movem.l         (sp)+,d0-d7/a0-a5
                 unlk            a6
                 rts
 

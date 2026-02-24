@@ -34,7 +34,7 @@ CHAR_BYTES      equ             16              ; 16 bytes per character
 
 _plot_character:
                 link            a6,#0
-                movem.l         d0-d7/a0-a6,-(sp)
+                movem.l         d0-d7/a0-a5,-(sp)
 
                 ; Get character code and calculate font offset
                 move.w          ch(a6),d0       ; get character code
@@ -66,7 +66,7 @@ _plot_character:
                 lea             14(sp),sp       ; clean up parameters
                 
 done:
-                movem.l         (sp)+,d0-d7/a0-a6
+                movem.l         (sp)+,d0-d7/a0-a5
                 unlk            a6
                 rts
 
