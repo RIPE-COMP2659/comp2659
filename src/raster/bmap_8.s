@@ -37,9 +37,9 @@ _plot_bitmap_8:
                 ; Check bounds using the _check_bounds routine.
 
                 move.w          #8,-(sp)           ; push width (8 pixels)
-                move.w          height(sp),-(sp)   ; push height
-                move.w          col(sp),-(sp)      ; push col
-                move.w          row(sp),-(sp)      ; push row
+                move.w          height+2(sp),-(sp) ; push height (sp moved by 2)
+                move.w          col+4(sp),-(sp)    ; push col (sp moved by 4)
+                move.w          row+6(sp),-(sp)    ; push row (sp moved by 6)
                 jsr             _check_bounds
                 adda.l             #8,sp           ; clean parameters from  stack
                 
@@ -135,11 +135,11 @@ use_clipped:
                 move.w          d6,-(sp)            ; push new_width
                 move.w          d7,-(sp)            ; push status
                 move.w          #8,-(sp)            ; push width (8 pixels)
-                move.w          height(sp),-(sp)    ; push height
-                move.l          bitmap(sp),-(sp)    ; push bitmap
-                move.w          col+6(sp),-(sp)     ; push col
-                move.w          row+8(sp),-(sp)     ; push row
-                move.l          base+10(sp),-(sp)   ; push base
+                move.w          height+6(sp),-(sp)  ; push height (sp moved by 6)
+                move.l          bitmap+8(sp),-(sp)  ; push bitmap (sp moved by 8)
+                move.w          col+12(sp),-(sp)    ; push col (sp moved by 12)
+                move.w          row+14(sp),-(sp)    ; push row (sp moved by 14)
+                move.l          base+16(sp),-(sp)   ; push base (sp moved by 16)
                 jsr             _plot_clipped_bitmap
-                adda.l          #18,sp           ; clean up (4+2+4+2+2+2+2 = 18 bytes)
+                adda.l          #20,sp              ; clean up (2+2+2+2+4+2+2+4 = 20 bytes)
                 rts

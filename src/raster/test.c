@@ -83,6 +83,7 @@ void test_plot_string(UINT8 *base);
 
     /* Test 14: Plot String - text strings */
     test_plot_string(base);
+
     Cnecin();
 
     return 0;
@@ -1033,7 +1034,7 @@ void test_plot_string(UINT8 *base)
 
     /* Test 8: Information display */
     plot_string(base, 280, 10, "Atari ST Raster Library");
-    plot_string(base, 300, 10, "Character Test Complete");
+    plot_string(base, 300, 10, "I see you ;)");
 
     /* Test 9: Centered text (approximate) */
     plot_string(base, 330, 240, "CENTERED");

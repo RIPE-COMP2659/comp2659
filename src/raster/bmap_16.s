@@ -163,11 +163,11 @@ use_clipped:
                 move.w          d6,-(sp)            ; push new_width
                 move.w          d7,-(sp)            ; push status
                 move.w          #16,-(sp)           ; push width (16 pixels)
-                move.w          height(sp),-(sp)    ; push height
-                move.l          bitmap(sp),-(sp)    ; push bitmap
-                move.w          col+6(sp),-(sp)     ; push col
-                move.w          row+8(sp),-(sp)     ; push row
-                move.l          base+10(sp),-(sp)   ; push base
+                move.w          height+6(sp),-(sp)  ; push height (sp moved by 6)
+                move.l          bitmap+8(sp),-(sp)  ; push bitmap (sp moved by 8)
+                move.w          col+12(sp),-(sp)    ; push col (sp moved by 12)
+                move.w          row+14(sp),-(sp)    ; push row (sp moved by 14)
+                move.l          base+16(sp),-(sp)   ; push base (sp moved by 16)
                 jsr             _plot_clipped_bitmap
-                lea             18(sp),sp           ; clean up (4+2+4+2+2+2+2 = 18 bytes)
+                lea             20(sp),sp           ; clean up (2+2+2+2+4+2+2+4 = 20 bytes)
                 rts
