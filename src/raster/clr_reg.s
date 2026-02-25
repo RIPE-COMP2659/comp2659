@@ -20,31 +20,32 @@
 
                 xdef            _clear_region
 
-base            equ             64              
-row             equ             68               
-col             equ             70             
-length          equ             72
-width           equ             74
+base            equ             8               
+row             equ             12               
+col             equ             14             
+length          equ             16
+width           equ             18
 
 
 _clear_region:  
+                link            a6,#0
                 movem.l         d0-d7/a0-a6,-(sp)
 
-                movea.l         base(sp),a0     ; get base address
+                movea.l         base(a6),a0     ; get base address
                 
                 ; Calculate and add row offset: row * 80 bytes
-                move.w          row(sp),d0
+                move.w          row(a6),d0
                 mulu.w          #80,d0          ; screen width in bytes (result is long)
                 adda.l          d0,a0           ; add row offset
                 
                 ; Calculate and add col offset: col / 8 (pixels to bytes)
-                move.w          col(sp),d0
+                move.w          col(a6),d0
                 lsr.w           #3,d0           ; divide by 8 (shift right 3 bits)
                 ext.l           d0              ; extend to long
                 adda.l          d0,a0           ; add col offset in bytes
 
                 ; Check if width == 32 pixels (4 bytes) for optimization
-                move.w          width(sp),d0
+                move.w          width(a6),d0
                 cmpi.w          #32,d0          ; check if exactly 32 pixels
                 bne             unoptimized
                 
@@ -60,7 +61,7 @@ opt_32:
                 
                 moveq           #0,d1           ; clear register to zero
                 
-                move.w          length(sp),d7   ; get height (number of rows in pixels)
+                move.w          length(a6),d7   ; get height (number of rows in pixels)
                 subq.w          #1,d7           ; adjust for dbra
                 
 row_loop_32:    move.l          d1,(a0)         ; write 1 long (4 bytes)
@@ -68,24 +69,25 @@ row_loop_32:    move.l          d1,(a0)         ; write 1 long (4 bytes)
                 dbra            d7,row_loop_32
                 
                 movem.l         (sp)+,d0-d7/a0-a6
+                unlk            a6
                 rts
 
 unoptimized:    
                 ; Generic clear region - calculate bytes needed for col through col+width-1
                 ; Formula: ceil((col+width)/8) - floor(col/8)
                 
-                move.w          col(sp),d6      ; get col in pixels
-                add.w           width(sp),d6    ; d6 = col + width
+                move.w          col(a6),d6      ; get col in pixels
+                add.w           width(a6),d6    ; d6 = col + width
                 addq.w          #7,d6           ; d6 = col + width + 7 (for ceiling division)
                 lsr.w           #3,d6           ; d6 = (col + width + 7) / 8 = ceiling((col+width)/8)
                 
-                move.w          col(sp),d5      ; get col in pixels  
+                move.w          col(a6),d5      ; get col in pixels  
                 lsr.w           #3,d5           ; d5 = col / 8 = floor(col/8)
                 
                 sub.w           d5,d6           ; d6 = ceiling - floor = num_bytes
                 subq.w          #1,d6           ; adjust for dbra
                 
-                move.w          length(sp),d7   ; outer loop: rows (in pixels)
+                move.w          length(a6),d7   ; outer loop: rows (in pixels)
                 subq.w          #1,d7           ; adjust for dbra
                 
 row_loop:       movea.l         a0,a1           ; save row start position
@@ -98,4 +100,5 @@ col_loop:       clr.b           (a1)+           ; clear one byte, advance
                 dbra            d7,row_loop
                 
                 movem.l         (sp)+,d0-d7/a0-a6
+                unlk            a6
                 rts

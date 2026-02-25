@@ -12,22 +12,23 @@
 
     xdef          _plot_clipped_bitmap
 
-base            equ             64 
-row             equ             68               
-col             equ             70
-bitmap          equ             72              
-height          equ             76
-width           equ             78
-status          equ             80
-new_width       equ             82
+base            equ             8 
+row             equ             12               
+col             equ             14
+bitmap          equ             16              
+height          equ             20
+width           equ             22
+status          equ             24
+new_width       equ             26
 
 
 _plot_clipped_bitmap:
+                link            a6,#0
                 movem.l         d0-d7/a0-a6,-(sp)
 
                 ; Get status and new_width from parameters (already computed by caller)
-                move.w          status(sp),d7       ; get status in d7
-                move.w          new_width(sp),d6    ; get new_width in d6
+                move.w          status(a6),d7       ; get status in d7
+                move.w          new_width(a6),d6    ; get new_width in d6
                 
                 ; Check status and handle accordingly
                 cmpi.b          #3,d7
@@ -46,28 +47,28 @@ _plot_clipped_bitmap:
 
 plot_normal:
                 ; No clipping needed - plot full bitmap
-                movea.l         base(sp),a0         ; get screen base
-                movea.l         bitmap(sp),a1       ; get bitmap data
-                move.w          row(sp),d0
-                move.w          col(sp),d1
-                move.w          height(sp),d2
-                move.w          width(sp),d3        ; clipped width = original width
-                move.w          width(sp),d4        ; original width
+                movea.l         base(a6),a0         ; get screen base
+                movea.l         bitmap(a6),a1       ; get bitmap data
+                move.w          row(a6),d0
+                move.w          col(a6),d1
+                move.w          height(a6),d2
+                move.w          width(a6),d3        ; clipped width = original width
+                move.w          width(a6),d4        ; original width
                 bsr             do_plot
                 bra             done_clip
 
 plot_left_clip:
                 ; Left edge clipping: adjust col to 0, adjust bitmap pointer
                 ; new_width is in d6
-                movea.l         base(sp),a0         ; get screen base
-                movea.l         bitmap(sp),a1       ; get bitmap data
-                move.w          row(sp),d0          ; row unchanged
-                move.w          col(sp),d5          ; get original col (negative)
+                movea.l         base(a6),a0         ; get screen base
+                movea.l         bitmap(a6),a1       ; get bitmap data
+                move.w          row(a6),d0          ; row unchanged
+                move.w          col(a6),d5          ; get original col (negative)
                 neg.w           d5                  ; d5 = abs(col) = pixels to skip
                 moveq           #0,d1               ; new col = 0
-                move.w          height(sp),d2       ; height unchanged
+                move.w          height(a6),d2       ; height unchanged
                 move.w          d6,d3               ; use new_width from check_bounds
-                move.w          width(sp),d4        ; original bitmap width
+                move.w          width(a6),d4        ; original bitmap width
                 
                 ; Adjust bitmap pointer: skip (abs(col)/8) bytes per row
                 ; For simplicity, we'll handle this in the plotting routine
@@ -77,18 +78,19 @@ plot_left_clip:
 plot_right_clip:
                 ; Right edge clipping: use reduced width
                 ; new_width is in d6
-                movea.l         base(sp),a0         ; get screen base
-                movea.l         bitmap(sp),a1       ; get bitmap data
-                move.w          row(sp),d0
-                move.w          col(sp),d1
-                move.w          height(sp),d2
+                movea.l         base(a6),a0         ; get screen base
+                movea.l         bitmap(a6),a1       ; get bitmap data
+                move.w          row(a6),d0
+                move.w          col(a6),d1
+                move.w          height(a6),d2
                 move.w          d6,d3               ; use new_width from check_bounds
-                move.w          width(sp),d4        ; original bitmap width
+                move.w          width(a6),d4        ; original bitmap width
                 bsr             do_plot
                 bra             done_clip
 
 done_clip:
                 movem.l         (sp)+,d0-d7/a0-a6
+                unlk            a6
                 rts
 
 ;----------------------------------------------------------------

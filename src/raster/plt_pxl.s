@@ -14,22 +14,23 @@
 
                 xdef            _plot_pixel
 
-base            equ             20              ; offset from SP
-row             equ             24              ; UINT16 (2 bytes)
-col             equ             26              ; UINT16 (2 bytes)
+base            equ             8               ; offset from A6
+row             equ             12              ; UINT16 (2 bytes)
+col             equ             14              ; UINT16 (2 bytes)
 
 
 _plot_pixel:    
+                link            a6,#0
                 movem.l         d0-d2/a0,-(sp)
-                movea.l         base(sp),a0     ; get base address
+                movea.l         base(a6),a0     ; get base address
                 
                 ; Calculate and add row offset: row * 80 bytes
-                move.w          row(sp),d0
+                move.w          row(a6),d0
                 mulu.w          #80,d0          ; screen width in bytes
                 adda.l          d0,a0           ; add row offset
                 
                 ; Calculate and add col byte offset: col / 8
-                move.w          col(sp),d1
+                move.w          col(a6),d1
                 move.w          d1,d2           ; save col for bit calculation
                 lsr.w           #3,d1           ; d1 = col / 8 (byte offset)
                 adda.w          d1,a0           ; a0 now points to the byte
@@ -43,6 +44,7 @@ _plot_pixel:
                 bset            d0,(a0)         ; set bit d0 in byte at (a0)
 
                 movem.l         (sp)+,d0-d2/a0
+                unlk            a6
                 rts
 
                 

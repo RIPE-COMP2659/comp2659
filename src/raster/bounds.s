@@ -25,17 +25,18 @@
 
     xdef           _check_bounds
 
-row             equ             56
-col             equ             60
-height          equ             64
-width           equ             68
+row             equ             8
+col             equ             10
+height          equ             12
+width           equ             14
 
 _check_bounds:
-                movem.l         d2-d7/a0-a6,-(sp)      ; save registers (keep d0,d1 for return)
-                move.w          row(sp),d0
-                move.w          col(sp),d1
-                move.w          height(sp),d2
-                move.w          width(sp),d3
+                link            a6,#0
+                movem.l         d2-d7/a0-a5,-(sp)      ; save registers (keep d0,d1 for return, preserve a6!)
+                move.w          row(a6),d0
+                move.w          col(a6),d1
+                move.w          height(a6),d2
+                move.w          width(a6),d3
 
 ; check if either row or col is negative
                 tst.w           d0              ; test row
@@ -124,5 +125,6 @@ entirely_out:
                 moveq           #0,d1           ; return 0 for width
 
 done:
-                movem.l         (sp)+,d2-d7/a0-a6      ; restore registers (d0,d1 have return values)
+                movem.l         (sp)+,d2-d7/a0-a5      ; restore registers (d0,d1 have return values)
+                unlk            a6
                 rts
