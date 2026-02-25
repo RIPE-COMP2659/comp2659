@@ -22,19 +22,20 @@
                 xdef            _plot_triangle
                 xref            _plot_horizontal_line
 
-base            equ             64              ; UINT32* (4 bytes)
-row             equ             68              ; UINT16 (2 bytes)
-col             equ             70              ; UINT16 (2 bytes)
-base_tri        equ             72              ; UINT16 (2 bytes)
-height          equ             74              ; UINT16 (2 bytes)
-direction       equ             76              ; UINT8 (1 byte, but padded to 2)
+base            equ             8               ; UINT32* (4 bytes)
+row             equ             12              ; UINT16 (2 bytes)
+col             equ             14              ; UINT16 (2 bytes)
+base_tri        equ             16              ; UINT16 (2 bytes)
+height          equ             18              ; UINT16 (2 bytes)
+direction       equ             20              ; UINT8 (1 byte, but padded to 2)
 
 
 _plot_triangle:
+                link            a6,#0
                 movem.l         d0-d7/a0-a6,-(sp)
                 
                 ; Check direction and branch
-                move.b          direction(sp),d0
+                move.b          direction(a6),d0
                 andi.w          #$FF,d0                 ; clear upper byte
                 cmpi.w          #0,d0
                 beq             dir_top_left
@@ -51,7 +52,7 @@ dir_top_left:
                 ; Triangle expands rightward and downward
                 ; Row i has line of length: (base * (i+1)) / height
                 
-                move.w          height(sp),d7           ; loop counter
+                move.w          height(a6),d7           ; loop counter
                 beq             done                    ; if height = 0, exit
                 subq.w          #1,d7                   ; adjust for dbra
                 moveq           #0,d6                   ; current row offset (0 to height-1)
@@ -59,20 +60,20 @@ dir_top_left:
 tl_loop:        ; Calculate line length: (base_tri * (d6 + 1)) / height
                 move.w          d6,d0
                 addq.w          #1,d0                   ; d0 = row_offset + 1
-                move.w          base_tri(sp),d1
+                move.w          base_tri(a6),d1
                 mulu.w          d1,d0                   ; d0 = base * (row_offset + 1)
-                move.w          height(sp),d1
+                move.w          height(a6),d1
                 divu.w          d1,d0                   ; d0 = (base * (row_offset + 1)) / height
                 
                 ; Draw horizontal line at (row + d6, col, length = d0)
-                move.w          row(sp),d2
+                move.w          row(a6),d2
                 add.w           d6,d2                   ; current_row = row + d6
                 
                 ; Call plot_horizontal_line(base, current_row, col, length)
                 move.w          d0,-(sp)                ; push length
-                move.w          col+2(sp),-(sp)         ; push col (+2 for length)
+                move.w          col(a6),-(sp)           ; push col
                 move.w          d2,-(sp)                ; push current_row
-                move.l          base+6(sp),-(sp)        ; push base (+6 for 3 words)
+                move.l          base(a6),-(sp)          ; push base
                 jsr             _plot_horizontal_line
                 adda.w          #10,sp                  ; clean up stack (4+2+2+2)
                 
@@ -85,29 +86,29 @@ dir_top_right:
                 ; Triangle expands leftward and downward
                 ; Row i has line of length: (base * (i+1)) / height, ending at col
                 
-                move.w          height(sp),d7
+                move.w          height(a6),d7
                 beq             done
                 subq.w          #1,d7
                 moveq           #0,d6
                 
 tr_loop:        move.w          d6,d0
                 addq.w          #1,d0
-                move.w          base_tri(sp),d1
+                move.w          base_tri(a6),d1
                 mulu.w          d1,d0
-                move.w          height(sp),d1
+                move.w          height(a6),d1
                 divu.w          d1,d0                   ; d0 = line length
                 
-                move.w          row(sp),d2
+                move.w          row(a6),d2
                 add.w           d6,d2                   ; current_row
                 
-                move.w          col(sp),d3
+                move.w          col(a6),d3
                 sub.w           d0,d3                   ; start_col = col - length
                 
                 ; Call plot_horizontal_line(base, current_row, start_col, length)
                 move.w          d0,-(sp)
                 move.w          d3,-(sp)
                 move.w          d2,-(sp)
-                move.l          base+6(sp),-(sp)
+                move.l          base(a6),-(sp)
                 jsr             _plot_horizontal_line
                 adda.w          #10,sp
                 
@@ -120,26 +121,26 @@ dir_bottom_left:
                 ; Triangle expands rightward and upward
                 ; Row i (from top) has line of length: (base * i) / height
                 
-                move.w          height(sp),d7
+                move.w          height(a6),d7
                 beq             done
                 subq.w          #1,d7
                 move.w          d7,d6                   ; start from height-1, go down to 0
                 
 bl_loop:        move.w          d6,d0
                 addq.w          #1,d0
-                move.w          base_tri(sp),d1
+                move.w          base_tri(a6),d1
                 mulu.w          d1,d0
-                move.w          height(sp),d1
+                move.w          height(a6),d1
                 divu.w          d1,d0                   ; d0 = line length
                 
-                move.w          row(sp),d2
+                move.w          row(a6),d2
                 sub.w           d6,d2                   ; current_row = row - d6 (going upward)
                 
                 ; Call plot_horizontal_line(base, current_row, col, length)
                 move.w          d0,-(sp)
-                move.w          col+2(sp),-(sp)
+                move.w          col(a6),-(sp)
                 move.w          d2,-(sp)
-                move.l          base+6(sp),-(sp)
+                move.l          base(a6),-(sp)
                 jsr             _plot_horizontal_line
                 adda.w          #10,sp
                 
@@ -150,29 +151,29 @@ dir_bottom_right:
                 ; Direction 3: 90° angle at bottom-right
                 ; Triangle expands leftward and upward
                 
-                move.w          height(sp),d7
+                move.w          height(a6),d7
                 beq             done
                 subq.w          #1,d7
                 move.w          d7,d6
                 
 br_loop:        move.w          d6,d0
                 addq.w          #1,d0
-                move.w          base_tri(sp),d1
+                move.w          base_tri(a6),d1
                 mulu.w          d1,d0
-                move.w          height(sp),d1
+                move.w          height(a6),d1
                 divu.w          d1,d0                   ; d0 = line length
                 
-                move.w          row(sp),d2
+                move.w          row(a6),d2
                 sub.w           d6,d2                   ; current_row = row - d6
                 
-                move.w          col(sp),d3
+                move.w          col(a6),d3
                 sub.w           d0,d3                   ; start_col = col - length
                 
                 ; Call plot_horizontal_line(base, current_row, start_col, length)
                 move.w          d0,-(sp)
                 move.w          d3,-(sp)
                 move.w          d2,-(sp)
-                move.l          base+6(sp),-(sp)
+                move.l          base(a6),-(sp)
                 jsr             _plot_horizontal_line
                 adda.w          #10,sp
                 
@@ -180,5 +181,6 @@ br_loop:        move.w          d6,d0
 
 done:
                 movem.l         (sp)+,d0-d7/a0-a6
+                unlk            a6
                 rts
 

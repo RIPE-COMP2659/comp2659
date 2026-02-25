@@ -21,7 +21,6 @@ void test_plot_bitmap_32(UINT8 *base);
 void test_plot_character(UINT8 *base);
 void test_plot_string(UINT8 *base);
 
-
 {
     UINT8 *base = (UINT8 *)Physbase();
 
@@ -1019,7 +1018,7 @@ void test_plot_string(UINT8 *base)
     /* Test 5: Multiple lines */
     plot_string(base, 110, 10, "Line 1: Testing plot_string");
     plot_string(base, 130, 10, "Line 2: Second line of text");
-    plot_string(base, 150, 10, "Line 3: Third line of text");
+    plot_string(base, 150, 10, "Line 3: If youre reading this... Its behind you.");
 
     /* Test 6: Different starting positions */
     plot_string(base, 180, 50, "Offset text");

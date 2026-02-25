@@ -20,29 +20,30 @@
 
                 xdef            _plot_line
 
-base            equ             44              
-start_row       equ             48              
-start_col       equ             50              
-end_row         equ             52              
-end_col         equ             54              
-color           equ             56             
+base            equ             8               
+start_row       equ             12              
+start_col       equ             14              
+end_row         equ             16              
+end_col         equ             18              
+color           equ             20             
 
 
 _plot_line:
+                link            a6,#0
                 movem.l         d0-d7/a0-a1,-(sp)
                 
                 ; Save color in a1 (using address register to free up data registers)
-                move.w          color(sp),d0
+                move.w          color(a6),d0
                 andi.w          #1,d0                   ; ensure color is 0 or 1
                 movea.w         d0,a1                   ; a1 = color (preserved)
                 
                 ; Initialize current position
-                move.w          start_row(sp),d4       ; current_row
-                move.w          start_col(sp),d5       ; current_col
+                move.w          start_row(a6),d4       ; current_row
+                move.w          start_col(a6),d5       ; current_col
                 
                 ; Calculate dx = abs(end_col - start_col)
-                move.w          end_col(sp),d0
-                move.w          start_col(sp),d1
+                move.w          end_col(a6),d0
+                move.w          start_col(a6),d1
                 sub.w           d1,d0                   ; d0 = end_col - start_col
                 bge.s           dx_positive
                 neg.w           d0                      ; d0 = abs(dx)
@@ -50,8 +51,8 @@ dx_positive:
                 move.w          d0,d6                   ; d6 = dx (preserved)
                 
                 ; Calculate dy = abs(end_row - start_row)
-                move.w          end_row(sp),d0
-                move.w          start_row(sp),d1
+                move.w          end_row(a6),d0
+                move.w          start_row(a6),d1
                 sub.w           d1,d0                   ; d0 = end_row - start_row
                 bge.s           dy_positive
                 neg.w           d0                      ; d0 = abs(dy)
@@ -59,8 +60,8 @@ dy_positive:
                 move.w          d0,d7                   ; d7 = dy (preserved)
                 
                 ; Determine step direction for x (col)
-                move.w          end_col(sp),d0
-                cmp.w           start_col(sp),d0
+                move.w          end_col(a6),d0
+                cmp.w           start_col(a6),d0
                 bge.s           step_x_positive
                 moveq           #-1,d2                  ; step_x = -1
                 bra.s           check_y_step
@@ -69,8 +70,8 @@ step_x_positive:
                 
 check_y_step:
                 ; Determine step direction for y (row)
-                move.w          end_row(sp),d0
-                cmp.w           start_row(sp),d0
+                move.w          end_row(a6),d0
+                cmp.w           start_row(a6),d0
                 bge.s           step_y_positive
                 moveq           #-1,d3                  ; step_y = -1
                 bra.s           init_bresenham
@@ -96,7 +97,7 @@ init_bresenham:
                 
 vert_loop:
                 ; Plot pixel at (d4, d5) with color in a1
-                movea.l         base(sp),a0
+                movea.l         base(a6),a0
                 
                 ; Calculate row offset: row * 80
                 move.w          d4,d0
@@ -125,7 +126,7 @@ vert_plot_black:
                 
 vert_check_end:
                 ; Check if we've reached the end
-                cmp.w           end_row(sp),d4
+                cmp.w           end_row(a6),d4
                 beq             line_done
                 
                 ; Update error and position
@@ -153,7 +154,7 @@ horiz_line:
                 
 horiz_loop:
                 ; Plot pixel at (d4, d5) with color in a1
-                movea.l         base(sp),a0
+                movea.l         base(a6),a0
                 
                 ; Calculate row offset: row * 80
                 move.w          d4,d0
@@ -182,7 +183,7 @@ horiz_plot_black:
                 
 horiz_check_end:
                 ; Check if we've reached the end
-                cmp.w           end_col(sp),d5
+                cmp.w           end_col(a6),d5
                 beq.s           line_done
                 
                 ; Update error and position
@@ -204,4 +205,5 @@ horiz_no_y_step:
                 
 line_done:
                 movem.l         (sp)+,d0-d7/a0-a1
+                unlk            a6
                 rts

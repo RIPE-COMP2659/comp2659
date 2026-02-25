@@ -20,29 +20,30 @@
 
                 xdef            _plot_vertical_line
 
-base            equ             24              
-row             equ             28              ; UINT16 (2 bytes)
-col             equ             30              ; UINT16 (2 bytes)  
-length          equ             32              ; UINT16 (2 bytes)
-color           equ             34              ; UINT16 (2 bytes)
+base            equ             8               
+row             equ             12               ; UINT16 (2 bytes)
+col             equ             14               ; UINT16 (2 bytes)  
+length          equ             16               ; UINT16 (2 bytes)
+color           equ             18               ; UINT16 (2 bytes)
 
 
 _plot_vertical_line:    
+                link            a6,#0
                 movem.l         d0-d3/a0,-(sp)
                 
                 ; Check if length is zero
-                move.w          length(sp),d3
+                move.w          length(a6),d3
                 beq             done            ; if length = 0, exit
                 
-                movea.l         base(sp),a0     ; get base address
+                movea.l         base(a6),a0     ; get base address
                 
                 ; Calculate and add row offset: row * 80 bytes
-                move.w          row(sp),d0
+                move.w          row(a6),d0
                 mulu.w          #80,d0          ; screen width in bytes
                 adda.l          d0,a0           ; add row offset
                 
                 ; Calculate and add col byte offset: col / 8
-                move.w          col(sp),d1
+                move.w          col(a6),d1
                 move.w          d1,d2           ; save col for bit calculation
                 lsr.w           #3,d1           ; d1 = col / 8 (byte offset)
                 adda.w          d1,a0           ; a0 now points to the byte
@@ -53,7 +54,7 @@ _plot_vertical_line:
                 sub.w           d2,d0           ; d0 = 7 - (col % 8) = bit position
                 
                 ; Check color parameter
-                move.w          color(sp),d1
+                move.w          color(a6),d1
                 tst.w           d1              ; check if color is 0
                 beq             pixel_loop_black
                 
@@ -83,4 +84,5 @@ pixel_loop_black:
 
 done:
                 movem.l         (sp)+,d0-d3/a0
+                unlk            a6
                 rts

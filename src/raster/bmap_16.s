@@ -22,15 +22,16 @@
                 xref            _check_bounds
                 xref            _plot_clipped_bitmap
 
-base            equ             64             
-row             equ             68               
-col             equ             70
-bitmap          equ             72
-height          equ             76
+base            equ             8             
+row             equ             12               
+col             equ             14
+bitmap          equ             16
+height          equ             20
 
 
 _plot_bitmap_16: 
-                movem.l         d0-d7/a0-a6,-(sp)
+                link            a6,#0
+                movem.l         d0-d7/a0-a5,-(sp)
 
 
 ;--------------------------------------------------------------------------------------------
@@ -39,9 +40,9 @@ _plot_bitmap_16:
 ;--------------------------------------------------------------------------------------------
                 ; Check bounds first
                 move.w          #16,-(sp)           ; push width (16 pixels)
-                move.w          height+2(sp),-(sp)  ; push height
-                move.w          col+4(sp),-(sp)     ; push col
-                move.w          row+6(sp),-(sp)     ; push row
+                move.w          height(a6),-(sp)  ; push height
+                move.w          col(a6),-(sp)     ; push col
+                move.w          row(a6),-(sp)     ; push row
                 jsr             _check_bounds
                 adda.l             #8,sp            ; clean up stack
                 
@@ -53,16 +54,16 @@ _plot_bitmap_16:
                 bne             use_clipped         ; if status != 0 (but not 3), use clipped version
                 
                 ; No clipping needed, continue with optimized routine
-                movea.l         base(sp),a0     ; get base address (screen)
-                movea.l         bitmap(sp),a1   ; get bitmap data address
+                movea.l         base(a6),a0     ; get base address (screen)
+                movea.l         bitmap(a6),a1   ; get bitmap data address
                 
                 ; Calculate and add row offset: row * 80 bytes
-                move.w          row(sp),d0
+                move.w          row(a6),d0
                 mulu.w          #80,d0          ; screen width in bytes
                 adda.l          d0,a0           ; add row offset
                 
                 ; Calculate and add col offset: col / 8 (pixels to bytes)
-                move.w          col(sp),d0
+                move.w          col(a6),d0
                 lsr.w           #3,d0           ; divide by 8 (shift right 3 bits)
                 ext.l           d0              ; extend to long
                 adda.l          d0,a0           ; add col offset in bytes
@@ -83,7 +84,7 @@ _plot_bitmap_16:
                 bne             word_copy       ; if not long-aligned, use word copy
                 
                 ; Check if we have even number of rows for long optimization
-                move.w          height(sp),d7
+                move.w          height(a6),d7
                 btst            #0,d7           ; test if height is odd
                 bne             word_copy       ; if odd, use word copy
                 
@@ -98,7 +99,8 @@ long_loop:      move.l          (a1)+,d0        ; get 2 words (4 bytes) of bitma
                 adda.w          #160,a0         ; move to current_row + 2 (2 rows * 80 bytes)
                 dbra            d7,long_loop
                 
-                movem.l         (sp)+,d0-d7/a0-a6
+                movem.l         (sp)+,d0-d7/a0-a5
+                unlk            a6
                 rts
 
 word_copy:      
@@ -113,19 +115,20 @@ word_copy:
                 bne             byte_copy       ; if odd, must use byte copy
                 
                 ; Standard word-by-word copy
-                move.w          height(sp),d7   ; get height (number of rows)
+                move.w          height(a6),d7   ; get height (number of rows)
                 subq.w          #1,d7           ; adjust for dbra
                 
 row_loop:       move.w          (a1)+,(a0)      ; copy one word of bitmap to screen
                 adda.w          #80,a0          ; move to next row (80 bytes per row)
                 dbra            d7,row_loop
                 
-                movem.l         (sp)+,d0-d7/a0-a6
+                movem.l         (sp)+,d0-d7/a0-a5
+                unlk            a6
                 rts
 
 byte_copy:
                 ; Byte-by-byte copy for misaligned addresses
-                move.w          height(sp),d7   ; get height (number of rows)
+                move.w          height(a6),d7   ; get height (number of rows)
                 subq.w          #1,d7           ; adjust for dbra
                 
 byte_loop:      move.b          (a1)+,(a0)+     ; copy first byte
@@ -133,11 +136,13 @@ byte_loop:      move.b          (a1)+,(a0)+     ; copy first byte
                 adda.w          #79,a0          ; move to next row (80 - 1 already advanced)
                 dbra            d7,byte_loop
                 
-                movem.l         (sp)+,d0-d7/a0-a6
+                movem.l         (sp)+,d0-d7/a0-a5
+                unlk            a6
                 rts
 
 done:
-                movem.l         (sp)+,d0-d7/a0-a6
+                movem.l         (sp)+,d0-d7/a0-a5
+                unlk            a6
                 rts
 
 use_clipped:
@@ -148,7 +153,7 @@ use_clipped:
                 move.w          d1,(sp)             ; Store new_width
                 
                 ; Restore registers from offset (skipping our saved values)
-                movem.l         4(sp),d0-d7/a0-a6   ; Restore from sp+4
+                movem.l         4(sp),d0-d7/a0-a5   ; Restore from sp+4
                 
                 ; Pop our saved values into d6/d7
                 move.w          (sp)+,d6            ; d6 = new_width
@@ -163,11 +168,12 @@ use_clipped:
                 move.w          d6,-(sp)            ; push new_width
                 move.w          d7,-(sp)            ; push status
                 move.w          #16,-(sp)           ; push width (16 pixels)
-                move.w          height+6(sp),-(sp)  ; push height (sp moved by 6)
-                move.l          bitmap+8(sp),-(sp)  ; push bitmap (sp moved by 8)
-                move.w          col+12(sp),-(sp)    ; push col (sp moved by 12)
-                move.w          row+14(sp),-(sp)    ; push row (sp moved by 14)
-                move.l          base+16(sp),-(sp)   ; push base (sp moved by 16)
+                move.w          height(a6),-(sp)  ; push height
+                move.l          bitmap(a6),-(sp)  ; push bitmap
+                move.w          col(a6),-(sp)    ; push col
+                move.w          row(a6),-(sp)    ; push row
+                move.l          base(a6),-(sp)   ; push base
                 jsr             _plot_clipped_bitmap
-                lea             20(sp),sp           ; clean up (2+2+2+2+4+2+2+4 = 20 bytes)
+                lea             20(sp),sp           
+                unlk            a6
                 rts
