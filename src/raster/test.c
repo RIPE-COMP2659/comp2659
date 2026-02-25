@@ -2,8 +2,6 @@
 #include <stdio.h>
 #include <osbind.h>
 
-#define BYTES_PER_SCREEN 32000
-
 void disable_cursor();
 void fill_screen(UINT32 *base, char pattern);
 void test_clear_screen(UINT8 *base);

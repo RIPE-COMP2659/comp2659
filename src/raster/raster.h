@@ -1,5 +1,8 @@
 #ifndef RASTER_H
 #define RASTER_H
+
+#define BYTES_PER_SCREEN 32000
+
 /*
 
  This header file contains all functions in our raster library.
