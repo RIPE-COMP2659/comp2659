@@ -5,6 +5,7 @@ __pycache__
 # Ignore all executables and object files.
 *.O
 *.TOS
+*.UT
 
 # Executables
 geo_dash
