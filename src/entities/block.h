@@ -1,4 +1,7 @@
-# include "dtypes.h"
+#ifndef BLOCK_H
+#define BLOCK_H
+
+#include "dtypes.h"
 
 #define BLOCK_SIZE 32
 
@@ -38,10 +41,12 @@ static const unsigned int BLOCK_SPRITE[BLOCK_SIZE][BLOCK_SIZE / WORD] = {
 };
 
 typedef struct {
-    unsigned int x;
-    unsigned int y;
-    unsigned int size;
-    const unsigned int (*sprite)[BLOCK_SIZE / WORD];
+  unsigned int x;
+  unsigned int y;
+  unsigned int size;
+  const unsigned int (*sprite)[BLOCK_SIZE / WORD];
 } Block;
 
 void block_placeholder(void);
+
+#endif /* BLOCK_H */

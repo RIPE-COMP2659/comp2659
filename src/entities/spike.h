@@ -1,4 +1,7 @@
-# include "dtypes.h"
+#ifndef SPIKE_H
+#define SPIKE_H
+
+#include "dtypes.h"
 
 #define SPIKE_SIZE 32
 
@@ -38,10 +41,12 @@ static const unsigned int SPIKE_SPRITE[SPIKE_SIZE][SPIKE_SIZE / WORD] = {
 };
 
 typedef struct {
-    unsigned int x;
-    unsigned int y;
-    unsigned int size;
-    const unsigned int (*sprite)[SPIKE_SIZE / WORD];
+  unsigned int x;
+  unsigned int y;
+  unsigned int size;
+  const unsigned int (*sprite)[SPIKE_SIZE / WORD];
 } Spike;
 
 void spike_placeholder(void);
+
+#endif /* SPIKE_H */
