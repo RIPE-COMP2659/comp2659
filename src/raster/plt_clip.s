@@ -29,33 +29,14 @@ _plot_clipped_bitmap:
                 ; Get status and new_width from parameters (already computed by caller)
         move.w  status(a6),d7                   ; get status in d7
         move.w  new_width(a6),d6                ; get new_width in d6
-                
-                ; Check status and handle accordingly
-        cmpi.b  #3,d7
-        beq     done_clip                       ; if entirely out of bounds, return
-                
-        cmpi.b  #0,d7
-        beq     plot_normal                     ; if no clipping needed, plot normally
-                
+
         cmpi.b  #1,d7
         beq     plot_left_clip                  ; if left edge clipping
-                
+
         cmpi.b  #2,d7
         beq     plot_right_clip                 ; if right edge clipping
-                
-        bra     done_clip                       ; safety - should never reach here
 
-plot_normal:
-                ; No clipping needed - plot full bitmap
-        movea.l base(a6),a0                     ; get screen base
-        movea.l bitmap(a6),a1                   ; get bitmap data
-        move.w  row(a6),d0
-        move.w  col(a6),d1
-        move.w  height(a6),d2
-        move.w  width(a6),d3                    ; clipped width = original width
-        move.w  width(a6),d4                    ; original width
-        bsr     do_plot
-        bra     done_clip
+        bra     done_clip                       ; safety - should never reach here
 
 plot_left_clip:
                 ; Left edge clipping: adjust col to 0, adjust bitmap pointer
@@ -69,8 +50,8 @@ plot_left_clip:
         move.w  height(a6),d2                   ; height unchanged
         move.w  d6,d3                           ; use new_width from check_bounds
         move.w  width(a6),d4                    ; original bitmap width
-                
-                ; Adjust bitmap pointer: skip (abs(col)/8) bytes per row
+
+        ; Adjust bitmap pointer: skip (abs(col)/8) bytes per row
                 ; For simplicity, we'll handle this in the plotting routine
         bsr     do_plot_left_clip
         bra     done_clip

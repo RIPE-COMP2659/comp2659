@@ -152,7 +152,7 @@ use_clipped:
         move.w  d1,(sp)                         ; Store new_width
                 
                 ; Restore registers from offset (skipping our saved values)
-        movem.l 4(sp),d0-d7/a0-a5               ; Restore from sp+4
+        movem.l 4(sp),d2-d7/a0-a5               ; Restore from sp+4 (excluding d0-d1)
                 
                 ; Pop our saved values into d6/d7
         move.w  (sp)+,d6                        ; d6 = new_width

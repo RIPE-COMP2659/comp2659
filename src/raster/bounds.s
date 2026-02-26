@@ -38,24 +38,23 @@ _check_bounds:
         move.w  height(a6),d2
         move.w  width(a6),d3
 
-; check if row + height > screen height (400)
+; Check for right edge
         cmp.w   #400,d0                         ; compare with SCREEN_HEIGHT
         bge     entirely_out                    ; if row + height > 400, entirely out
+; Check for bottom edge (row + height <= 0)
         move.w  d0,d4                           ; d4 = row
-        add.w   d3,d4
+        add.w   d2,d4                           ; d4 = row + height
         cmp.w   0,d4
-        ble.w   entirely_out      
+        ble.w   entirely_out
 
-
-        cmp.w   #640,d1                         ; compare height with SCREEN_HEIGHT
-        bge     entirely_out                    ; if col + width > 640, entirely out
-        
-        move.w  d0,d4                           ; d4 = row
-        add.w   d3,d4
-        cmp.w   0,d4
-        ble.w   entirely_out     
-
-
+; Check for right edge
+        cmp.w   #640,d1                         ; compare with SCREEN_WIDTH
+        bge     entirely_out                    ; if col >= 640, entirely out
+; Check for left edge
+        move.w  d1,d4                           ; d4 = col
+        add.w   d3,d4                           ; d4 = col + width
+        cmp.w   0,d4                            ; compare with 0
+        ble.w   entirely_out                    ; if col + width <= 0, entirely out     
 
 ; check if col + width > screen width (640)
         move.w  d1,d4                           ; d4 = col
@@ -63,11 +62,9 @@ _check_bounds:
         cmp.w   #640,d4                         ; compare with SCREEN_WIDTH
         bgt     right_edge                      ; if col + width > 640, right edge
 
-; check if either row or col is negative
-        tst.w   d0                              ; test row
-        blt     entirely_out                    ; if row < 0, entirely out
-        tst.w   d1                              ; test col
-        blt     left_edge                       ; if col < 0, left edge
+; check if col < 0 (left edge)
+        tst.w   d1                              ; test if col is negative
+        bmi     left_edge                       ; Tests for N bit
 
 ; if we get here, within bounds
         moveq   #0,d0                           ; status = 0 (within bounds)
@@ -78,60 +75,26 @@ _check_bounds:
 left_edge:
 ; col < 0, need to calculate new width
 ; new_width = width + col (since col is negative)
+; We know col + width > 0 (checked earlier), so new_width will be positive
         move.w  d3,d4                           ; d4 = width
-        add.w   d1,d4                           ; d4 = width + col
-        tst.w   d4                              ; check if new_width > 0
-        ble     entirely_out                    ; if new_width <= 0, entirely out
+        add.w   d1,d4                           ; d4 = width + col = new width. NOTE, COL is negative in this case
         moveq   #1,d0                           ; status = 1 (left edge)
-        move.w  d4,d1                           ; new width
-        ext.l   d1                              ; extend to long
+        move.w  d4,d1                           ; return new width
+        ext.l   d1                              ; extend to long. Avoid junk.
         bra     done
 
 right_edge:
 ; col + width > 640, need to calculate new width
 ; Must ensure we don't write past byte 79 (last byte in 80-byte row)
 ; When bitmaps are not byte-aligned, they can span multiple bytes!
+; We know col < 640 (checked earlier), so 640 - col will be positive
         move.w  #640,d4                         ; d4 = 640
         sub.w   d1,d4                           ; d4 = 640 - col (pixel-based limit)
-        tst.w   d4                              ; check if new_width > 0
-        ble     entirely_out                    ; if new_width <= 0, entirely out
-                
-                ; Calculate bytes that will be touched on screen
-                ; bytes_touched = ((col % 8) + width + 7) / 8
-                ; We need: starting_byte + bytes_touched <= 80
-                
-        move.w  d1,d5                           ; d5 = col
-        move.w  d5,d6                           ; d6 = col (copy)
-        andi.w  #7,d5                           ; d5 = col % 8 (bit offset)
-        lsr.w   #3,d6                           ; d6 = col / 8 (starting byte)
-                
-                ; Calculate max width that keeps starting_byte + bytes_touched <= 80
-                ; bytes_touched <= 80 - starting_byte
-                ; ((bit_offset + width + 7) / 8) <= max_bytes
-                ; bit_offset + width + 7 <= max_bytes * 8 + 7
-                ; width <= (max_bytes * 8) - bit_offset
-                
-        move.w  #80,d7                          ; d7 = 80
-        sub.w   d6,d7                           ; d7 = 80 - starting_byte (max bytes we can touch)
-        bne     calc_byte_limit                 ; if > 0, calculate limit
-        bra     entirely_out                    ; if 0, can't write anything
-                
-calc_byte_limit:
-        lsl.w   #3,d7                           ; d7 = max_bytes * 8
-        sub.w   d5,d7                           ; d7 = (max_bytes * 8) - bit_offset (byte-based width limit)
-                
-                ; Use minimum of pixel-based limit and byte-based limit
-        cmp.w   d7,d4                           ; compare pixel-based vs byte-based limit
-        ble     use_pixel_limit                 ; if pixel limit <= byte limit, use it
-        move.w  d7,d4                           ; else use byte limit
-                
-use_pixel_limit:
-        tst.w   d4                              ; final check if width > 0
-        ble     entirely_out                    ; if width <= 0, entirely out
         moveq   #2,d0                           ; status = 2 (right edge)
-        move.w  d4,d1                           ; new width (safe for both pixel and byte boundaries)
-        ext.l   d1                              ; extend to long
+        move.w  d4,d1                           ; return new width = 640 - col
+        ext.l   d1                              ; extend to long. Avoid junk.
         bra     done
+
 
 entirely_out:
         moveq   #3,d0                           ; status = 3 (entirely out)

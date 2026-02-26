@@ -1,3 +1,4 @@
+
 # COMP2659 Assignment
 Made for the final project/overall project of COMP2659 at Mount Royal University. The specifications will be listed [here](https://docs.google.com/document/d/1sgGgx19n0Oh4ml2uCEyvfwX6mpvj2tBK_8uIYWLluds/edit?usp=sharing) for now, but will likely be moved into another file in this directory. 
 
@@ -52,3 +53,7 @@ Lines executed:100.00% of 2
 **If no test is performed,** or nothing pops up- you are likely merging into a branch that does not require/ have the tests automated for it.👾
 
 Contributors: [@emykh268](https://github.com/emykh268), [@PkHutch](https://github.com/PkHutch), [@rileygramlich](https://github.com/rileygramlich), [@sudonym-i](https://github.com/sudonym-i)
+
+
+make -f MAKE_ATR tbmap_32
+tbmap_32.ut

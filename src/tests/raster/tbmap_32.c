@@ -235,7 +235,7 @@ void test_plot_bitmap_32_off_right_edge(void)
     {
         for (col = 0; col < 16; col++)
         {
-            TEST_ASSERT_EQUAL_INT(COLOR_WHITE, get_pixel(mock_screen, row, start_col + col));
+            TEST_ASSERT_EQUAL_INT(1, get_pixel(mock_screen, row, start_col + col));
         }
     }
 
