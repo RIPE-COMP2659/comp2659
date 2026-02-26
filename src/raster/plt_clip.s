@@ -24,7 +24,7 @@ new_width equ   26
 
 _plot_clipped_bitmap:
         link    a6,#0
-        movem.l d0-d7/a0-a6,-(sp)
+        movem.l d0-d7/a0-a5,-(sp)
 
                 ; Get status and new_width from parameters (already computed by caller)
         move.w  status(a6),d7                   ; get status in d7
@@ -89,7 +89,7 @@ plot_right_clip:
         bra     done_clip
 
 done_clip:
-        movem.l (sp)+,d0-d7/a0-a6
+        movem.l (sp)+,d0-d7/a0-a5
         unlk    a6
         rts
 
