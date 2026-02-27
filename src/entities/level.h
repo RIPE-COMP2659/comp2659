@@ -7,13 +7,21 @@ typedef struct {
   Block *blocks;
   Spike *spikes;
   Lava *lava;
-  unsigned int current_block;
-  unsigned int current_spike;
-  unsigned int current_lava;
+  unsigned int blocks_size;
+  unsigned int spikes_size;
+  unsigned int lava_size;
   unsigned int end_x;
 } Level;
 
-Level create_level(Block* blocks, Spike* spikes, Lava* lava, unsigned int end_x);
+Level create_level(
+    Block* blocks,
+    Spike* spikes,
+    Lava* lava,
+    unsigned int blocks_size,
+    unsigned int spikes_size,
+    unsigned int lava_size,
+    unsigned int end_x
+);
 Level get_level1(void);
 Level get_level2(void);
 Level* get_levels(void);

@@ -75,6 +75,7 @@ void test_block_sprite_size(void) {
     TEST_ASSERT_EQUAL_INT(block1.size, num_rows);
     TEST_ASSERT_EQUAL_INT(block1.size, bits_per_row);
 }
+
 /* Main function to run all tests */
 int main(void) {
     UNITY_BEGIN();

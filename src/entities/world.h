@@ -1,11 +1,13 @@
 #include "geo.h"
 #include "level.h"
+#include "camera.h"
 
 /* TODO: Turn these into constants somehow */
 typedef struct {
   Level *levels;
   Geo geo;
   unsigned int ground_y;
+  Camera camera;
 } World;
 
 World create_world(Level *levels, Geo geo, unsigned int ground_y);

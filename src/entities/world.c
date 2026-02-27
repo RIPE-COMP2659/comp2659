@@ -5,6 +5,7 @@ World create_world(Level* levels, Geo geo, unsigned int ground_y) {
 
 	world.levels = levels;
 	world.geo = geo;
+	world.camera = create_camera(0, SCREEN_HEIGHT);
 	world.ground_y = ground_y;
 
 	return world;
@@ -13,7 +14,7 @@ World create_world(Level* levels, Geo geo, unsigned int ground_y) {
 World get_world(void) {
 	Level* levels;
 	unsigned int ground_y = 32;
-	Geo geo = create_geo(100, ground_y + GEO_SIZE, ground_y);
+	Geo geo = create_geo((SCREEN_WIDTH / 4), ground_y + GEO_SIZE, ground_y);
 
 	levels = get_levels();
 

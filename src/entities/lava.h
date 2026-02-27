@@ -6,13 +6,13 @@
 #define LAVA_SIZE 32
 
 static const unsigned int LAVA_SPRITE[LAVA_SIZE][LAVA_SIZE / WORD] = {
-    /* 1–4: full white */
+    /* 1–2: full white */
     {0x0000, 0x0000}, /* 1 */
     {0x0000, 0x0000},
-    {0x0000, 0x0000},
-    {0x0000, 0x0000}, /* 4 */
 
-    /* 5–12: chessboard */
+    /* 3–12: chessboard */
+    {0xAAAA, 0xAAAA},
+    {0x5555, 0x5555}, /* 4 */
     {0xAAAA, 0xAAAA}, /* 5 */
     {0x5555, 0x5555},
     {0xAAAA, 0xAAAA},
