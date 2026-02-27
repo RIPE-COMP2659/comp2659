@@ -2,13 +2,18 @@
 .venv
 __pycache__
 
+# Ignore all executables and object files.
+*.O
+*.TOS
+*.UT
+
 # Executables
 geo_dash
-test*
 *.exe
 
 # Make sure to keep the files in our tests directory.
-!/src/tests/
+!test*.c
+!src/tests/
 
 # Coverage files
 *.gcov

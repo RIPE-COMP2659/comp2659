@@ -2,6 +2,14 @@
 
 This directory contains the C source code for the project.
 
+## Running on STEEM
+
+Copy the contents of this folder, src, into your appropriate STEEM folder. You do not need to include tests, nor do you need to include the .md files. Furthermore, DO NOT INCLUDE Makefile, and rename MAKEFILE_STEEM to MAKEFILE.
+
+Then "RUN_MAKE.g" from Gulam.
+
+Then "prog.tos".
+
 ## Prerequisites
 
 Ensure the following is installed:
