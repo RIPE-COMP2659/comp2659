@@ -111,13 +111,13 @@ do_plot:
         subq.w  #1,d2                           ; height - 1 for dbra
 plot_row_loop:
         move.w  d6,d7                           ; bytes to copy this row
-        subq.w  #1,d7                           ; adjust for dbra
         movea.l a0,a2                           ; save screen position
-                
+        bra.s   plot_byte_entry                 ; enter loop at check
 plot_byte_loop:
         move.b  (a1)+,d1                        ; get bitmap byte
         or.b    d1,(a2)+                        ; OR onto screen
-        dbra    d7,plot_byte_loop
+plot_byte_entry:
+        dbra    d7,plot_byte_loop               ; decrement and branch if not -1
                 
                 ; Advance bitmap pointer to next row (skip remaining bytes)
         move.w  d5,d1                           ; original bytes per row
@@ -166,15 +166,15 @@ do_plot_left_clip:
                 ; Plot bitmap row by row
         subq.w  #1,d2                           ; height - 1 for dbra
 plot_lclip_row:
-        adda.w  d7,a1                           ; skip left bytes
-        move.w  d4,d1                           ; bytes to copy this row
-        subq.w  #1,d1                           ; adjust for dbra
         movea.l a0,a2                           ; save screen position
-                
+        move.w  d4,d1                           ; bytes to copy this row
+        adda.w  d7,a1                           ; skip left bytes
+        bra.s   plot_lclip_entry                ; enter loop at check
 plot_lclip_byte:
         move.b  (a1)+,d0                        ; get bitmap byte
         or.b    d0,(a2)+                        ; OR onto screen
-        dbra    d1,plot_lclip_byte
+plot_lclip_entry:
+        dbra    d1,plot_lclip_byte              ; decrement and branch if not -1
                 
                 ; Move to next row in original bitmap (skip remaining bytes)
         move.w  d6,d1                           ; original bytes per row
