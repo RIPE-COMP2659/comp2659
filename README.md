@@ -54,6 +54,7 @@ Lines executed:100.00% of 2
 
 Contributors: [@emykh268](https://github.com/emykh268), [@PkHutch](https://github.com/PkHutch), [@rileygramlich](https://github.com/rileygramlich), [@sudonym-i](https://github.com/sudonym-i)
 
+### Usage for test scripts (example for tbmap_32)
 
 make -f MAKE_ATR tbmap_32
 tbmap_32.ut

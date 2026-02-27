@@ -45,7 +45,7 @@ BMAP_32 = bmap_32
 PLT_CHR = plt_chr
 PLT_STR = plt_str
 BOUNDS  = bounds
-PLT_CLIP = plt_clip
+PLT_CLIP = plt_clp
 
 # Global Variables
 ATARI_CC     = cc68x
