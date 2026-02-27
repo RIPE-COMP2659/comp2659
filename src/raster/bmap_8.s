@@ -116,20 +116,9 @@ done:
         rts
 
 use_clipped:
-                ; Save status and new_width before restoring registers
-                ; Create space and store them
-        subq.l  #4,sp                           ; Make room for 2 words
-        move.w  d0,2(sp)                        ; Store status
-        move.w  d1,(sp)                         ; Store new_width
+        move.b  d0,d7                           ; d7 = status from check_bounds
+        move.w  d1,d6                           ; d6 = new_width from check_bounds
                 
-                ; Restore registers from offset (skipping our saved values)
-        movem.l 4(sp),d0-d7/a0-a5               ; Restore from sp+4
-                
-                ; Pop our saved values into d6/d7
-        move.w  (sp)+,d6                        ; d6 = new_width
-        move.w  (sp)+,d7                        ; d7 = status
-                
-
 ;--------------------------------------------------------------------------------------------
 ;                       !MIGRATE to pass-by-register for faster performance in the future!
 ;                       This will avoid read/writes to memory, which costs us clock cycles
@@ -145,6 +134,7 @@ use_clipped:
         move.w  row(a6),-(sp)                   ; push row
         move.l  base(a6),-(sp)                  ; push base
         jsr     _plot_clipped_bitmap
-        adda.l  #20,sp             
+        adda.l  #20,sp                          ; clean up parameters
+        movem.l (sp)+,d0-d7/a0-a5               ; restore saved registers
         unlk    a6
         rts

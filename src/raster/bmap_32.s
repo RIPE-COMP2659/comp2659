@@ -52,7 +52,7 @@ _plot_bitmap_32:
         tst.b   d0                              ; check if any clipping needed
         bne     use_clipped                     ; if status != 0 (but not 3), use clipped version
                 
-                ; No clipping needed, continue with optimized routine
+                ; No clipping needed, continue
         movea.l base(a6),a0                     ; get base address (screen)
         movea.l bitmap(a6),a1                   ; get bitmap data address
                 
@@ -70,13 +70,13 @@ _plot_bitmap_32:
                 ; Check long word alignment for optimization
         move.l  a0,d1
         btst    #0,d1                           ; test if start address is odd
-        bne     long_copy                       ; if odd, use long copy
+        bne     byte_copy                       ; if odd, MUST use byte copy (word/long ops fail on odd addresses!)
         btst    #1,d1                           ; test if screen address is word-aligned but not long-aligned
         bne     long_copy                       ; if not long-aligned, use long copy
                 
         move.l  a1,d1
         btst    #0,d1                           ; test if bitmap address is odd
-        bne     long_copy                       ; if odd, use long copy
+        bne     byte_copy                       ; if odd, MUST use byte copy
         btst    #1,d1                           ; test if bitmap address is word-aligned but not long-aligned
         bne     long_copy                       ; if not long-aligned, use long copy
                 
@@ -145,19 +145,9 @@ done:
         rts
 
 use_clipped:
-                ; Save status and new_width before restoring registers
-                ; Create space and store them
-        subq.l  #4,sp                           ; Make room for 2 words
-        move.w  d0,2(sp)                        ; Store status
-        move.w  d1,(sp)                         ; Store new_width
-                
-                ; Restore registers from offset (skipping our saved values)
-        movem.l 4(sp),d2-d7/a0-a5               ; Restore from sp+4 (excluding d0-d1)
-                
-                ; Pop our saved values into d6/d7
-        move.w  (sp)+,d6                        ; d6 = new_width
-        move.w  (sp)+,d7                        ; d7 = status
-                
+        move.b  d0,d7                           ; d7 = status from check_bounds
+        move.w  d1,d6                           ; d6 = new_width from check_bounds
+
 ;--------------------------------------------------------------------------------------------
 ;                       !MIGRATE to pass-by-register for faster performance in the future!
 ;                       This will avoid read/writes to memory, which costs us clock cycles

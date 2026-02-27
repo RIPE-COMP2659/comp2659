@@ -38,39 +38,47 @@ _check_bounds:
         move.w  height(a6),d2
         move.w  width(a6),d3
 
-; Check for right edge
-        cmp.w   #400,d0                         ; compare with SCREEN_HEIGHT
-        bge     entirely_out                    ; if row + height > 400, entirely out
-; Check for bottom edge (row + height <= 0)
+
+; // Check if entirely out of bounds
+;
+; if (col >= 640) || (col + width <= 0) → entirely out (left/right)
+; if (row >= 400) || (row + height <= 0) → entirely out (top/bottom)
+;
+; Then check for edge clipping cases
+
+        ; Check if entirely right of screen
+        cmpi.w  #640,d1                         ; col >= 640?
+        bge     entirely_out
+
+        ; Check if entirely left of screen (col + width <= 0)
+        move.w  d1,d4                           ; d4 = col
+        add.w   d3,d4                           ; d4 = col + width
+        blt     entirely_out                    ; if col + width <= 0
+
+        ; Check if entirely below screen
+        cmpi.w  #400,d0                         ; row >= 400?
+        bgt     entirely_out
+
+        ; Check if entirely above screen (row + height <= 0)
         move.w  d0,d4                           ; d4 = row
         add.w   d2,d4                           ; d4 = row + height
-        cmp.w   0,d4
-        ble.w   entirely_out
+        blt     entirely_out                    ; if row + height <= 0
 
-; Check for right edge
-        cmp.w   #640,d1                         ; compare with SCREEN_WIDTH
-        bge     entirely_out                    ; if col >= 640, entirely out
-; Check for left edge
+        ; Now check for partial clipping
+        tst.w   d1                              ; col < 0 ?
+        blt     left_edge
+
         move.w  d1,d4                           ; d4 = col
         add.w   d3,d4                           ; d4 = col + width
-        cmp.w   0,d4                            ; compare with 0
-        ble.w   entirely_out                    ; if col + width <= 0, entirely out     
+        cmpi.w  #640,d4                         ; check right edge overflow
+        bgt     right_edge
 
-; check if col + width > screen width (640)
-        move.w  d1,d4                           ; d4 = col
-        add.w   d3,d4                           ; d4 = col + width
-        cmp.w   #640,d4                         ; compare with SCREEN_WIDTH
-        bgt     right_edge                      ; if col + width > 640, right edge
-
-; check if col < 0 (left edge)
-        tst.w   d1                              ; test if col is negative
-        bmi     left_edge                       ; Tests for N bit
-
-; if we get here, within bounds
-        moveq   #0,d0                           ; status = 0 (within bounds)
-        move.w  d3,d1                           ; return width unchanged
-        ext.l   d1                              ; extend to long
+        moveq   #0,d0                           ; status = 0 (in bounds)
+        move.w  d3,d1                           ; return original width
+        ext.l   d1                              ; extend to long. Avoid junk.
         bra     done
+
+
 
 left_edge:
 ; col < 0, need to calculate new width

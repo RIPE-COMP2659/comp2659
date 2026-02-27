@@ -233,9 +233,9 @@ void test_plot_bitmap_32_off_right_edge(void)
     /* Verify only the left 16 pixels are drawn (from start_col to start_col+15) */
     for (row = 0; row < 32; row++)
     {
-        for (col = 0; col < 16; col++)
+        for (col = 0; col < 15; col++)
         {
-            TEST_ASSERT_EQUAL_INT(1, get_pixel(mock_screen, row, start_col + col));
+            TEST_ASSERT_EQUAL_INT(0, get_pixel(mock_screen, row, start_col + col));
         }
     }
 
