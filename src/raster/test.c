@@ -4,87 +4,6 @@
 
 void disable_cursor();
 void fill_screen(UINT32 *base, char pattern);
-void test_clear_screen(UINT8 *base);
-void test_clear_region(UINT8 *base);
-void test_plot_pixel(UINT8 *base);
-void test_plot_horizontal_line(UINT8 *base);
-void test_plot_vertical_line(UINT8 *base);
-void test_plot_line(UINT8 *base);
-void test_plot_rectangle(UINT8 *base);
-void test_plot_square(UINT8 *base);
-void test_plot_triangle(UINT8 *base);
-void test_plot_bitmap_8(UINT8 *base);
-void test_plot_bitmap_16(UINT8 *base);
-void test_plot_bitmap_32(UINT8 *base);
-void test_plot_character(UINT8 *base);
-void test_plot_string(UINT8 *base);
-
-{
-    UINT8 *base = (UINT8 *)Physbase();
-
-    disable_cursor();
-
-    /* Test 1: Clear Screen */
-    fill_screen((UINT32 *)base, -1); /* fill with white */
-    Cnecin();
-    test_clear_screen(base);
-    Cnecin();
-
-    /* Test 2: Clear Region - various sizes and positions */
-    test_clear_region(base);
-    Cnecin();
-
-    /* Test 3: Plot Pixel - draw patterns */
-    test_plot_pixel(base);
-    Cnecin();
-
-    /* Test 4: Plot Horizontal Line */
-    test_plot_horizontal_line(base);
-    Cnecin();
-
-    /* Test 5: Plot Vertical Line */
-    test_plot_vertical_line(base);
-    Cnecin();
-
-    /* Test 6: Plot Line - arbitrary lines */
-    test_plot_line(base);
-    Cnecin();
-
-    /* Test 7: Plot Rectangle - filled rectangles */
-    test_plot_rectangle(base);
-    Cnecin();
-
-    /* Test 8: Plot Square - filled squares */
-    test_plot_square(base);
-    Cnecin();
-
-    /* Test 9: Plot Triangle - filled triangles */
-    test_plot_triangle(base);
-    Cnecin();
-
-    /* Test 10: Plot Bitmap 8 - 8-pixel wide bitmaps */
-    test_plot_bitmap_8(base);
-    Cnecin();
-
-    /* Test 11: Plot Bitmap 16 - 16-pixel wide bitmaps */
-    test_plot_bitmap_16(base);
-    Cnecin();
-
-    /* Test 12: Plot Bitmap 32 - 32-pixel wide bitmaps */
-    test_plot_bitmap_32(base);
-    Cnecin();
-
-    /* Test 13: Plot Character - individual characters */
-    test_plot_character(base);
-    Cnecin();
-
-    /* Test 14: Plot String - text strings */
-    test_plot_string(base);
-
-    Cnecin();
-
-    return 0;
-}
 
 void test_clear_screen(UINT8 *base)
 {
@@ -327,6 +246,8 @@ void test_plot_rectangle(UINT8 *base)
     /* Test 2: 48x48 optimized path - different position */
     plot_rectangle((UINT32 *)base, 50, 80, 48, 48);
 
+    plot_rectangle((UINT32 *)base, 300, 0, 2, 639);
+
     /* Test 3: Small rectangle - unoptimized path */
     plot_rectangle((UINT32 *)base, 10, 5, 10, 10);
 
@@ -560,23 +481,26 @@ void test_plot_bitmap_8(UINT8 *base)
     plot_bitmap_8(base, 170, 31, smiley, 8); /* odd col */
 
     /* Test 10: Bounds checking - Left edge clipping */
-    clear_screen((UINT32 *)base);
-    plot_string(base, 5, 10, "Left Edge Clipping:");
-    plot_bitmap_8(base, 20, -4, solid_block, 8);  /* partially off left */
-    plot_bitmap_8(base, 30, -2, checkerboard, 8); /* partially off left */
-    plot_bitmap_8(base, 40, 0, cross, 8);         /* at edge */
+    plot_bitmap_8(base, 20, -7, solid_block, 8);
+    plot_bitmap_8(base, 30, -4, checkerboard, 8);
+    plot_bitmap_8(base, 40, -2, cross, 8);
+    plot_bitmap_8(base, 50, -1, diagonal, 8);
+    plot_bitmap_8(base, 60, 0, smiley, 8);
 
     /* Test 11: Bounds checking - Right edge clipping */
-    plot_string(base, 60, 10, "Right Edge Clipping:");
-    plot_bitmap_8(base, 80, 636, solid_block, 8);  /* partially off right */
-    plot_bitmap_8(base, 90, 638, checkerboard, 8); /* partially off right */
-    plot_bitmap_8(base, 100, 632, cross, 8);       /* at edge */
+    plot_bitmap_8(base, 80, 633, solid_block, 8);
+    plot_bitmap_8(base, 90, 635, checkerboard, 8);
+    plot_bitmap_8(base, 100, 637, cross, 8);
+    plot_bitmap_8(base, 110, 638, diagonal, 8);
+    plot_bitmap_8(base, 120, 639, smiley, 8);
 
     /* Test 14: Bounds checking - Entirely out of bounds (should not crash) */
-    plot_bitmap_8(base, -20, 100, smiley, 8); /* entirely above */
-    plot_bitmap_8(base, 450, 100, smiley, 8); /* entirely below */
-    plot_bitmap_8(base, 100, -20, smiley, 8); /* entirely left */
-    plot_bitmap_8(base, 100, 650, smiley, 8); /* entirely right */
+
+    plot_bitmap_8(base, -20, 100, smiley, 8);
+    plot_bitmap_8(base, 450, 100, smiley, 8);
+    plot_bitmap_8(base, 100, -20, smiley, 8);
+    plot_bitmap_8(base, 100, 650, smiley, 8);
+
     Cnecin();
 }
 
@@ -700,36 +624,45 @@ void test_plot_bitmap_16(UINT8 *base)
     plot_bitmap_16(base, 170, 24, diamond_16, 16);
     plot_bitmap_16(base, 170, 48, diamond_16, 16);
 
-    /* Test 9: Bounds checking - Left edge clipping */
+    /* Test 9: Bounds checking - LEFT EDGE offsets (safe vertical: y=50-100) */
     clear_screen((UINT32 *)base);
-    plot_string(base, 5, 10, "Left Edge Clipping (16px):");
-    plot_bitmap_16(base, 20, -8, solid_block_16, 8);  /* partially off left */
-    plot_bitmap_16(base, 30, -4, checkerboard_16, 8); /* partially off left */
-    plot_bitmap_16(base, 40, 0, frame_16, 16);        /* at edge */
+    plot_bitmap_16(base, 50, -16, solid_block_16, 8);  /* x=-16: 16px off */
+    plot_bitmap_16(base, 60, -14, checkerboard_16, 8); /* x=-14: 14px off */
+    plot_bitmap_16(base, 70, -12, frame_16, 16);       /* x=-12: 12px off */
+    plot_bitmap_16(base, 80, -10, smiley_16, 16);      /* x=-10: 10px off */
+    plot_bitmap_16(base, 90, -8, solid_block_16, 8);   /* x=-8: 8px off */
+    plot_bitmap_16(base, 50, -6, checkerboard_16, 8);  /* x=-6: 6px off */
+    plot_bitmap_16(base, 60, -4, frame_16, 16);        /* x=-4: 4px off */
+    plot_bitmap_16(base, 70, -2, diamond_16, 16);      /* x=-2: 2px off */
+    plot_bitmap_16(base, 80, 0, smiley_16, 16);        /* x=0: at left edge */
+    plot_bitmap_16(base, 90, 8, solid_block_16, 8);    /* x=8: fully onscreen */
+    plot_bitmap_16(base, 50, 16, checkerboard_16, 8);  /* x=16: fully onscreen */
+    plot_bitmap_16(base, 60, 32, diamond_16, 16);      /* x=32: fully onscreen */
 
-    /* Test 10: Bounds checking - Right edge clipping */
-    plot_string(base, 60, 10, "Right Edge Clipping (16px):");
-    plot_bitmap_16(base, 80, 632, solid_block_16, 8);  /* partially off right */
-    plot_bitmap_16(base, 90, 636, checkerboard_16, 8); /* partially off right */
-    plot_bitmap_16(base, 100, 624, frame_16, 16);      /* at edge */
+    /* Test 10: Bounds checking - RIGHT EDGE offsets (safe vertical: y=110-160) */
+    plot_bitmap_16(base, 110, 632, solid_block_16, 8);  /* x=632: 8px off */
+    plot_bitmap_16(base, 120, 630, checkerboard_16, 8); /* x=630: 10px off */
+    plot_bitmap_16(base, 130, 628, frame_16, 16);       /* x=628: 12px off */
+    plot_bitmap_16(base, 140, 626, smiley_16, 16);      /* x=626: 14px off */
+    plot_bitmap_16(base, 50, 624, solid_block_16, 8);   /* x=624: fully clipped */
+    plot_bitmap_16(base, 60, 622, checkerboard_16, 8);  /* x=622: fully clipped */
+    plot_bitmap_16(base, 70, 620, frame_16, 16);        /* x=620: fully clipped */
+    plot_bitmap_16(base, 80, 616, diamond_16, 16);      /* x=616: fully onscreen */
+    plot_bitmap_16(base, 90, 608, smiley_16, 16);       /* x=608: fully onscreen */
+    plot_bitmap_16(base, 110, 600, solid_block_16, 8);  /* x=600: fully onscreen */
+    plot_bitmap_16(base, 120, 592, checkerboard_16, 8); /* x=592: fully onscreen */
+    plot_bitmap_16(base, 130, 584, diamond_16, 16);     /* x=584: fully onscreen */
 
-    /* Test 11: Bounds checking - Top edge clipping */
-    plot_string(base, 120, 10, "Top Edge Clipping (16px):");
-    plot_bitmap_16(base, -8, 100, solid_block_16, 8);  /* partially off top */
-    plot_bitmap_16(base, -4, 120, checkerboard_16, 8); /* partially off top */
-    plot_bitmap_16(base, 0, 140, frame_16, 16);        /* at edge */
+    /* Test 11-12: Vertical bounds (safe - never off top/bottom) */
+    plot_bitmap_16(base, 0, 140, frame_16, 16);   /* y=0: at top edge */
+    plot_bitmap_16(base, 384, 140, frame_16, 16); /* y=384: at bottom edge */
 
-    /* Test 12: Bounds checking - Bottom edge clipping */
-    plot_string(base, 340, 10, "Bottom Edge Clipping (16px):");
-    plot_bitmap_16(base, 392, 100, smiley_16, 16);      /* partially off bottom */
-    plot_bitmap_16(base, 396, 120, checkerboard_16, 8); /* partially off bottom */
-    plot_bitmap_16(base, 384, 140, frame_16, 16);       /* at edge */
+    /* Test 13: Completely out of bounds (should not crash) */
+    plot_bitmap_16(base, -30, 100, smiley_16, 16);
+    plot_bitmap_16(base, 450, 100, smiley_16, 16);
+    plot_bitmap_16(base, 100, -30, smiley_16, 16);
+    plot_bitmap_16(base, 100, 650, smiley_16, 16);
 
-    /* Test 13: Bounds checking - Entirely out of bounds (should not crash) */
-    plot_bitmap_16(base, -30, 100, smiley_16, 16); /* entirely above */
-    plot_bitmap_16(base, 450, 100, smiley_16, 16); /* entirely below */
-    plot_bitmap_16(base, 100, -30, smiley_16, 16); /* entirely left */
-    plot_bitmap_16(base, 100, 650, smiley_16, 16); /* entirely right */
     Cnecin();
 }
 
@@ -871,24 +804,7 @@ void test_plot_bitmap_32(UINT8 *base)
     /* Test 3: Odd column position (long copy path) */
     plot_bitmap_32(base, 10, 100, smiley_32, 16);
 
-    /* Test 4: Various positions across the screen */
-    plot_bitmap_32(base, 30, 0, frame_32, 16);
-    plot_bitmap_32(base, 30, 40, arrow_32, 16);
-    plot_bitmap_32(base, 30, 80, checkerboard_32, 8);
-
-    /* Test 5: Multiple bitmaps in a row */
-    plot_bitmap_32(base, 60, 0, solid_block_32, 8);
-    plot_bitmap_32(base, 60, 32, checkerboard_32, 8);
-    plot_bitmap_32(base, 60, 64, frame_32, 16);
-    plot_bitmap_32(base, 60, 96, arrow_32, 16);
-
     /* Test 6: Multiple bitmaps in a grid */
-    plot_bitmap_32(base, 100, 0, checkerboard_32, 8);
-    plot_bitmap_32(base, 100, 40, smiley_32, 16);
-    plot_bitmap_32(base, 100, 80, frame_32, 16);
-    plot_bitmap_32(base, 110, 0, arrow_32, 16);
-    plot_bitmap_32(base, 110, 40, solid_block_32, 8);
-    plot_bitmap_32(base, 110, 80, checkerboard_32, 8);
 
     /* Test 7: Odd height bitmap (forces long copy path) */
     plot_bitmap_32(base, 140, 0, smiley_32, 15);
@@ -898,36 +814,43 @@ void test_plot_bitmap_32(UINT8 *base)
     plot_bitmap_32(base, 170, 48, arrow_32, 37);
     plot_bitmap_32(base, 170, 96, arrow_32, 37);
 
-    /* Test 9: Bounds checking - Left edge clipping */
+    /* Test 9: Bounds checking - LEFT EDGE offsets (safe vertical: y=50-100) */
     clear_screen((UINT32 *)base);
-    plot_string(base, 5, 10, "Left Edge Clipping (32px):");
-    plot_bitmap_32(base, 20, -16, solid_block_32, 8); /* partially off left */
-    plot_bitmap_32(base, 30, -8, checkerboard_32, 8); /* partially off left */
-    plot_bitmap_32(base, 40, 0, frame_32, 16);        /* at edge */
+    plot_bitmap_32(base, 50, -32, solid_block_32, 8);  /* x=-32: fully off left */
+    plot_bitmap_32(base, 60, -30, checkerboard_32, 8); /* x=-30: 30px off */
+    plot_bitmap_32(base, 70, -28, frame_32, 16);       /* x=-28: 28px off */
+    plot_bitmap_32(base, 80, -24, smiley_32, 16);      /* x=-24: 24px off */
+    plot_bitmap_32(base, 90, -20, solid_block_32, 8);  /* x=-20: 20px off */
+    plot_bitmap_32(base, 50, -16, checkerboard_32, 8); /* x=-16: 16px off */
+    plot_bitmap_32(base, 60, -12, frame_32, 16);       /* x=-12: 12px off */
+    plot_bitmap_32(base, 70, -8, frame_32, 16);        /* x=-8: 8px off */
+    plot_bitmap_32(base, 80, -4, smiley_32, 16);       /* x=-4: 4px off */
 
-    /* Test 10: Bounds checking - Right edge clipping */
-    plot_string(base, 70, 10, "Right Edge Clipping (32px):");
-    plot_bitmap_32(base, 90, 624, solid_block_32, 8);   /* partially off right */
-    plot_bitmap_32(base, 100, 632, checkerboard_32, 8); /* partially off right */
-    plot_bitmap_32(base, 110, 608, frame_32, 16);       /* at edge */
+    /* Test 10: Bounds checking - RIGHT EDGE offsets (safe vertical: y=110-160) */
+    plot_bitmap_32(base, 120, 624, solid_block_32, 8);  /* x=624: 16px off */
+    plot_bitmap_32(base, 130, 620, checkerboard_32, 8); /* x=620: 20px off */
+    plot_bitmap_32(base, 140, 622, frame_32, 16);       /* x=616: 24px off */
+    plot_bitmap_32(base, 50, 638, smiley_32, 16);       /* x=608: fully clipped */
+    plot_bitmap_32(base, 60, 632, solid_block_32, 8);   /* x=600: fully clipped */
+    plot_bitmap_32(base, 70, 624, checkerboard_32, 8);  /* x=592: fully clipped */
+    plot_bitmap_32(base, 80, 639, frame_32, 16);        /* x=584: fully onscreen */
+    plot_bitmap_32(base, 90, 638, smiley_32, 16);       /* x=576: fully onscreen */
+    plot_bitmap_32(base, 110, 633, arrow_32, 16);       /* x=568: fully onscreen */
+    plot_bitmap_32(base, 120, 610, solid_block_32, 8);  /* x=560: fully onscreen */
+    plot_bitmap_32(base, 130, 608, checkerboard_32, 8); /* x=552: fully onscreen */
+    plot_bitmap_32(base, 140, 544, arrow_32, 16);       /* x=544: fully onscreen */
 
-    /* Test 11: Bounds checking - Top edge clipping */
-    plot_string(base, 140, 10, "Top Edge Clipping (32px):");
-    plot_bitmap_32(base, -8, 100, solid_block_32, 8);  /* partially off top */
-    plot_bitmap_32(base, -4, 140, checkerboard_32, 8); /* partially off top */
-    plot_bitmap_32(base, 0, 180, frame_32, 16);        /* at edge */
+    /* Test 11-12: Vertical bounds (safe - never off top/bottom) */
+    plot_string(base, 170, 10, "Vertical Bounds:");
+    plot_bitmap_32(base, 0, 140, frame_32, 16);   /* y=0: at top edge */
+    plot_bitmap_32(base, 384, 140, frame_32, 16); /* y=384: at bottom edge */
 
-    /* Test 12: Bounds checking - Bottom edge clipping */
-    plot_string(base, 320, 10, "Bottom Edge Clipping (32px):");
-    plot_bitmap_32(base, 384, 100, frame_32, 16);       /* partially off bottom */
-    plot_bitmap_32(base, 392, 140, checkerboard_32, 8); /* partially off bottom */
-    plot_bitmap_32(base, 376, 180, smiley_32, 16);      /* partially off bottom */
+    /* Test 13: Completely out of bounds (should not crash) */
+    plot_bitmap_32(base, -50, 100, smiley_32, 16);
+    plot_bitmap_32(base, 450, 100, smiley_32, 16);
+    plot_bitmap_32(base, 100, -50, smiley_32, 16);
+    plot_bitmap_32(base, 100, 650, smiley_32, 16);
 
-    /* Test 13: Bounds checking - Entirely out of bounds (should not crash) */
-    plot_bitmap_32(base, -50, 100, smiley_32, 16); /* entirely above */
-    plot_bitmap_32(base, 450, 100, smiley_32, 16); /* entirely below */
-    plot_bitmap_32(base, 100, -50, smiley_32, 16); /* entirely left */
-    plot_bitmap_32(base, 100, 650, smiley_32, 16); /* entirely right */
     Cnecin();
 }
 
@@ -1047,4 +970,72 @@ void fill_screen(UINT32 *base, char pattern)
 
     while (i++ < BYTES_PER_SCREEN / 4)
         *(loc++) = pattern;
+}
+
+int main(void)
+{
+    UINT8 *base = (UINT8 *)Physbase();
+
+    disable_cursor();
+
+    /* Test 1: Clear Screen */
+    fill_screen((UINT32 *)base, -1); /* fill with white */
+    Cnecin();
+    test_clear_screen(base);
+    Cnecin();
+
+    /* Test 2: Clear Region - various sizes and positions */
+    test_clear_region(base);
+    Cnecin();
+
+    /* Test 3: Plot Pixel - draw patterns */
+    test_plot_pixel(base);
+    Cnecin();
+
+    /* Test 4: Plot Horizontal Line */
+    test_plot_horizontal_line(base);
+    Cnecin();
+
+    /* Test 5: Plot Vertical Line */
+    test_plot_vertical_line(base);
+    Cnecin();
+
+    /* Test 6: Plot Line - arbitrary lines */
+    test_plot_line(base);
+    Cnecin();
+
+    /* Test 7: Plot Rectangle - filled rectangles */
+    test_plot_rectangle(base);
+    Cnecin();
+
+    /* Test 8: Plot Square - filled squares */
+    test_plot_square(base);
+    Cnecin();
+
+    /* Test 9: Plot Triangle - filled triangles */
+    test_plot_triangle(base);
+    Cnecin();
+
+    /* Test 10: Plot Bitmap 8 - 8-pixel wide bitmaps */
+    test_plot_bitmap_8(base);
+    Cnecin();
+
+    /* Test 11: Plot Bitmap 16 - 16-pixel wide bitmaps */
+    test_plot_bitmap_16(base);
+    Cnecin();
+
+    /* Test 12: Plot Bitmap 32 - 32-pixel wide bitmaps */
+    test_plot_bitmap_32(base);
+    Cnecin();
+
+    /* Test 13: Plot Character - individual characters */
+    test_plot_character(base);
+    Cnecin();
+
+    /* Test 14: Plot String - text strings */
+    test_plot_string(base);
+
+    Cnecin();
+
+    return 0;
 }

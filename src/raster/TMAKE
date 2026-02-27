@@ -1,11 +1,11 @@
-rtest.tos: test.o clr_scrn.o clr_reg.o plt_pxl.o plt_hor.o plt_vert.o plt_line.o plt_rec.o plt_sqr.o plt_tri.o bmap_8.o bmap_16.o bmap_32.o plt_char.o plt_str.o bounds.o plt_clip.o
-	cc68x -g test.o clr_scrn.o clr_reg.o plt_pxl.o plt_hor.o plt_vert.o plt_line.o plt_rec.o plt_sqr.o plt_tri.o bmap_8.o bmap_16.o bmap_32.o plt_char.o plt_str.o bounds.o plt_clip.o -o rtest.tos
+rtest.tos: test.o clr_scn.o clr_reg.o plt_pxl.o plt_hor.o plt_vrt.o plt_lin.o plt_rec.o plt_sqr.o plt_tri.o bmap_8.o bmap_16.o bmap_32.o plt_chr.o plt_str.o bounds.o plt_clp.o
+	cc68x -g test.o clr_scn.o clr_reg.o plt_pxl.o plt_hor.o plt_vrt.o plt_lin.o plt_rec.o plt_sqr.o plt_tri.o bmap_8.o bmap_16.o bmap_32.o plt_chr.o plt_str.o bounds.o plt_clp.o -o rtest.tos
 
 test.o: test.c raster.h
 	cc68x -g -c test.c
 
-clr_scrn.o: clr_scrn.s
-	cc68x -g -c clr_scrn.s
+clr_scn.o: clr_scn.s
+	cc68x -g -c clr_scn.s
 
 clr_reg.o: clr_reg.s
 	cc68x -g -c clr_reg.s
@@ -16,11 +16,11 @@ plt_pxl.o: plt_pxl.s
 plt_hor.o: plt_hor.s
 	cc68x -g -c plt_hor.s
 
-plt_vert.o: plt_vert.s
-	cc68x -g -c plt_vert.s
+plt_vrt.o: plt_vrt.s
+	cc68x -g -c plt_vrt.s
 
-plt_line.o: plt_line.s
-	cc68x -g -c plt_line.s
+plt_lin.o: plt_lin.s
+	cc68x -g -c plt_lin.s
 
 plt_rec.o: plt_rec.s
 	cc68x -g -c plt_rec.s
@@ -40,8 +40,8 @@ bmap_16.o: bmap_16.s
 bmap_32.o: bmap_32.s
 	cc68x -g -c bmap_32.s
 
-plt_char.o: plt_char.s
-	cc68x -g -c plt_char.s
+plt_chr.o: plt_chr.s
+	cc68x -g -c plt_chr.s
 
 plt_str.o: plt_str.s
 	cc68x -g -c plt_str.s
@@ -49,5 +49,5 @@ plt_str.o: plt_str.s
 bounds.o: bounds.s
 	cc68x -g -c bounds.s
 
-plt_clip.o: plt_clip.s
-	cc68x -g -c plt_clip.s
+plt_clp.o: plt_clp.s
+	cc68x -g -c plt_clp.s
