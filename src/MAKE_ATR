@@ -28,6 +28,7 @@ GEO    = geo
 LEVEL  = level
 WORLD  = world
 MAIN   = main
+CAMERA = camera
 
 # File Names, Base - Raster
 CLR_SCN = clr_scn
@@ -53,15 +54,15 @@ SHARED_FLAGS = -g
 
 # Program Configuration
 TOS_FLAGS      = $(SHARED_FLAGS) -c -I. -I$(ENTITIES_FOLDER) -I$(RASTER_FOLDER)
-RASTER_OBJECTS = $(CLR_SCN).o $(CLR_REG).o $(PLT_PXL).o $(PLT_HOR).o $(PLT_VRT).o $(PLT_LIN).o $(PLT_REC).o $(PLT_SQR).o $(PLT_TRI).o $(BMAP_8).o $(BMAP_16).o $(BMAP_32).o $(PLT_CHR).o $(PLT_STR).o $(BOUNDS).o $(PLT_CLIP).o
-TOS_OBJECTS    = $(BLOCK).o $(SPIKE).o $(LAVA).o $(GEO).o $(LEVEL).o $(WORLD).o $(MAIN).o $(RASTER_OBJECTS)
+RASTER_OBJECTS = $(CLR_SCN).o $(CLR_REG).o $(PLT_PXL).o $(PLT_HOR).o $(PLT_VRT).o $(PLT_LIN).o $(PLT_REC).o $(PLT_SQR).o $(PLT_TRI).o $(BMAP_8).o $(BMAP_16).o $(BMAP_32).o $(PLT_CHR).o $(PLT_STR).o $(BOUNDS).o $(PLT_CLP).o
+TOS_OBJECTS    = $(BLOCK).o $(SPIKE).o $(LAVA).o $(GEO).o $(LEVEL).o $(WORLD).o $(CAMERA).o $(MAIN).o $(RASTER_OBJECTS)
 TOS_NAME       = prog.tos
 MAIN_FLAGS     = $(SHARED_FLAGS) -I. -I$(ENTITIES_FOLDER) -I$(RASTER_FOLDER)
 
 # Test Configuration
 # TODO: It's a bit silly, but pretty sure we're including all our .c files for each test.
 TEST_FLAGS = $(SHARED_FLAGS) -I. -I$(ENTITIES_FOLDER) -I$(UNITY_FOLDER) -DUNITY_EXCLUDE_STDINT_H -DUNITY_INT_WIDTH=16 -DUNITY_LONG_WIDTH=32 -DUNITY_POINTER_WIDTH=32 -DTESTING
-TEST_SRC   = $(ENTITIES_FOLDER)\$(BLOCK).c $(ENTITIES_FOLDER)\$(SPIKE).c $(ENTITIES_FOLDER)\$(LAVA).c $(ENTITIES_FOLDER)\$(GEO).c $(ENTITIES_FOLDER)\$(LEVEL).c $(ENTITIES_FOLDER)\$(WORLD).c
+TEST_SRC   = $(ENTITIES_FOLDER)\$(BLOCK).c $(ENTITIES_FOLDER)\$(SPIKE).c $(ENTITIES_FOLDER)\$(LAVA).c $(ENTITIES_FOLDER)\$(GEO).c $(ENTITIES_FOLDER)\$(LEVEL).c $(ENTITIES_FOLDER)\$(WORLD).c $(ENTITIES_FOLDER)\$(CAMERA).c
 UNITY      = $(UNITY_FOLDER)\unity.c
 
 # Raster Test Configuration
@@ -74,6 +75,7 @@ TLAVA  = t${LAVA}
 TLEVEL = t${LEVEL}
 TSPIKE = t${SPIKE}
 TWORLD = t${WORLD}
+TCAMERA = t${CAMERA}
 
 # File Names, Tests - Raster
 TCLR_SCN = t${CLR_SCN}
@@ -97,6 +99,9 @@ TPLT_CLIP = t${PLT_CLIP}
 # ----- Program Builds -------------------------------------------------------
 $(TOS_NAME): $(TOS_OBJECTS)
 	$(ATARI_CC) $(MAIN_FLAGS) $(TOS_OBJECTS) -o $(TOS_NAME)
+
+$(CAMERA).o: $(ENTITIES_FOLDER)\$(CAMERA).c $(ENTITIES_FOLDER)\$(CAMERA).h $(ENTITIES_FOLDER)\dtypes.h
+	$(ATARI_CC) $(TOS_FLAGS) $(ENTITIES_FOLDER)\$(CAMERA).c -o $(CAMERA).o
 
 $(BLOCK).o: $(ENTITIES_FOLDER)\$(BLOCK).c $(ENTITIES_FOLDER)\$(BLOCK).h $(ENTITIES_FOLDER)\dtypes.h
 	$(ATARI_CC) $(TOS_FLAGS) $(ENTITIES_FOLDER)\$(BLOCK).c -o $(BLOCK).o
@@ -138,6 +143,9 @@ $(TSPIKE):
 
 $(TWORLD):
 	$(ATARI_CC) $(TEST_FLAGS) $(TESTS_ENTITIES_FOLDER)\$(TWORLD).c $(TEST_SRC) $(UNITY) -o $(TWORLD).ut
+
+$(TCAMERA):
+	$(ATARI_CC) $(TEST_FLAGS) $(TESTS_ENTITIES_FOLDER)\$(TCAMERA).c $(TEST_SRC) $(UNITY) -o $(TCAMERA).ut
 
 
 # TODO: For some of these, there is cascading dependencies on objects, eg chr

@@ -8,6 +8,40 @@
 /* Only works on Atari ST, comment out starting here */
 /* End commenting out here */
 
+void test_rendering(UINT32 *base, World world)
+{
+    unsigned int i;
+
+    clear_screen(base);
+
+    /* Test Plotting Ground */
+    /* TODO: These are getting incompatible pointer type warnings, left for another time, it works */
+    plot_rectangle((UINT32 *)base, camera_get_relative_y(&world.camera, world.ground_y), camera_get_relative_x(&world.camera, 0), 4, SCREEN_WIDTH);
+
+    /* Test Geo */
+    plot_bitmap_32((UINT8 *)base, camera_get_relative_y(&world.camera, world.geo.y), camera_get_relative_x(&world.camera, world.geo.x), world.geo.sprite, world.geo.size);
+
+    /* Test Blocks */
+    for (i = 0; i < world.levels[0].blocks_size; i++) {
+        Block block = world.levels[0].blocks[i];
+        plot_bitmap_32((UINT8 *)base, camera_get_relative_y(&world.camera, block.y), camera_get_relative_x(&world.camera, block.x), block.sprite, block.size);
+    }
+
+    /* Test Spikes */
+    for (i = 0; i < world.levels[0].spikes_size; i++) {
+        Spike spike = world.levels[0].spikes[i];
+        plot_bitmap_32((UINT8 *)base, camera_get_relative_y(&world.camera, spike.y), camera_get_relative_x(&world.camera, spike.x), spike.sprite, spike.size);
+    }
+
+    /* Test Lava */
+    for (i = 0; i < world.levels[0].lava_size; i++) {
+        Lava lava = world.levels[0].lava[i];
+        plot_bitmap_32((UINT8 *)base, camera_get_relative_y(&world.camera, lava.y), camera_get_relative_x(&world.camera, lava.x), lava.sprite, lava.size);
+    }
+
+    Cnecin();
+}
+
 void disable_cursor()
 {
     printf("\033f");
@@ -58,6 +92,8 @@ int main(void) {
     /* For now, just a placeholder */
     UINT8 *base = (UINT8 *)Physbase();
     World world = get_world();
+
+    test_rendering((UINT32 *)base, world);
 
     disable_cursor();
 
