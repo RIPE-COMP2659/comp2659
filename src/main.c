@@ -14,8 +14,7 @@ void test_rendering(UINT32 *base, World world)
     unsigned int w_iter;
 
     for (w_iter = 0; w_iter < 200; w_iter++) {
-        geo_update(&world.geo);
-        camera_update_coordinates(&world.camera, world.geo.x - 160, SCREEN_HEIGHT);
+        world_update(&world, 0);
 
         clear_screen(base);
 
@@ -23,8 +22,6 @@ void test_rendering(UINT32 *base, World world)
         /* TODO: These are getting incompatible pointer type warnings, left for another time, it works */
         /* TODO: Without hardcoding 0, this causes a crash. */
         plot_rectangle((UINT32 *)base, camera_get_relative_y(&world.camera, world.ground_y), 0, 4, SCREEN_WIDTH);
-
-        world_update_camera(&world,0);
 
         /* Test Blocks */
         for (i = world.cam_min_bi; i < world.cam_max_bi; i++) {

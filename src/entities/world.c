@@ -1,5 +1,7 @@
 #include "world.h"
 
+#define CAMERA_OFFSET 160
+
 /* TODO: Levels must be in ascending x value order or logic will break */
 /* Make sure levels adhere to this upon creation */
 World create_world(Level* levels, Geo geo, unsigned int ground_y) {
@@ -21,12 +23,19 @@ World create_world(Level* levels, Geo geo, unsigned int ground_y) {
 	return world;
 }
 
+/* TODO: World to keep track of it's own level index */
+void world_update(World *world, unsigned int level_index) {
+    geo_update(&world->geo);
+    camera_update_coordinates(&world->camera, world->geo.x - CAMERA_OFFSET, SCREEN_HEIGHT);
+    world_update_camera(world, level_index);
+}
+
 World get_world(void) {
 	Level* levels = get_levels();
 	unsigned int ground_y = 32;
     /* TODO: Should probably not be hard coded for starting x */
     /* TODO: Added some additional height to test the start, can be removed */
-	Geo geo = create_geo(161, ground_y + GEO_SIZE + GEO_SIZE, ground_y);
+	Geo geo = create_geo(CAMERA_OFFSET, ground_y + GEO_SIZE + GEO_SIZE, ground_y);
 
 	return create_world(levels, geo, ground_y);
 }

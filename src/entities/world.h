@@ -26,3 +26,4 @@ void world_collision_geo_block(World *world, Block *block);
 void world_collision_geo_spike(World *world, Spike *spike);
 void world_collision_geo_lava(World *world, Lava *lava);
 void world_collision_geo_ground(World *world);
+void world_update(World *world, unsigned int level_index);
