@@ -23,11 +23,19 @@ Level create_level(
 }
 
 Level get_level1(void) {
-    static Block level_blocks[4] = {
+    static Block level_blocks[12] = {
         {288, 64, BLOCK_SIZE, BLOCK_SPRITE},
         {352, 96, BLOCK_SIZE, BLOCK_SPRITE},
         {416, 96, BLOCK_SIZE, BLOCK_SPRITE},
-        {480, 64, BLOCK_SIZE, BLOCK_SPRITE}
+        {480, 64, BLOCK_SIZE, BLOCK_SPRITE},
+        {608, 96, BLOCK_SIZE, BLOCK_SPRITE},
+        {640, 96, BLOCK_SIZE, BLOCK_SPRITE},
+        {672, 96, BLOCK_SIZE, BLOCK_SPRITE},
+        {704, 96, BLOCK_SIZE, BLOCK_SPRITE},
+        {736, 96, BLOCK_SIZE, BLOCK_SPRITE},
+        {768, 96, BLOCK_SIZE, BLOCK_SPRITE},
+        {800, 96, BLOCK_SIZE, BLOCK_SPRITE},
+        {832, 96, BLOCK_SIZE, BLOCK_SPRITE}
     };
     static Spike level_spikes[2] = {
         {256, 64, SPIKE_SIZE, SPIKE_SPRITE},

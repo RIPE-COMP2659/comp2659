@@ -11,35 +11,45 @@
 void test_rendering(UINT32 *base, World world)
 {
     unsigned int i;
+    unsigned int w_iter;
 
-    clear_screen(base);
+    for (w_iter = 0; w_iter < 200; w_iter++) {
+        geo_update(&world.geo);
+        camera_update_coordinates(&world.camera, world.geo.x - 160, SCREEN_HEIGHT);
 
-    /* Test Plotting Ground */
-    /* TODO: These are getting incompatible pointer type warnings, left for another time, it works */
-    plot_rectangle((UINT32 *)base, camera_get_relative_y(&world.camera, world.ground_y), camera_get_relative_x(&world.camera, 0), 4, SCREEN_WIDTH);
+        clear_screen(base);
 
-    /* Test Geo */
-    plot_bitmap_32((UINT8 *)base, camera_get_relative_y(&world.camera, world.geo.y), camera_get_relative_x(&world.camera, world.geo.x), world.geo.sprite, world.geo.size);
+        /* Test Plotting Ground */
+        /* TODO: These are getting incompatible pointer type warnings, left for another time, it works */
+        /* TODO: Without hardcoding 0, this causes a crash. */
+        plot_rectangle((UINT32 *)base, camera_get_relative_y(&world.camera, world.ground_y), 0, 4, SCREEN_WIDTH);
 
-    /* Test Blocks */
-    for (i = 0; i < world.levels[0].blocks_size; i++) {
-        Block block = world.levels[0].blocks[i];
-        plot_bitmap_32((UINT8 *)base, camera_get_relative_y(&world.camera, block.y), camera_get_relative_x(&world.camera, block.x), block.sprite, block.size);
+        world_update_camera(&world,0);
+
+        /* Test Blocks */
+        for (i = world.cam_min_bi; i < world.cam_max_bi; i++) {
+            Block block = world.levels[0].blocks[i];
+            plot_bitmap_32((UINT8 *)base, camera_get_relative_y(&world.camera, block.y), camera_get_relative_x(&world.camera, block.x), block.sprite, block.size);
+        }
+
+        /* Test Spikes */
+        for (i = world.cam_min_si; i < world.cam_max_si; i++) {
+            Spike spike = world.levels[0].spikes[i];
+            plot_bitmap_32((UINT8 *)base, camera_get_relative_y(&world.camera, spike.y), camera_get_relative_x(&world.camera, spike.x), spike.sprite, spike.size);
+        }
+
+        /* Test Lava */
+        for (i = world.cam_min_li; i < world.cam_max_li; i++) {
+            Lava lava = world.levels[0].lava[i];
+            plot_bitmap_32((UINT8 *)base, camera_get_relative_y(&world.camera, lava.y), camera_get_relative_x(&world.camera, lava.x), lava.sprite, lava.size);
+        }
+
+        /* Test Geo */
+        plot_bitmap_32((UINT8 *)base, camera_get_relative_y(&world.camera, world.geo.y), camera_get_relative_x(&world.camera, world.geo.x), world.geo.sprite, world.geo.size);
+
+        printf("Geo x: %d\n", world.geo.x);
+        Cnecin();
     }
-
-    /* Test Spikes */
-    for (i = 0; i < world.levels[0].spikes_size; i++) {
-        Spike spike = world.levels[0].spikes[i];
-        plot_bitmap_32((UINT8 *)base, camera_get_relative_y(&world.camera, spike.y), camera_get_relative_x(&world.camera, spike.x), spike.sprite, spike.size);
-    }
-
-    /* Test Lava */
-    for (i = 0; i < world.levels[0].lava_size; i++) {
-        Lava lava = world.levels[0].lava[i];
-        plot_bitmap_32((UINT8 *)base, camera_get_relative_y(&world.camera, lava.y), camera_get_relative_x(&world.camera, lava.x), lava.sprite, lava.size);
-    }
-
-    Cnecin();
 }
 
 void disable_cursor()
