@@ -248,6 +248,103 @@ void test_plot_bitmap_32_off_right_edge(void)
     TEST_ASSERT_EQUAL_INT(COLOR_BLACK, get_pixel(mock_screen, 32, start_col));
 }
 
+/* Test: Plot 32x32 sprite partially off top edge */
+void test_plot_bitmap_32_off_top_edge(void)
+{
+    int row, col;
+    const INT16 start_row = -16; /* Half off screen to the top */
+
+    /* Create a 32x32 bitmap with all bits set to 1 (white) */
+    const UINT32 bitmap[32] = {
+        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
+        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
+        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
+        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
+        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
+        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
+        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
+        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF};
+
+    /* Plot sprite starting at row -16 (top 16 pixels clipped) */
+    plot_bitmap_32(mock_screen, start_row, 0, bitmap, 32);
+
+    /* Verify only the bottom 16 pixels of the sprite (rows 0-15 on screen) are drawn */
+    for (row = 0; row < 16; row++)
+    {
+        for (col = 0; col < 32; col++)
+        {
+            TEST_ASSERT_EQUAL_INT(COLOR_WHITE, get_pixel(mock_screen, row, col));
+        }
+    }
+
+    /* Verify pixels just below the visible portion remain black */
+    for (col = 0; col < 32; col++)
+    {
+        TEST_ASSERT_EQUAL_INT(COLOR_BLACK, get_pixel(mock_screen, 16, col));
+    }
+}
+
+/* Test: Plot 32x32 sprite partially off bottom edge */
+void test_plot_bitmap_32_off_bottom_edge(void)
+{
+    int row, col;
+    const INT16 start_row = SCREEN_HEIGHT_PIXELS - 16; /* Half off screen to the bottom */
+
+    /* Create a 32x32 bitmap with all bits set to 1 (white) */
+    const UINT32 bitmap[32] = {
+        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
+        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
+        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
+        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
+        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
+        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
+        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
+        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF};
+
+    /* Plot sprite starting at row SCREEN_HEIGHT_PIXELS - 16 (bottom 16 pixels clipped) */
+    plot_bitmap_32(mock_screen, start_row, 0, bitmap, 32);
+
+    /* Verify only the top 16 pixels of the sprite are drawn */
+    for (row = 0; row < 16; row++)
+    {
+        for (col = 0; col < 32; col++)
+        {
+            TEST_ASSERT_EQUAL_INT(COLOR_WHITE, get_pixel(mock_screen, start_row + row, col));
+        }
+    }
+
+    /* Verify pixels just above the sprite remain black */
+    for (col = 0; col < 32; col++)
+    {
+        TEST_ASSERT_EQUAL_INT(COLOR_BLACK, get_pixel(mock_screen, start_row - 1, col));
+    }
+}
+
+/* Test: Plot 32x32 sprite completely off screen (top and bottom) */
+void test_plot_bitmap_32_completely_off_screen(void)
+{
+    /* Create a 32x32 bitmap with all bits set to 1 (white) */
+    const UINT32 bitmap[32] = {
+        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
+        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
+        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
+        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
+        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
+        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
+        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
+        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF};
+
+    /* Plot way above the top edge */
+    plot_bitmap_32(mock_screen, -40, 0, bitmap, 32);
+    
+    /* Plot way below the bottom edge */
+    plot_bitmap_32(mock_screen, SCREEN_HEIGHT_PIXELS + 10, 0, bitmap, 32);
+
+    /* Verify that bounds remain perfectly black, proving the draw aborted */
+    TEST_ASSERT_EQUAL_INT(COLOR_BLACK, get_pixel(mock_screen, 0, 0));
+    TEST_ASSERT_EQUAL_INT(COLOR_BLACK, get_pixel(mock_screen, SCREEN_HEIGHT_PIXELS - 1, 0));
+}
+
 /* Main function to run all tests */
 int main(void)
 {
@@ -259,6 +356,9 @@ int main(void)
     RUN_TEST(test_plot_bitmap_32_bottom_right);
     RUN_TEST(test_plot_bitmap_32_off_left_edge);
     RUN_TEST(test_plot_bitmap_32_off_right_edge);
+    RUN_TEST(test_plot_bitmap_32_off_top_edge);
+    RUN_TEST(test_plot_bitmap_32_off_bottom_edge);
+    RUN_TEST(test_plot_bitmap_32_completely_off_screen);
 
     return UNITY_END();
 }
