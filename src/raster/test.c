@@ -494,6 +494,18 @@ void test_plot_bitmap_8(UINT8 *base)
     plot_bitmap_8(base, 110, 638, diagonal, 8);
     plot_bitmap_8(base, 120, 639, smiley, 8);
 
+    /* Test 12: Bounds checking - Top edge clipping (Partial) */
+    /* Negative Y values will chop off the top rows of the sprites */
+    plot_bitmap_8(base, -4, 300, arrow_down, 16); /* Top 4 rows clipped */
+    plot_bitmap_8(base, -6, 320, smiley, 8);      /* Top 6 rows clipped */
+    plot_bitmap_8(base, -2, 340, cross, 8);       /* Top 2 rows clipped */
+
+    /* Test 13: Bounds checking - Bottom edge clipping (Partial) */
+    /* Y values near 400 will chop off the bottom rows of the sprites */
+    plot_bitmap_8(base, 390, 300, arrow_down, 16); /* Bottom 6 rows clipped */
+    plot_bitmap_8(base, 396, 320, smiley, 8);      /* Bottom 4 rows clipped */
+    plot_bitmap_8(base, 398, 340, cross, 8);       /* Bottom 6 rows clipped */
+
     /* Test 14: Bounds checking - Entirely out of bounds (should not crash) */
 
     plot_bitmap_8(base, -20, 100, smiley, 8);
