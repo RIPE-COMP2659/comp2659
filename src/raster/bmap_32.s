@@ -61,12 +61,17 @@ _plot_bitmap_32:
         mulu.w  #80,d0                          ; screen width in bytes
         adda.l  d0,a0                           ; add row offset
                 
-                ; Calculate and add col offset: col / 8 (pixels to bytes)
-        move.w  col(a6),d0
-        lsr.w   #3,d0                           ; divide by 8 (shift right 3 bits)
-        ext.l   d0                              ; extend to long
-        adda.l  d0,a0                           ; add col offset in bytes
+                ; Calculate col byte offset and bit shift
+        move.w  col(a6),d6                      ; d6 = col (pixel column)
+        move.w  d6,d5                           ; copy for bit calculation
+        lsr.w   #3,d6                           ; d6 = col / 8 (byte offset)
+        ext.l   d6                              ; extend to long
+        adda.l  d6,a0                           ; add col offset in bytes
+        
+        andi.w  #7,d5                           ; d5 = col % 8 (bit shift amount)
+        bne     unaligned_copy_32               ; if non-zero, use unaligned copy
                 
+                ; Byte-aligned copy - use optimized paths
                 ; Check long word alignment for optimization
         move.l  a0,d1
         btst    #0,d1                           ; test if start address is odd
@@ -95,6 +100,56 @@ movem_loop:                                     ; (happy)
         move.l  d1,80(a0)                       ; plot second row
         adda.w  #160,a0                         ; move to row+2 (2 rows * 80 bytes)
         dbra    d7,movem_loop
+        
+        movem.l (sp)+,d0-d7/a0-a5
+        unlk    a6
+        rts
+
+unaligned_copy_32:
+                ; Unaligned copy - need to shift bits (col % 8 != 0)
+        move.w  height(a6),d7                   ; get height
+        subq.w  #1,d7                           ; adjust for dbra
+                
+shift_loop_32: moveq #0,d0                     ; clear d0
+        move.b  (a1)+,d0                        ; get bitmap byte 0 into low byte
+        lsl.w   #8,d0                           ; shift to high byte
+        lsr.w   d5,d0                           ; shift right by bit offset
+                ; d0 now has: high byte = bits for current screen byte
+                ;             low byte = bits for next screen byte
+        move.b  d0,d1                           ; get low byte (for next screen byte)
+        lsr.w   #8,d0                           ; get high byte into low position
+        or.b    d0,(a0)                         ; OR into current screen byte
+        or.b    d1,1(a0)                        ; OR into next screen byte
+        
+        moveq   #0,d0
+        move.b  (a1)+,d0                        ; get bitmap byte 1 into low byte
+        lsl.w   #8,d0
+        lsr.w   d5,d0
+        move.b  d0,d1
+        lsr.w   #8,d0
+        or.b    d0,1(a0)                        ; OR into screen byte 1
+        or.b    d1,2(a0)                        ; OR into screen byte 2
+        
+        moveq   #0,d0
+        move.b  (a1)+,d0                        ; get bitmap byte 2 into low byte
+        lsl.w   #8,d0
+        lsr.w   d5,d0
+        move.b  d0,d1
+        lsr.w   #8,d0
+        or.b    d0,2(a0)                        ; OR into screen byte 2
+        or.b    d1,3(a0)                        ; OR into screen byte 3
+        
+        moveq   #0,d0
+        move.b  (a1)+,d0                        ; get bitmap byte 3 into low byte
+        lsl.w   #8,d0
+        lsr.w   d5,d0
+        move.b  d0,d1
+        lsr.w   #8,d0
+        or.b    d0,3(a0)                        ; OR into screen byte 3
+        or.b    d1,4(a0)                        ; OR into screen byte 4
+        
+        adda.w  #80,a0                          ; move to next row
+        dbra    d7,shift_loop_32
                 
         movem.l (sp)+,d0-d7/a0-a5
         unlk    a6
