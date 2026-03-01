@@ -6,35 +6,29 @@
  */
 
 #include "synch.h"
+#include "cond.h"
 
 /*
  * on_clock_tick
  *
  * PURPOSE: Called once per frame (1/70th of a second).
- *          Advances Geo's position by delegating to
- *          geo_move(), which updates:
- *            x  += dx   (constant horizontal movement)
- *            dy += ddy  (gravity applied to vertical velocity)
- *            y  += dy   (vertical position updated)
+ *          Updates Geo's position, camera view, and
+ *          checks for collisions.
  *
- * INPUT:   geo   — pointer to the player Geo struct
- *          level — pointer to the current Level
+ * INPUT:   world — pointer to the World object
+ *          level_index - index of current Level
  *
- * OUTPUT:  None (modifies geo in place)
+ * OUTPUT:  None (modifies world in place)
  *
- * ASSUMPTIONS: geo and level are not NULL
- *
- * NOTE:    The level parameter is included for future use
- *          (e.g., scrolling obstacles into view based on
- *          Geo's world-x position).
+ * ASSUMPTIONS: world is not NULL
  */
-void on_clock_tick(Geo *geo, Level *level) {
-  geo_move(geo);
-  (void)level; /* suppress unused-parameter warning for now */
-}
+void on_clock_tick(World *world, unsigned int level_index) {
+  /* 1. Update Geo's position and velocity */
+  geo_update(&world->geo);
 
-/* FUTURE TODO (Frame-based Updates):
- * void update_animations(World *world); geo rotation, coin rotation, etc.
- * void update_camera(World *world); camera follows geo
- * void update_scrolling_background(World *world); background scrolls with geo or objects move towards geo
- */
+  /* 2. Update camera position and entity visibility indices */
+  world_update_camera(world, level_index);
+
+  /* 3. Check for collisions using tracked block boundaries */
+  check_collisions(world, level_index);
+}

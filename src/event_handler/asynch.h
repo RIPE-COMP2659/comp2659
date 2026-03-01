@@ -8,7 +8,7 @@
 #ifndef ASYNCH_H
 #define ASYNCH_H
 
-#include "../geo.h"
+#include "../entities/geo.h"
 
 /*
  * on_jump_request
