@@ -54,7 +54,7 @@ SHARED_FLAGS = -g
 
 # Program Configuration
 TOS_FLAGS      = $(SHARED_FLAGS) -c -I. -I$(ENTITIES_FOLDER) -I$(RASTER_FOLDER)
-RASTER_OBJECTS = $(CLR_SCN).o $(CLR_REG).o $(PLT_PXL).o $(PLT_HOR).o $(PLT_VRT).o $(PLT_LIN).o $(PLT_REC).o $(PLT_SQR).o $(PLT_TRI).o $(BMAP_8).o $(BMAP_16).o $(BMAP_32).o $(PLT_CHR).o $(PLT_STR).o $(BOUNDS).o $(PLT_CLP).o
+RASTER_OBJECTS = $(CLR_SCN).o $(CLR_REG).o $(PLT_PXL).o $(PLT_HOR).o $(PLT_VRT).o $(PLT_LIN).o $(PLT_REC).o $(PLT_SQR).o $(PLT_TRI).o $(BMAP_8).o $(BMAP_16).o $(BMAP_32).o $(PLT_CHR).o $(PLT_STR).o $(BOUNDS).o $(PLT_CLIP).o
 TOS_OBJECTS    = $(BLOCK).o $(SPIKE).o $(LAVA).o $(GEO).o $(LEVEL).o $(WORLD).o $(CAMERA).o $(MAIN).o $(RASTER_OBJECTS)
 TOS_NAME       = prog.tos
 MAIN_FLAGS     = $(SHARED_FLAGS) -I. -I$(ENTITIES_FOLDER) -I$(RASTER_FOLDER)
