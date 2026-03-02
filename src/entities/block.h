@@ -5,7 +5,7 @@
 
 /**
  * Block entity which Geo can land on, or will die if colliding with the 
- * left or the right
+ * left or the bottom
  * 
  * unsigned int x:
  *     The x coordinate of the block in the world
@@ -34,6 +34,6 @@ typedef struct {
  *         The y coordinate of the block in the world
  * 
  * Returns:
- *    Block: The respective x, y, and default size and sprite
+ *    Block: Constructed object with respective x, y, default size, and sprite
  */
 Block create_block(unsigned int x, unsigned int y);
