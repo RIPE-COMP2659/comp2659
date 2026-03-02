@@ -297,21 +297,21 @@ shift_loop_32:
         lsr.l   #8,d3                           ; shift right 24 bits
         lsr.l   #8,d3
         lsr.l   #8,d3
-        or.b    d3,(a0)                         ; OR into screen byte 0
+        or.b    d3,(a0)                         ; OR into screen byte 0 (preserve masked bits)
                 
                 ; Byte 1
         move.l  d0,d3
         lsr.l   #8,d3                           ; shift right 16 bits
         lsr.l   #8,d3
-        or.b    d3,1(a0)                        ; OR into screen byte 1
+        move.b  d3,1(a0)                        ; write into screen byte 1
                 
                 ; Byte 2
         move.l  d0,d3
         lsr.l   #8,d3                           ; shift right 8 bits
-        or.b    d3,2(a0)                        ; OR into screen byte 2
+        move.b  d3,2(a0)                        ; write into screen byte 2
                 
                 ; Byte 3
-        or.b    d0,3(a0)                        ; OR into screen byte 3 (low byte of d0)
+        move.b  d0,3(a0)                        ; write into screen byte 3 (low byte of d0)
                 
                 ; Byte 4 (rightmost, overflow bits) - needs masking to preserve low bits
         move.l  #$ff,d4                         ; start with 0x0000FF
