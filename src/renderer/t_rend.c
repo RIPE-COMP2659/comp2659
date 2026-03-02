@@ -1,0 +1,88 @@
+#include "unity.h"
+#include "renderer/renderer.h"
+#include "entities/world.h"
+#include <string.h>
+
+/*
+ * PURPOSE: Unity test suite for the Renderer module.
+ * Verifies that the master render function correctly delegates to 
+ * sub-renderers and respects camera culling indices.
+ */
+
+#define SCREEN_SIZE_BYTES 32000
+#define SCREEN_WIDTH_BYTES 80
+
+/* Mock screen buffer for testing assertions */
+static UINT8 mock_screen[SCREEN_SIZE_BYTES];
+
+/* Helper to check if a pixel at (row, col) is set */
+static int get_pixel(UINT8 *base, int row, int col) {
+    UINT8 *byte_ptr = base + (row * SCREEN_WIDTH_BYTES) + (col / 8);
+    int bit_pos = 7 - (col % 8);
+    return (*byte_ptr >> bit_pos) & 1;
+}
+
+/* Setup - runs before each test */
+void setUp(void) {
+    memset(mock_screen, 0x00, SCREEN_SIZE_BYTES);
+}
+
+/* Teardown - runs after each test */
+void tearDown(void) {
+}
+
+/* Test: Basic Frame Render
+ * Verifies that the ground is plotted and player (Geo) appears at 
+ * the correct relative coordinates.
+ */
+void test_render_master_frame(void) {
+    World world = get_world();
+    int rel_geo_x, rel_geo_y;
+
+    /* Initialize camera indices */
+    world_update_camera(&world, 0);
+
+    /* Render the world to our mock screen */
+    render(&world, mock_screen);
+
+    /* Verify Ground (starts at relative Y of ground_y, across SCREEN_WIDTH) */
+    /* We check a pixel in the middle of the screen at the ground height */
+    rel_geo_y = camera_get_relative_y(&world.camera, world.ground_y);
+    TEST_ASSERT_EQUAL_INT_MESSAGE(1, get_pixel(mock_screen, rel_geo_y, 320), "Ground not rendered correctly");
+
+    /* Verify Geo (Player) placement */
+    rel_geo_x = camera_get_relative_x(&world.camera, world.geo.x);
+    rel_geo_y = camera_get_relative_y(&world.camera, world.geo.y);
+    
+    /* We check the top-left pixel of Geo's 32x32 sprite */
+    /* Note: This assumes Geo's sprite has a set pixel at (0,0) */
+    TEST_ASSERT_EQUAL_INT_MESSAGE(1, get_pixel(mock_screen, rel_geo_y, rel_geo_x), "Geo (Player) not rendered at expected coordinates");
+}
+
+/* Test: Camera Culling
+ * Verifies that blocks outside the camera window indices are not rendered.
+ */
+void test_render_culling_bounds(void) {
+    World world = get_world();
+    
+    /* Manually set indices to 0 to force culling of all level elements */
+    world.cam_min_bi = 0;
+    world.cam_max_bi = 0;
+    
+    render(&world, mock_screen);
+
+    /* Ensure a block that exists in world.levels[0].blocks[0] didn't draw */
+    /* (Assuming blocks[0] would normally be visible at the start) */
+    TEST_ASSERT_EQUAL_INT_MESSAGE(0, get_pixel(mock_screen, 200, 100), "Culling failed: Block rendered outside active camera indices");
+}
+
+int main(void) {
+    UNITY_BEGIN();
+    RUN_TEST(test_render_master_frame);
+    RUN_TEST(test_render_culling_bounds);
+    return UNITY_END();
+}
+
+#ifdef TESTING
+/* Add extra testing logic here if needed */
+#endif

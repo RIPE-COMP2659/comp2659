@@ -1,54 +1,10 @@
-#include <stdio.h> /* Temporary printf import */
+#include <stdio.h>
 #include <osbind.h>
-#include "model/model.h"
+#include "entities/model.h"
 #include "raster/raster.h"
+#include "renderer/renderer.h"
 
 #define BYTES_PER_SCREEN 32000
-
-/* Only works on Atari ST, comment out starting here */
-/* End commenting out here */
-
-void test_rendering(UINT32 *base, Model model)
-{
-    World *world = &model.world;
-    unsigned int i;
-    unsigned int w_iter;
-
-    for (w_iter = 0; w_iter < 200; w_iter++) {
-        model_update(&model);
-
-        clear_screen(base);
-
-        /* Test Plotting Ground */
-        /* TODO: These are getting incompatible pointer type warnings, left for another time, it works */
-        /* TODO: Without hardcoding 0, this causes a crash. */
-        plot_rectangle((UINT32 *)base, camera_get_relative_y(&world->camera, world->ground_y), 0, 4, SCREEN_WIDTH);
-
-        /* Test Blocks */
-        for (i = world->cam_min_bi; i < world->cam_max_bi; i++) {
-            Block block = world->levels[0].blocks[i];
-            plot_bitmap_32((UINT8 *)base, camera_get_relative_y(&world->camera, block.y), camera_get_relative_x(&world->camera, block.x), block.sprite, block.size);
-        }
-
-        /* Test Spikes */
-        for (i = world->cam_min_si; i < world->cam_max_si; i++) {
-            Spike spike = world->levels[0].spikes[i];
-            plot_bitmap_32((UINT8 *)base, camera_get_relative_y(&world->camera, spike.y), camera_get_relative_x(&world->camera, spike.x), spike.sprite, spike.size);
-        }
-
-        /* Test Lava */
-        for (i = world->cam_min_li; i < world->cam_max_li; i++) {
-            Lava lava = world->levels[0].lava[i];
-            plot_bitmap_32((UINT8 *)base, camera_get_relative_y(&world->camera, lava.y), camera_get_relative_x(&world->camera, lava.x), lava.sprite, lava.size);
-        }
-
-        /* Test Geo */
-        plot_bitmap_32((UINT8 *)base, camera_get_relative_y(&world->camera, world->geo.y), camera_get_relative_x(&world->camera, world->geo.x), world->geo.sprite, world->geo.size);
-
-        printf("Geo x: %d\n", world->geo.x);
-        Cnecin();
-    }
-}
 
 void disable_cursor()
 {
@@ -72,8 +28,6 @@ void test_clear_screen(UINT8 *base)
 
 void test_clear_region(UINT8 *base)
 {
-    int i;
-
     /* Fill screen with white first */
     fill_screen((UINT32 *)base, -1);
 
@@ -96,13 +50,33 @@ void test_clear_region(UINT8 *base)
     clear_region((UINT32 *)base, 200, 5, 15, 4);
 }
 
+void test_rendering(UINT8 *base, Model *model)
+{
+    World *world = &model->world;
+    unsigned int w_iter;
+
+    for (w_iter = 0; w_iter < 200; w_iter++) {
+        /* 1. Update Model Logic */
+        model_update(model);
+
+        /* 2. Clear Buffer */
+        clear_screen((UINT32 *)base);
+
+        /* 3. Render World State */
+        render(world, base);
+
+        /* Debug Info */
+        printf("Geo x: %d (Frame: %d)\n", world->geo.x, w_iter);
+        
+        /* Wait for input to step through frames */
+        Cnecin();
+    }
+}
+
 int main(void) {
-    /* For now, just a placeholder */
     UINT8 *base = (UINT8 *)Physbase();
     Model model = get_model();
     World *world = &model.world;
-
-    test_rendering((UINT32 *)base, model);
 
     disable_cursor();
 
@@ -116,8 +90,12 @@ int main(void) {
     test_clear_region(base);
     Cnecin();
 
-    printf("Running main!\n");
+    printf("Running main rendering test!\n");
 
+    /* Test 3: Run the 200-frame rendering loop */
+    test_rendering(base, &model);
+
+    /* Test 4: Physical logic verification */
     printf("Level has %u block size \n", 
         world->levels[0].blocks[0].size
     );
