@@ -1,6 +1,6 @@
+#include "camera.h"
 #include "geo.h"
 #include "level.h"
-#include "camera.h"
 
 /* TODO: Turn these into constants somehow */
 typedef struct {

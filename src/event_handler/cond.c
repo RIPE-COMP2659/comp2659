@@ -2,64 +2,93 @@
  * cond.c
  *
  * PURPOSE: Implements conditional (collision/state-triggered)
- *          event handlers. Checks Geo against all level
- *          obstacles each frame using model functions.
+ *          event handlers. Checks Geo against level
+ *          obstacles using model functions and camera indices.
  */
 
 #include "cond.h"
-#include "../dtypes.h"
+#include "../entities/dtypes.h"
 #include "events.h"
 
 /*
  * check_collisions
  *
- * PURPOSE: Iterates through all obstacles in the level
- *          and checks for collisions with Geo using the
- *          model's geo_check_square_collision logic.
+ * PURPOSE: Iterates through obstacles in the level that
+ *          are currently on-screen (using camera indices)
+ *          and checks for collisions with Geo.
  *
- * INPUT:   geo   — pointer to Geo
- *          level — pointer to current Level
+ * INPUT:   world — pointer to the World object
+ *          level_index - index of current Level
  *
- * OUTPUT:  int — EVENT_DEATH (hazard or side collision)
- *                EVENT_LANDED (top of block collision)
- *                EVENT_NONE (no collision)
+ * OUTPUT:  int — EVENT_DEATH if Geo hits a hazard or
+ *                  side/bottom of block
+ *                EVENT_LANDED if Geo lands on top of block
+ *                EVENT_NONE if no collision
  */
-int check_collisions(Geo *geo, const Level *level) {
+int check_collisions(World *world, unsigned int level_index) {
   unsigned int i;
-  signed int collision;
+  Level *level = &world->levels[level_index];
+  Geo *geo = &world->geo;
+  unsigned int geo_right = geo->x + geo->size;
 
   /* Check spikes - any collision is death */
-  for (i = 0; i < level->current_spike; i++) {
-    collision = geo_check_square_collision(
-        geo, level->spikes[i].x, level->spikes[i].y, level->spikes[i].size);
-    if (collision != COLLISION_NONE) {
+  for (i = world->cam_min_si; i <= world->cam_max_si && i < level->spikes_size;
+       i++) {
+    /* Optimization: If obstacle is past Geo's reach, stop checking (sorted
+     * list) */
+    if (level->spikes[i].x > geo_right) {
+      break;
+    }
+    /* Optimization: If obstacle is already behind Geo, skip it */
+    if (level->spikes[i].x + level->spikes[i].size < geo->x) {
+      continue;
+    }
+
+    world_collision_geo_spike(world, &level->spikes[i]);
+    if (geo->is_dead == TRUE) {
       return EVENT_DEATH;
     }
   }
 
   /* Check lava - any collision is death */
-  for (i = 0; i < level->current_lava; i++) {
-    collision = geo_check_square_collision(
-        geo, level->lava[i].x, level->lava[i].y, level->lava[i].size);
-    if (collision != COLLISION_NONE) {
+  for (i = world->cam_min_li; i <= world->cam_max_li && i < level->lava_size;
+       i++) {
+    if (level->lava[i].x > geo_right) {
+      break;
+    }
+    if (level->lava[i].x + level->lava[i].size < geo->x) {
+      continue;
+    }
+
+    world_collision_geo_lava(world, &level->lava[i]);
+    if (geo->is_dead == TRUE) {
       return EVENT_DEATH;
     }
   }
 
   /* Check blocks - top is safe/land, side/bottom is death */
-  for (i = 0; i < level->current_block; i++) {
-    collision = geo_check_square_collision(
-        geo, level->blocks[i].x, level->blocks[i].y, level->blocks[i].size);
+  for (i = world->cam_min_bi; i <= world->cam_max_bi && i < level->blocks_size;
+       i++) {
+    if (level->blocks[i].x > geo_right) {
+      break;
+    }
+    if (level->blocks[i].x + level->blocks[i].size < geo->x) {
+      continue;
+    }
 
-    if (collision == COLLISION_TOP) {
-      /* Snap Geo to top of block and zero dy */
-      geo->y = level->blocks[i].y + level->blocks[i].size;
-      geo->dy = 0;
-      geo->is_landed = TRUE;
-      return EVENT_LANDED;
-    } else if (collision == COLLISION_LEFT || collision == COLLISION_BOTTOM) {
+    world_collision_geo_block(world, &level->blocks[i]);
+    if (geo->is_dead == TRUE) {
       return EVENT_DEATH;
     }
+    if (geo->is_landed == TRUE) {
+      return EVENT_LANDED;
+    }
+  }
+
+  /* Also check ground if not landed on block */
+  world_collision_geo_ground(world);
+  if (geo->is_landed == TRUE) {
+    return EVENT_LANDED;
   }
 
   return EVENT_NONE;
@@ -94,12 +123,13 @@ int check_floor(Geo *geo, int floor_y) {
   if (geo->is_landed == TRUE) {
     return EVENT_LANDED;
   }
+  (void)floor_y;
   return EVENT_NONE;
-  (void)floor_y; /* Ignore for now as model handles clamping */
 }
 
 /* FUTURE TODO/Nice to haves (State Transitions/Triggers):
  * void on_geo_death(World *world);    -- Stop music, play boom, start reset
  * timer void on_geo_victory(World *world);  -- Play cheer, trigger menu
- * transition void on_item_collision(Geo *geo, Item *item); if we decide to implement bonus coins, etc.
+ * transition void on_item_collision(Geo *geo, Item *item); if we decide to
+ * implement bonus coins, etc.
  */

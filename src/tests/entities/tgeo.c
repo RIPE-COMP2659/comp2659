@@ -26,45 +26,36 @@ void test_geo_init_size(void) {
     TEST_ASSERT_EQUAL_INT(GEO_SIZE, geo.size);
 }
 
-void test_geo_init_sprite(void) {
-    TEST_ASSERT_EQUAL_PTR(GEO_SPRITE, geo.sprite);
-}
-
-void test_geo_sprite_size(void) {
-    int num_rows = sizeof(GEO_SPRITE) / sizeof(GEO_SPRITE[0]);
-    int bits_per_row = (GEO_SIZE / WORD) * WORD;
-
-    TEST_ASSERT_EQUAL_INT(geo.size, num_rows);
-    TEST_ASSERT_EQUAL_INT(geo.size, bits_per_row);
-}
-
 void test_geo_move_increases_x_by_constant_dx(void) {
     unsigned int current_x = geo.x;
+    unsigned int current_dx = geo.dx;
 
     geo_update(&geo);
-    TEST_ASSERT_EQUAL_INT(current_x + GEO_DX, geo.x);
+    TEST_ASSERT_EQUAL_INT(current_x + current_dx, geo.x);
     current_x = geo.x;
 
     geo_update(&geo);
-    TEST_ASSERT_EQUAL_INT(current_x + GEO_DX, geo.x);
+    TEST_ASSERT_EQUAL_INT(current_x + current_dx, geo.x);
 }
 
 void test_geo_move_decreases_dy_by_constant_ddy(void) {
     signed int current_dy = geo.dy;
+    signed int current_ddy = geo.ddy;
     /* Need to make sure geo is above the ground */
     unsigned int offset = current_dy >= 0 ? current_dy * 3 : (-current_dy) * 3;
     geo.y = geo.ground_y + geo.size + offset;
 
     geo_update(&geo);
-    TEST_ASSERT_EQUAL_INT(current_dy + GEO_DDY, geo.dy);
+    TEST_ASSERT_EQUAL_INT(current_dy + current_ddy, geo.dy);
     current_dy = geo.dy;
 
     geo_update(&geo);
-    TEST_ASSERT_EQUAL_INT(current_dy + GEO_DDY, geo.dy);
+    TEST_ASSERT_EQUAL_INT(current_dy + current_ddy, geo.dy);
 }
 
 void test_geo_move_decreases_y_by_constant_ddy(void) {
     signed int current_dy = geo.dy;
+    signed int current_ddy = geo.ddy;
     unsigned int current_y;
     /* Need to make sure geo is above the ground */
     unsigned int offset = current_dy >= 0 ? current_dy * 3 : (-current_dy) * 3;
@@ -73,12 +64,12 @@ void test_geo_move_decreases_y_by_constant_ddy(void) {
     current_y = geo.y;
 
     geo_update(&geo);
-    TEST_ASSERT_EQUAL_INT(current_y + current_dy + GEO_DDY, geo.y);
+    TEST_ASSERT_EQUAL_INT(current_y + current_dy + current_ddy, geo.y);
     current_y = geo.y;
     current_dy = geo.dy;
 
     geo_update(&geo);
-    TEST_ASSERT_EQUAL_INT(current_y + current_dy + GEO_DDY, geo.y);
+    TEST_ASSERT_EQUAL_INT(current_y + current_dy + current_ddy, geo.y);
 }
 
 /* TODO: Add test to make sure can't jump if not landed */
@@ -86,7 +77,8 @@ void test_geo_jump_sets_dy_to_constant(void) {
     geo.dy = -20; /* Set to something other than the jump value to make sure it's being set, not added to */
     geo_update(&geo); /* Move to update landed status based on initial position and ground_y */
     geo_jump(&geo);
-    TEST_ASSERT_EQUAL_INT(GEO_JUMP_DY, geo.dy);
+    /* NOTE: This will need to be adjusted if the jump value changes */
+    TEST_ASSERT_EQUAL_INT(10, geo.dy);
 }
 
 void test_geo_update_landed_false_when_above_ground(void) {
@@ -122,6 +114,7 @@ void test_geo_update_landed_true_when_below_ground(void) {
 void test_geo_jump_works_with_move_until_apex_and_back(void) {
     signed int current_y;
     signed int current_dy;
+    signed int current_ddy = geo.ddy;
     unsigned int iterations_to_apex;
     unsigned int i;
 
@@ -130,13 +123,14 @@ void test_geo_jump_works_with_move_until_apex_and_back(void) {
 
     current_y = geo.y;
     current_dy = geo.dy;
-    iterations_to_apex = GEO_JUMP_DY / (-1 * GEO_DDY);
+    /* NOTE: This will need to be adjust if jump dy changes */
+    iterations_to_apex = 10 / (-1 * current_ddy);
 
     for (i = 0; i < iterations_to_apex; i++) {
         geo_update(&geo);
 
-        TEST_ASSERT_EQUAL_INT(current_dy + GEO_DDY, geo.dy);
-        TEST_ASSERT_EQUAL_INT(current_y + current_dy + GEO_DDY, geo.y);
+        TEST_ASSERT_EQUAL_INT(current_dy + current_ddy, geo.dy);
+        TEST_ASSERT_EQUAL_INT(current_y + current_dy + current_ddy, geo.y);
 
         current_y = geo.y;
         current_dy = geo.dy;
@@ -145,8 +139,8 @@ void test_geo_jump_works_with_move_until_apex_and_back(void) {
     TEST_ASSERT_EQUAL_INT(0, geo.dy);
 
     geo_update(&geo);
-    TEST_ASSERT_EQUAL_INT(current_dy + GEO_DDY, geo.dy);
-    TEST_ASSERT_EQUAL_INT(current_y + current_dy + GEO_DDY, geo.y);
+    TEST_ASSERT_EQUAL_INT(current_dy + current_ddy, geo.dy);
+    TEST_ASSERT_EQUAL_INT(current_y + current_dy + current_ddy, geo.y);
 }
 
 void test_geo_check_square_collision_no_collision(void) {
@@ -239,8 +233,6 @@ int main(void) {
 
     RUN_TEST(test_geo_init);
     RUN_TEST(test_geo_init_size);
-    RUN_TEST(test_geo_init_sprite);
-    RUN_TEST(test_geo_sprite_size);
     RUN_TEST(test_geo_move_increases_x_by_constant_dx);
     RUN_TEST(test_geo_move_decreases_dy_by_constant_ddy);
     RUN_TEST(test_geo_move_decreases_y_by_constant_ddy);

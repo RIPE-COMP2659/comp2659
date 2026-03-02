@@ -14,9 +14,9 @@ typedef struct {
 } Level;
 
 Level create_level(
-    Block* blocks,
-    Spike* spikes,
-    Lava* lava,
+    Block *blocks,
+    Spike *spikes,
+    Lava *lava,
     unsigned int blocks_size,
     unsigned int spikes_size,
     unsigned int lava_size,

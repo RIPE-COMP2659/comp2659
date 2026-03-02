@@ -96,7 +96,7 @@ void test_camera_get_relative_y_positive(void) {
     TEST_ASSERT_EQUAL_INT(50, relative_y);
 }
 
-/* Test camera tracking - simulate following an object */
+/* Test camera tracking */
 void test_camera_tracking_object(void) {
     unsigned int object_x = 500;
     unsigned int object_y = 300;

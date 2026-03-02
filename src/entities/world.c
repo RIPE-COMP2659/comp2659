@@ -5,12 +5,12 @@
 /* TODO: Levels must be in ascending x value order or logic will break */
 /* Make sure levels adhere to this upon creation */
 World create_world(Level* levels, Geo geo, unsigned int ground_y) {
-	World world;
+    World world;
 
-	world.levels = levels;
-	world.geo = geo;
-	world.camera = create_camera(0, SCREEN_HEIGHT);
-	world.ground_y = ground_y;
+    world.levels = levels;
+    world.geo = geo;
+    world.camera = create_camera(0, SCREEN_HEIGHT);
+    world.ground_y = ground_y;
     world.cam_min_bi = 0; /* block index */
     world.cam_max_bi = 0; /* block index */
     world.cam_min_si = 0; /* spike index */
@@ -20,7 +20,7 @@ World create_world(Level* levels, Geo geo, unsigned int ground_y) {
 
     world_update_camera(&world, 0);
 
-	return world;
+    return world;
 }
 
 /* TODO: World to keep track of it's own level index */
@@ -31,13 +31,13 @@ void world_update(World *world, unsigned int level_index) {
 }
 
 World get_world(void) {
-	Level* levels = get_levels();
-	unsigned int ground_y = 32;
+    Level* levels = get_levels();
+    unsigned int ground_y = 32;
     /* TODO: Should probably not be hard coded for starting x */
     /* TODO: Added some additional height to test the start, can be removed */
-	Geo geo = create_geo(CAMERA_OFFSET, ground_y + GEO_SIZE + GEO_SIZE, ground_y);
+    Geo geo = create_geo(CAMERA_OFFSET, ground_y + GEO_SIZE + GEO_SIZE, ground_y);
 
-	return create_world(levels, geo, ground_y);
+    return create_world(levels, geo, ground_y);
 }
 
 /* Generic helper function to update camera indices for any entity type */
@@ -165,7 +165,7 @@ void world_collision_geo_block(World *world, Block *block) {
 
     if (collision == COLLISION_TOP) {
         world->geo.ground_y = block->y;
-		world->geo.is_landed = TRUE;
+        world->geo.is_landed = TRUE;
     } else if (collision == COLLISION_BOTTOM || collision == COLLISION_LEFT) {
         world->geo.is_dead = TRUE;
     } else if (collision == COLLISION_NONE) {

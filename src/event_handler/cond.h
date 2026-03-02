@@ -9,8 +9,9 @@
 #ifndef COND_H
 #define COND_H
 
-#include "../geo.h"
-#include "../level.h"
+#include "../entities/geo.h"
+#include "../entities/level.h"
+#include "../entities/world.h"
 
 /* Default ground height (bottom of the screen) */
 #define GROUND_Y 0
@@ -21,16 +22,17 @@
  * PURPOSE: Checks Geo against all obstacles in the level
  *          (blocks, spikes, lava). Determines whether a
  *          collision results in death or a safe landing.
+ *          Uses camera indices for block tracking/optimisation.
  *
- * INPUT:   geo   — pointer to Geo (may be modified on landing)
- *          level — pointer to current Level
+ * INPUT:   world — pointer to the World object
+ *          level_index - index of current Level
  *
  * OUTPUT:  int — EVENT_DEATH if Geo hits a hazard or
  *                  side/bottom of block
  *                EVENT_LANDED if Geo lands on top of block
  *                EVENT_NONE if no collision
  */
-int check_collisions(Geo *geo, const Level *level);
+int check_collisions(World *world, unsigned int level_index);
 
 /*
  * check_level_complete
