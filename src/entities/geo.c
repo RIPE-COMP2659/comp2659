@@ -1,5 +1,6 @@
 #include "geo.h"
 
+/* TODO: Comments, refactoring, cleanup. */
 const unsigned int GEO_SPRITE[GEO_SIZE][GEO_SIZE / WORD] = {
     {0x800C, 0x3001}, /* 1 */
     {0x3FC9, 0x93FC},
@@ -38,9 +39,9 @@ const unsigned int GEO_SPRITE[GEO_SIZE][GEO_SIZE / WORD] = {
 Geo create_geo(unsigned int x, unsigned int y, unsigned int ground_y) {
     Geo geo;
 
-    geo.ddy = GEO_DDY;
-    geo.dx = GEO_DX;
-    geo.dy = GEO_DY;
+    geo.ddy = -1;
+    geo.dx = 1;
+    geo.dy = 0;
     geo.is_landed = FALSE;
     geo.is_dead = FALSE;
     geo.ground_y = ground_y;
@@ -50,35 +51,6 @@ Geo create_geo(unsigned int x, unsigned int y, unsigned int ground_y) {
     geo.sprite = GEO_SPRITE;
 
     return geo;
-}
-
-void geo_update(Geo *geo) {
-    geo->x += geo->dx;
-
-    geo->dy += geo->ddy;
-    geo->y += geo->dy;
-
-    geo_update_landed(geo);
-}
-
-void geo_jump(Geo *geo) {
-    if (geo->is_landed == TRUE) {
-        geo->dy = GEO_JUMP_DY;
-    }
-}
-
-/* TODO: This currently snaps geo up to the position of landed even if they're much lower, might be weird in practice. */
-void geo_update_landed(Geo *geo) {
-    signed int geo_bottom = geo->y - geo->size;
-    signed int ground_y = geo->ground_y;
-
-    if (geo_bottom <= ground_y) {
-        geo->is_landed = TRUE;
-        geo->y = geo->ground_y + geo->size;
-        geo->dy = 0;
-    } else {
-        geo->is_landed = FALSE;
-    }
 }
 
 /* TODO: This will take some fine tuning on what feels right, but can't really be done until gameplay */
@@ -136,3 +108,34 @@ signed int geo_check_square_collision(Geo *geo, unsigned int object_x, unsigned 
 
     return collision_result;
 }
+
+void geo_update(Geo *geo) {
+    geo->x += geo->dx;
+
+    geo->dy += geo->ddy;
+    geo->y += geo->dy;
+
+    geo_update_landed(geo);
+}
+
+void geo_jump(Geo *geo) {
+    if (geo->is_landed == TRUE) {
+        geo->dy = 10;
+    }
+}
+
+/* TODO: This currently snaps geo up to the position of landed even if they're much lower, might be weird in practice. */
+void geo_update_landed(Geo *geo) {
+    signed int geo_bottom = geo->y - geo->size;
+    signed int ground_y = geo->ground_y;
+
+    if (geo_bottom <= ground_y) {
+        geo->is_landed = TRUE;
+        geo->y = geo->ground_y + geo->size;
+        geo->dy = 0;
+    } else {
+        geo->is_landed = FALSE;
+    }
+}
+
+
