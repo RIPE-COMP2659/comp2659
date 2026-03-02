@@ -137,6 +137,3 @@ hor_done:
 	movem.l	(sp)+,d0-d3/a0
 	unlk	a6
 	rts
-
-; END OF FILE PADDING
-; (Ensures as68 sees a clean carriage return past the rts)
