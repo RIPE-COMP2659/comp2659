@@ -1,6 +1,6 @@
 #include <stdio.h> /* Temporary printf import */
 #include <osbind.h>
-#include "entities/model.h"
+#include "model/model.h"
 #include "raster/raster.h"
 
 #define BYTES_PER_SCREEN 32000
