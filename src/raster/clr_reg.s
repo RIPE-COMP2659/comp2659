@@ -16,153 +16,167 @@
 ; Falls back to generic byte-by-byte clearing for other widths or odd addresses.
 ;
 
-	xdef	_clear_region
 
-_clear_region:	
-	link	a6,#0
-	movem.l	d0-d7/a0-a6,-(sp)
 
-	; Check if length is zero
-	move.w	16(a6),d3			; length
-	beq	clr_done
-	
-	; Check if width is zero
-	move.w	18(a6),d4			; width
-	beq	clr_done
+        xdef    _clear_region
 
-;--------------------------------------------------------------------------------------------
-;               CLIPPING LOGIC
-;               Check bounds before clearing. Modify start/end points 
-;               and dimensions so the original loop stays unbothered.
-;--------------------------------------------------------------------------------------------
+base    equ     8               
+row     equ     12               
+col     equ     14             
+length  equ     16
+width   equ     18
 
-	; 1. Top Clipping
-	move.w	12(a6),d0			; row
-	tst.w	d0
-	bge	check_bottom			; If row >= 0, skip top clip
 
-	move.w	d0,d2
-	add.w	16(a6),d2			; d2 = row + length
-	ble	clr_done			; If entirely off top, exit
+_clear_region:  
+        link    a6,#0
+        movem.l d0-d7/a0-a6,-(sp)
 
-	add.w	d0,16(a6)			; length += negative row (decrease length)
-	clr.w	12(a6)				; row = 0
-	bra	check_bottom
+        tst.w   length(a6)                      ; nothing to clear if length == 0
+        beq     done
+        tst.w   width(a6)                       ; nothing to clear if width == 0
+        beq     done
 
-check_bottom:
-	cmpi.w	#400,d0
-	bge	clr_done			; If row >= 400, entirely off bottom
+        movea.l base(a6),a0                     ; get base address
+                
+                ; Calculate and add row offset: row * 80 bytes
+        move.w  row(a6),d0
+        mulu.w  #80,d0                          ; screen width in bytes (result is long)
+        adda.l  d0,a0                           ; add row offset
+                
+                ; Calculate and add col offset: col / 8 (pixels to bytes)
+        move.w  col(a6),d0
+        lsr.w   #3,d0                           ; divide by 8 (shift right 3 bits)
+        ext.l   d0                              ; extend to long
+        adda.l  d0,a0                           ; add col offset in bytes
 
-	move.w	d0,d2
-	add.w	16(a6),d2			; d2 = row + length (bottom edge Y)
-	cmpi.w	#400,d2
-	ble	check_left			; If bottom edge <= 400, skip bottom clip
+                ; Check if width == 32 pixels (4 bytes) for optimization
+        move.w  width(a6),d0
+        cmpi.w  #32,d0                          ; check if exactly 32 pixels
+        bne     unoptimized
+                
+                ; Ensure word alignment for move.l (address must be even)
+        move.l  a0,d1
+        btst    #0,d1                           ; test if address is odd
+        bne     unoptimized                     ; if odd, use unoptimized version
+        bra     opt_32
 
-	move.w	#400,d2
-	sub.w	d0,d2
-	move.w	d2,16(a6)			; length = 400 - row
+opt_32:      
+                ; Optimized for 32-pixel width (4 bytes = 1 long)
+                ; Uses move.l to clear 1 long at once
+                
+        moveq   #0,d1                           ; clear register to zero
+                
+        move.w  length(a6),d7                   ; get height (number of rows in pixels)
+        subq.w  #1,d7                           ; adjust for dbra
+                
+row_loop_32: move.l d1,(a0)                     ; write 1 long (4 bytes)
+        adda.w  #80,a0                          ; move to next row (80 bytes per row)
+        dbra    d7,row_loop_32
+                
+        movem.l (sp)+,d0-d7/a0-a6
+        unlk    a6
+        rts
 
-check_left:
-	move.w	14(a6),d1			; col
-	tst.w	d1
-	bge	check_right			; If col >= 0, skip left clip
+unoptimized:
+                ; Generic clear with edge masking for non-byte-aligned regions.
+                ; d2 = start_bit (col % 8)
+                ; d3 = end_bit ((col + width) % 8)
+                ; d6 = num_bytes = ceil((start_bit + width)/8)
 
-	move.w	d1,d2
-	add.w	18(a6),d2			; d2 = col + width
-	ble	clr_done			; If entirely off left, exit
+        move.w  col(a6),d2
+        andi.w  #7,d2                           ; d2 = start_bit
 
-	add.w	d1,18(a6)			; width += negative col (decrease width)
-	clr.w	14(a6)				; col = 0
-	bra	check_right
+        move.w  col(a6),d3
+        add.w   width(a6),d3
+        andi.w  #7,d3                           ; d3 = end_bit
 
-check_right:
-	cmpi.w	#640,d1
-	bge	clr_done			; If col >= 640, entirely off right
+        move.w  d2,d6
+        add.w   width(a6),d6
+        addq.w  #7,d6
+        lsr.w   #3,d6                           ; d6 = number of bytes touched per row
 
-	move.w	d1,d2
-	add.w	18(a6),d2			; d2 = col + width (right edge X)
-	cmpi.w	#640,d2
-	ble	clip_done			; If right edge <= 640, skip right clip
+        move.w  length(a6),d7
+        subq.w  #1,d7                           ; adjust for dbra
 
-	move.w	#640,d2
-	sub.w	d1,d2
-	move.w	d2,18(a6)			; width = 640 - col
+row_loop:
+        movea.l a0,a1                           ; row start pointer
+        move.w  d6,d5                           ; d5 = bytes remaining in this row
 
-clip_done:
-;--------------------------------------------------------------------------------------------
-;               END CLIPPING LOGIC - Original Routine Resumes
-;--------------------------------------------------------------------------------------------
+        cmpi.w  #1,d5
+        beq     single_byte_row
 
-	movea.l	8(a6),a0			; get base address
-		
-	; Calculate and add row offset: row * 80 bytes
-	move.w	12(a6),d0			; row
-	mulu.w	#80,d0				; screen width in bytes (result is long)
-	adda.l	d0,a0				; add row offset
-		
-	; Calculate and add col offset: col / 8 (pixels to bytes)
-	move.w	14(a6),d0			; col
-	lsr.w	#3,d0				; divide by 8 (shift right 3 bits)
-	ext.l	d0				; extend to long
-	adda.l	d0,a0				; add col offset in bytes
+                ; First byte: partial clear if start_bit != 0, else full clear
+        tst.w   d2
+        beq     first_full_byte
+        moveq   #-1,d4
+        moveq   #8,d0
+        sub.w   d2,d0                           ; d0 = 8 - start_bit
+        lsl.w   d0,d4                           ; keep high bits before region start
+        and.b   d4,(a1)+
+        subq.w  #1,d5
+        bra     after_first_byte
 
-	; Check if width == 32 pixels (4 bytes) for optimization
-	move.w	18(a6),d0			; width
-	cmpi.w	#32,d0				; check if exactly 32 pixels
-	bne	unoptimized
-		
-	; Ensure word alignment for move.l (address must be even)
-	move.l	a0,d1
-	btst	#0,d1				; test if address is odd
-	bne	unoptimized			; if odd, use unoptimized version
-	bra	opt_32
+first_full_byte:
+        clr.b   (a1)+
+        subq.w  #1,d5
 
-opt_32:	
-	; Optimized for 32-pixel width (4 bytes = 1 long)
-	; Uses move.l to clear 1 long at once
-		
-	moveq	#0,d1				; clear register to zero
-		
-	move.w	16(a6),d7			; length (height)
-	subq.w	#1,d7				; adjust for dbra
-		
-row_loop_32: 
-	move.l	d1,(a0)				; write 1 long (4 bytes)
-	adda.w	#80,a0				; move to next row (80 bytes per row)
-	dbra	d7,row_loop_32
-	bra	clr_done
-		
-unoptimized:	
-	; Generic clear region - calculate bytes needed for col through col+width-1
-	; Formula: ceil((col+width)/8) - floor(col/8)
-		
-	move.w	14(a6),d6			; get col in pixels
-	add.w	18(a6),d6			; d6 = col + width
-	addq.w	#7,d6				; d6 = col + width + 7 (for ceiling division)
-	lsr.w	#3,d6				; d6 = (col + width + 7) / 8 = ceiling((col+width)/8)
-		
-	move.w	14(a6),d5			; get col in pixels  
-	lsr.w	#3,d5				; d5 = col / 8 = floor(col/8)
-		
-	sub.w	d5,d6				; d6 = ceiling - floor = num_bytes
-	subq.w	#1,d6				; adjust for dbra
-		
-	move.w	16(a6),d7			; length (height)
-	subq.w	#1,d7				; adjust for dbra
-		
-row_loop: 
-	movea.l	a0,a1				; save row start position
-	move.w	d6,d5				; restore column counter
-		
-col_loop: 
-	clr.b	(a1)+				; clear one byte, advance
-	dbra	d5,col_loop
-		
-	adda.w	#80,a0				; move to next row
-	dbra	d7,row_loop
-		
-clr_done:
-	movem.l	(sp)+,d0-d7/a0-a6
-	unlk	a6
-	rts
+after_first_byte:
+                ; Reserve last byte if it is partial
+        tst.w   d3
+        beq     clear_middle_and_last_full
+        subq.w  #1,d5
 
+clear_middle_partial_last:
+        tst.w   d5
+        beq     apply_last_partial
+clear_middle_partial_last_loop:
+        clr.b   (a1)+
+        subq.w  #1,d5
+        bne     clear_middle_partial_last_loop
+
+apply_last_partial:
+        move.w  #$00ff,d4
+        lsr.w   d3,d4                           ; keep low bits after region end
+        and.b   d4,(a1)
+        bra     next_row
+
+clear_middle_and_last_full:
+        tst.w   d5
+        beq     next_row
+clear_middle_and_last_full_loop:
+        clr.b   (a1)+
+        subq.w  #1,d5
+        bne     clear_middle_and_last_full_loop
+        bra     next_row
+
+single_byte_row:
+                ; Region fits in one byte: preserve bits before start and after end.
+                ; preserve_mask = high_preserve | low_preserve
+        moveq   #0,d4
+
+        tst.w   d2
+        beq     single_skip_high
+        moveq   #-1,d0
+        moveq   #8,d1
+        sub.w   d2,d1                           ; d1 = 8 - start_bit
+        lsl.w   d1,d0                           ; high_preserve
+        or.w    d0,d4
+
+single_skip_high:
+        tst.w   d3
+        beq     single_apply
+        move.w  #$00ff,d0
+        lsr.w   d3,d0                           ; low_preserve
+        or.w    d0,d4
+
+single_apply:
+        and.b   d4,(a1)
+
+next_row:
+        adda.w  #80,a0
+        dbra    d7,row_loop
+
+done:
+        movem.l (sp)+,d0-d7/a0-a6
+        unlk    a6
+        rts
