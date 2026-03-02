@@ -1,45 +1,21 @@
-#ifndef BLOCK_H
-#define BLOCK_H
-
 #include "dtypes.h"
 
+/* Global size of all blocks and their sprites */
 #define BLOCK_SIZE 32
 
-static const unsigned int BLOCK_SPRITE[BLOCK_SIZE][BLOCK_SIZE / WORD] = {
-    {0xFFFF, 0xFFFF},/* 1 */
-    {0xFFFF, 0xFFFF},
-    {0xC000, 0x0003},
-    {0xC000, 0x0003},
-    {0xC000, 0x0003},
-    {0xC000, 0x0003},
-    {0xC000, 0x0003},
-    {0xC000, 0x0003},/* 8 */
-    {0xC000, 0x0003},
-    {0xC000, 0x0003},
-    {0xC000, 0x0003},
-    {0xC000, 0x0003},
-    {0xC000, 0x0003},
-    {0xC000, 0x0003},
-    {0xC000, 0x0003},
-    {0xC000, 0x0003},/* 16 */
-    {0xC000, 0x0003},
-    {0xC000, 0x0003},
-    {0xC000, 0x0003},
-    {0xC000, 0x0003},
-    {0xC000, 0x0003},
-    {0xC000, 0x0003},
-    {0xC000, 0x0003},
-    {0xC000, 0x0003},/* 24 */
-    {0xC000, 0x0003},
-    {0xC000, 0x0003},
-    {0xC000, 0x0003},
-    {0xC000, 0x0003},
-    {0xC000, 0x0003},
-    {0xC000, 0x0003},
-    {0xFFFF, 0xFFFF},
-    {0xFFFF, 0xFFFF} /* 32 */
-};
-
+/**
+ * Block entity which Geo can land on, or will die if colliding with the 
+ * left or the right
+ * 
+ * unsigned int x:
+ *     The x coordinate of the block in the world
+ * unsigned int y:
+ *     The y coordinate of the block in the world
+ * unsigned int size:
+ *     The size of the side of a block as a square and sprite
+ * const unsigned int (*sprite)[BLOCK_SIZE / WORD]:
+ *     A pointer to the block's sprite
+*/
 typedef struct {
   unsigned int x;
   unsigned int y;
@@ -47,6 +23,17 @@ typedef struct {
   const unsigned int (*sprite)[BLOCK_SIZE / WORD];
 } Block;
 
-void block_placeholder(void);
-
-#endif /* BLOCK_H */
+/**
+ * Creates a block with the given x and y coordinates, with the default size
+ * and sprite
+ * 
+ * Params:
+ *     unsigned int x:
+ *         The x coordinate of the block in the world
+ *     unsigned int y:
+ *         The y coordinate of the block in the world
+ * 
+ * Returns:
+ *    Block: The respective x, y, and default size and sprite
+ */
+Block create_block(unsigned int x, unsigned int y);

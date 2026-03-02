@@ -8,10 +8,7 @@ World world;
 
 void setUp(void) {
     world = get_world();
-    block.x = world.geo.x;
-    block.y = world.ground_y + BLOCK_SIZE;
-    block.size = BLOCK_SIZE;
-    block.sprite = BLOCK_SPRITE;
+    block = create_block(world.geo.x, world.ground_y + BLOCK_SIZE);
     spike.x = world.geo.x;
     spike.y = world.ground_y + SPIKE_SIZE;
     spike.size = SPIKE_SIZE;
@@ -419,12 +416,12 @@ void test_world_collision_ground_resets_when_leaving_block(void) {
 
 void test_world_update_camera_bi_blocks_outside_view(void) {
     /* Create blocks completely outside camera view */
-    static Block blocks[2] = {
-        {1000, 100, BLOCK_SIZE, BLOCK_SPRITE},
-        {1100, 100, BLOCK_SIZE, BLOCK_SPRITE}
-    };
+    static Block blocks[2];
     static Level level;
     World test_world;
+
+    blocks[0] = create_block(1000, 100);
+    blocks[1] = create_block(1100, 100);
     
     level.blocks = blocks;
     level.blocks_size = 1;
@@ -443,14 +440,14 @@ void test_world_update_camera_bi_blocks_outside_view(void) {
 
 void test_world_update_camera_bi_blocks_span_entire_array(void) {
     /* Create blocks that span entire array and all visible */
-    static Block blocks[4] = {
-        {0, 100, BLOCK_SIZE, BLOCK_SPRITE},
-        {100, 100, BLOCK_SIZE, BLOCK_SPRITE},
-        {200, 100, BLOCK_SIZE, BLOCK_SPRITE},
-        {300, 100, BLOCK_SIZE, BLOCK_SPRITE}
-    };
+    static Block blocks[4];
     static Level level;
     World test_world;
+
+    blocks[0] = create_block(0, 100);
+    blocks[1] = create_block(100, 100);
+    blocks[2] = create_block(200, 100);
+    blocks[3] = create_block(300, 100);
     
     level.blocks = blocks;
     level.blocks_size = 3;
@@ -469,14 +466,14 @@ void test_world_update_camera_bi_blocks_span_entire_array(void) {
 
 void test_world_update_camera_bi_min_is_zero_max_partial(void) {
     /* Create blocks where first ones are visible, last is not */
-    static Block blocks[4] = {
-        {50, 100, BLOCK_SIZE, BLOCK_SPRITE},
-        {100, 100, BLOCK_SIZE, BLOCK_SPRITE},
-        {200, 100, BLOCK_SIZE, BLOCK_SPRITE},
-        {1000, 100, BLOCK_SIZE, BLOCK_SPRITE}
-    };
+    static Block blocks[4];
     static Level level;
     World test_world;
+
+    blocks[0] = create_block(50, 100);
+    blocks[1] = create_block(100, 100);
+    blocks[2] = create_block(200, 100);
+    blocks[3] = create_block(1000, 100);
     
     level.blocks = blocks;
     level.blocks_size = 3;
@@ -496,15 +493,15 @@ void test_world_update_camera_bi_min_is_zero_max_partial(void) {
 /* TODO: Failing expected 2 was 0 */
 void test_world_update_camera_bi_min_offset_max_partial(void) {
     /* Create blocks where some are left of camera, some inside */
-    static Block blocks[5] = {
-        {0, 100, BLOCK_SIZE, BLOCK_SPRITE},
-        {50, 100, BLOCK_SIZE, BLOCK_SPRITE},
-        {100, 100, BLOCK_SIZE, BLOCK_SPRITE},
-        {200, 100, BLOCK_SIZE, BLOCK_SPRITE},
-        {400, 100, BLOCK_SIZE, BLOCK_SPRITE}
-    };
+    static Block blocks[5];
     static Level level;
     World test_world;
+
+    blocks[0] = create_block(0, 100);
+    blocks[1] = create_block(50, 100);
+    blocks[2] = create_block(100, 100);
+    blocks[3] = create_block(200, 100);
+    blocks[4] = create_block(400, 100);
     
     level.blocks = blocks;
     level.blocks_size = 4;
@@ -524,15 +521,15 @@ void test_world_update_camera_bi_min_offset_max_partial(void) {
 /* TODO: Failing expected 2 was 0 */
 void test_world_update_camera_bi_left_and_right_span(void) {
     /* Create blocks with some left of camera, some visible, some right of camera */
-    static Block blocks[5] = {
-        {0, 100, BLOCK_SIZE, BLOCK_SPRITE},
-        {50, 100, BLOCK_SIZE, BLOCK_SPRITE},
-        {100, 100, BLOCK_SIZE, BLOCK_SPRITE},
-        {200, 100, BLOCK_SIZE, BLOCK_SPRITE},
-        {1000, 100, BLOCK_SIZE, BLOCK_SPRITE}
-    };
+    static Block blocks[5];
     static Level level;
     World test_world;
+
+    blocks[0] = create_block(0, 100);
+    blocks[1] = create_block(50, 100);
+    blocks[2] = create_block(100, 100);
+    blocks[3] = create_block(200, 100);
+    blocks[4] = create_block(1000, 100);
     
     level.blocks = blocks;
     level.blocks_size = 4;

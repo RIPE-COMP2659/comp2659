@@ -141,7 +141,6 @@ void test_bounds_inside_bottom_right(void) {
 int main(void) {
     UNITY_BEGIN();
 
-    
     RUN_TEST(test_bounds_inside_basic);
     RUN_TEST(test_bounds_inside_top_left);
     RUN_TEST(test_bounds_inside_top_right);
