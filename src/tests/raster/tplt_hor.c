@@ -7,9 +7,6 @@
 #define SCREEN_WIDTH_PIXELS 640
 #define SCREEN_HEIGHT_PIXELS 400
 
-/* Prototype matching your assembly routine. 
- * Note: Using INT16 to allow passing negative coordinates for clipping tests!
- */
 extern void plot_horizontal_line(UINT32 *base, INT16 row, INT16 col, UINT16 length, UINT16 color);
 
 /* Mock screen buffer for testing */

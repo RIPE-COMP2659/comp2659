@@ -10,9 +10,6 @@
 /* Mock screen buffer for testing */
 static UINT32 mock_screen[SCREEN_SIZE_LONGS];
 
-/* Prototype matching your assembly routine. 
- * Note: Using INT16 to allow passing negative coordinates for clipping tests!
- */
 extern void clear_region(UINT32 *base, INT16 row, INT16 col, UINT16 length, UINT16 width);
 
 /* Helper to check if a pixel at (row, col) is black (0) or white (1) */
