@@ -105,6 +105,78 @@ movem_loop:                                     ; (happy)
         unlk    a6
         rts
 
+shifted_copy:
+                ; Bit-shifted copy for non-byte-aligned x positions
+                ; Writes 5 destination bytes per row for a 32-bit source row,
+                ; while preserving unaffected bits in first/last destination bytes.
+        moveq   #8,d6
+        sub.w   d5,d6                           ; d6 = (8 - bit_offset)
+
+        move.w  height(a6),d7                   ; get height (number of rows)
+        subq.w  #1,d7                           ; adjust for dbra
+
+shift_row_loop:
+        movea.l a0,a2                           ; row destination pointer
+
+        moveq   #0,d0
+        moveq   #0,d1
+        moveq   #0,d2
+        moveq   #0,d3
+        move.b  (a1)+,d0                        ; b0
+        move.b  (a1)+,d1                        ; b1
+
+                ; out0 = b0 >> shift, merge with first destination byte
+        moveq   #-1,d4
+        lsl.w   d6,d4                           ; keep mask for high bits before sprite start
+        and.b   d4,(a2)
+        move.w  d0,d4
+        lsr.w   d5,d4
+        or.b    d4,(a2)
+        addq.l  #1,a2
+
+                ; out1 = (b0 << (8-shift)) | (b1 >> shift)
+        move.w  d0,d4
+        lsl.w   d6,d4
+        move.w  d1,d3
+        lsr.w   d5,d3
+        or.b    d3,d4
+        move.b  d4,(a2)+
+
+        move.b  (a1)+,d2                        ; b2
+
+                ; out2 = (b1 << (8-shift)) | (b2 >> shift)
+        move.w  d1,d4
+        lsl.w   d6,d4
+        move.w  d2,d3
+        lsr.w   d5,d3
+        or.b    d3,d4
+        move.b  d4,(a2)+
+
+        move.b  (a1)+,d3                        ; b3
+
+                ; out3 = (b2 << (8-shift)) | (b3 >> shift)
+        move.w  d2,d4
+        lsl.w   d6,d4
+        move.w  d3,d0
+        lsr.w   d5,d0
+        or.b    d0,d4
+        move.b  d4,(a2)+
+
+                ; out4 = b3 << (8-shift), merge with last destination byte
+        moveq   #-1,d0
+        lsr.w   d5,d0                           ; keep mask for low bits after sprite end
+        and.b   d0,(a2)
+        move.w  d3,d4
+        lsl.w   d6,d4
+        or.b    d4,(a2)
+
+        adda.w  #80,a0                          ; next screen row
+        dbra    d7,shift_row_loop
+
+        movem.l (sp)+,d0-d7/a0-a5
+        unlk    a6
+        rts
+
 long_copy:
                 ; Check if screen address is word-aligned (even)
         move.l  a0,d1
@@ -133,7 +205,8 @@ byte_copy:                                      ; Byte-by-byte copy for misalign
         move.w  height(a6),d7                   ; get height (number of rows)
         subq.w  #1,d7                           ; adjust for dbra
                 
-byte_loop: move.b (a1)+,(a0)+                   ; copy byte 1
+byte_loop: 
+        move.b  (a1)+,(a0)+                     ; copy byte 1
         move.b  (a1)+,(a0)+                     ; copy byte 2
         move.b  (a1)+,(a0)+                     ; copy byte 3
         move.b  (a1)+,(a0)                      ; copy byte 4
@@ -167,7 +240,7 @@ shift_loop_32:
                 ; First, extract the bits that will overflow into the 5th byte
         move.l  d0,d1                           ; copy bitmap to d1
         moveq   #8,d2                           ; d2 = 8
-        sub.w   d5,d2                           ; d2 = 8 - bit_shift
+        sub.w   d5,d2                           ; d2 = 8 - bit_shift (d2 will be used for masking)
         lsl.l   d2,d1                           ; shift left to move overflow bits to high position
                 ; d1 now has the bits for the 5th byte in the high bits
                 
@@ -176,7 +249,10 @@ shift_loop_32:
                 ; d0 now has the 32 bits positioned correctly, but in 24+shift bits
                 
                 ; Extract individual bytes and write them using OR
-                ; Byte 0 (leftmost)
+                ; Byte 0 (leftmost) - needs masking to preserve high bits
+        moveq   #-1,d4                          ; start with all 1s
+        lsl.w   d2,d4                           ; shift left by (8-d5) to create mask for high bits
+        and.b   d4,(a0)                         ; clear the bits we're about to write
         move.l  d0,d3                           ; copy to d3
         lsr.l   #8,d3                           ; shift right 24 bits
         lsr.l   #8,d3
@@ -197,10 +273,11 @@ shift_loop_32:
                 ; Byte 3
         or.b    d0,3(a0)                        ; OR into screen byte 3 (low byte of d0)
                 
-                ; Byte 4 (rightmost, overflow bits)
-        lsr.l   #8,d1                           ; shift right 24 bits
-        lsr.l   #8,d1
-        lsr.l   #8,d1
+                ; Byte 4 (rightmost, overflow bits) - needs masking to preserve low bits
+        move.l  #$ff,d4                         ; start with 0x000000FF
+        lsr.l   d5,d4                           ; shift right by d5 to create mask for low (8-d5) bits
+        and.b   d4,4(a0)                        ; preserve the low bits
+                ; d1 already has overflow bits in low byte bits 7-5 from the lsl.l above
         or.b    d1,4(a0)                        ; OR into screen byte 4
                 
         adda.w  #80,a0                          ; move to next row

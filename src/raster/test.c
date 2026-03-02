@@ -810,12 +810,11 @@ void test_plot_bitmap_32(UINT8 *base)
     plot_bitmap_32(base, 140, 0, smiley_32, 15);
 
     /* Test 8: Various positions testing alignment */
-    plot_bitmap_32(base, 170, 100, arrow_32, 37);
-    plot_bitmap_32(base, 202, 101, arrow_32, 37);
-    plot_bitmap_32(base, 234, 102, arrow_32, 37);
+    plot_bitmap_32(base, 100, 100, checkerboard_32, 32);
+    plot_bitmap_32(base, 132, 101, checkerboard_32, 32);
+    plot_bitmap_32(base, 164, 102, checkerboard_32, 32);
 
-    /* Test 9: Bounds checking - LEFT EDGE offsets (safe vertical: y=50-100) */
-    clear_screen((UINT32 *)base);
+    /* Test 9: Bounds checking - LEFT EDGE offsets (safe verItical: y=50-100) */
     plot_bitmap_32(base, 50, -32, solid_block_32, 8);  /* x=-32: fully off left */
     plot_bitmap_32(base, 60, -30, checkerboard_32, 8); /* x=-30: 30px off */
     plot_bitmap_32(base, 70, -28, frame_32, 16);       /* x=-28: 28px off */
