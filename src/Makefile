@@ -15,7 +15,7 @@ CC = gcc
 GCOV = gcov
 
 # Compiler flags
-CFLAGS = -Wall -Wextra -std=c99
+CFLAGS = -Wall -Wextra -std=c89
 
 # Coverage flags for gcov
 # -fprofile-arcs: Generate arc coverage data
@@ -25,37 +25,52 @@ COVERAGE_FLAGS = -fprofile-arcs -ftest-coverage -O0
 # Include directories
 # -I. means include from current directory (for helloworld.h)
 # -Itests/unity means include from tests/unity subdirectory (for unity.h)
-INCLUDES = -I. -Itests/unity
+# -Imodel means include from model subdirectory (for entity headers)
+INCLUDES = -I. -Itests/unity -Imodel
 
-# Source files
-SRC = helloworld.c
+# Source files - automatically discover all .c files in src directory (excluding tests/)
+SRC = $(filter-out tests/%, $(wildcard *.c model/*.c))
+SRC_BASENAMES = $(basename $(SRC))
 UNITY_FILES = tests/unity/unity.c
+TEST_SUPPORT_SRC = $(filter-out main.c,$(SRC))
 
-# Dynamically discover test files (all .c files in tests/ excluding unity/)
-TEST_SRC_FILES = $(filter-out tests/unity/%, $(wildcard tests/*.c))
-TEST_EXECS = $(TEST_SRC_FILES:tests/%.c=%$(EXE_EXT))
+# Dynamically discover test files (all .c files in tests/model/)
+TEST_SRC_FILES = $(wildcard tests/model/*.c)
+TEST_EXECS = $(TEST_SRC_FILES:tests/model/%.c=%$(EXE_EXT))
+
+# Main program sources
+MAIN_EXE = main$(EXE_EXT)
+MAIN_SRC = main.c model/block.c model/spike.c model/lava.c model/geo.c model/level.c model/world.c
 
 # Default target
-all: test
+all: main
+
+# Default command prefix for running tests (can be overridden)
+RUN_CMD = $(RUN_PREFIX)
 
 # Compile and run all tests
 test: $(TEST_EXECS)
-	$(foreach exec,$(TEST_EXECS),$(RUN_PREFIX)$(exec) && ) $(NOOP)
+	$(foreach exec,$(TEST_EXECS),$(RUN_CMD)$(exec) && ) $(NOOP)
 
 # Build test executables (pattern rule)
-%$(EXE_EXT): tests/%.c $(SRC) $(UNITY_FILES)
-	$(CC) $(CFLAGS) $(COVERAGE_FLAGS) $(INCLUDES) -DTESTING $< $(SRC) $(UNITY_FILES) -o $@
+# Each test compiles with its corresponding source file: test_NAME.c compiles with NAME.c
+#%$(EXE_EXT): tests/model/%.c $(UNITY_FILES) $(TEST_SUPPORT_SRC)
+%$(EXE_EXT): tests/model/%.c $(UNITY_FILES) $(TEST_SUPPORT_SRC)
+	$(CC) $(CFLAGS) $(COVERAGE_FLAGS) $(INCLUDES) -DTESTING $< $(TEST_SUPPORT_SRC) $(UNITY_FILES) -o $@
 
 # Build the main program
-helloworld: helloworld.c
-	$(CC) $(CFLAGS) helloworld.c -o helloworld$(EXE_EXT)
+main: clean $(MAIN_EXE)
+
+$(MAIN_EXE): $(MAIN_SRC)
+	$(CC) $(CFLAGS) $(INCLUDES) $(MAIN_SRC) -o $(MAIN_EXE)
 
 # Clean up unncessary files
 coverage: generate-coverage clean-coverage
 
 # Generate coverage report using gcov for all test executables
+# Each test only reports coverage for its corresponding source file
 generate-coverage: clean test
-	$(foreach exec,$(TEST_EXECS:$(EXE_EXT)=),$(GCOV) $(exec)-helloworld.gcno && ) $(NOOP)
+	$(foreach exec,$(TEST_EXECS:$(EXE_EXT)=),$(GCOV) $(exec)-$(patsubst test_%,%,$(exec)).gcno && ) $(NOOP)
 	@echo Coverage report generated. Check *.gcov files for details.
 
 # Clean only coverage files (used before coverage generation)
@@ -64,7 +79,11 @@ clean-coverage:
 
 # Clean up build files
 clean:
-	-$(RM) *.exe *.o *.gcda *.gcno *.gcov $(TEST_EXECS)
+	-$(RM) *.exe *.o *.gcda *.gcno *.gcov *.ut *.tos $(TEST_EXECS)
+
+# Run tests with Valgrind memory checking
+valgrind: $(TEST_EXECS)
+	$(MAKE) test RUN_CMD="valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes $(RUN_PREFIX)"
 
 # Commands to run tests, otherwise make may assume these are files.
-.PHONY: all test clean clean-coverage coverage generate-coverage
+.PHONY: all main test clean clean-coverage coverage generate-coverage valgrind
