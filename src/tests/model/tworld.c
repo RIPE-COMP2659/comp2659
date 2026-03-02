@@ -806,6 +806,265 @@ void test_world_update_camera_li_left_and_right_span(void) {
     TEST_ASSERT_EQUAL_UINT(3, test_world.cam_max_li);
 }
 
+/* Collision Update Block Tests */
+void test_world_update_collision_bi_blocks_right_no_collision(void) {
+    /* Create blocks that are outside collision range */
+    static Block blocks[3];
+    static Level level;
+    World test_world;
+    test_world.levels = &level;
+    test_world.geo = create_geo(0, 0, 32);
+
+    blocks[0] = create_block(50, 100);
+    blocks[1] = create_block(100, 100);
+    blocks[2] = create_block(150, 100);
+
+    level.blocks = blocks;
+    level.blocks_size = 2;
+
+    test_world.cam_min_bi = 0;
+    test_world.cam_max_bi = 0;
+    test_world.col_min_bi = 0;
+    test_world.col_max_bi = 0;
+
+    world_update_collision_bi(&test_world, 0);
+
+    TEST_ASSERT_EQUAL_UINT(0, test_world.col_min_bi);
+    TEST_ASSERT_EQUAL_UINT(0, test_world.col_max_bi);
+}
+
+void test_world_update_collision_bi_blocks_right_barrier(void) {
+    /* Create blocks that are outside collision range */
+    static Block blocks[3];
+    static Level level;
+    World test_world;
+    test_world.levels = &level;
+    test_world.geo = create_geo(0, 0, 32);
+
+    blocks[0] = create_block(test_world.geo.x, 100);
+    blocks[1] = create_block(test_world.geo.x + test_world.geo.size - 1, 100);
+    blocks[2] = create_block(150, 100);
+
+    level.blocks = blocks;
+    level.blocks_size = 2;
+    test_world.cam_min_bi = 0;
+    test_world.cam_max_bi = 0;
+    test_world.col_min_bi = 0;
+    test_world.col_max_bi = 0;
+
+    world_update_collision_bi(&test_world, 0);
+
+    TEST_ASSERT_EQUAL_UINT(0, test_world.col_min_bi);
+    TEST_ASSERT_EQUAL_UINT(1, test_world.col_max_bi);
+}
+
+void test_world_update_collision_bi_min_is_zero_max_partial(void) {
+    /* Create blocks where first ones overlap, last is outside collision range */
+    static Block blocks[4];
+    static Level level;
+    World test_world;
+
+    test_world.geo = create_geo(100, 0, 0);
+    blocks[0] = create_block(test_world.geo.x, 100);
+    blocks[1] = create_block(test_world.geo.x + 10, 100);
+    blocks[2] = create_block(test_world.geo.x + 20, 100);
+    blocks[3] = create_block(test_world.geo.x + 100, 100);
+
+    level.blocks = blocks;
+    level.blocks_size = 3;
+
+    test_world.levels = &level;
+
+    test_world.cam_min_bi = 0;
+    test_world.cam_max_bi = 0;
+    test_world.col_min_bi = 0;
+    test_world.col_max_bi = 0;
+
+    world_update_collision_bi(&test_world, 0);
+
+    TEST_ASSERT_EQUAL_UINT(0, test_world.col_min_bi);
+    TEST_ASSERT_EQUAL_UINT(2, test_world.col_max_bi);
+}
+
+void test_world_update_collision_bi_min_offset_max_partial(void) {
+    /* Create blocks where some are left of collision range, some overlap */
+    static Block blocks[5];
+    static Level level;
+    World test_world;
+
+    test_world.geo = create_geo(100, 0, 0);
+    blocks[0] = create_block(test_world.geo.x - test_world.geo.size - test_world.geo.size, 100);
+    blocks[1] = create_block(test_world.geo.x - test_world.geo.size, 100);
+    blocks[2] = create_block(test_world.geo.x, 100);
+    blocks[3] = create_block(test_world.geo.x + 10, 100);
+    blocks[4] = create_block(test_world.geo.x + 300, 100);
+    
+    level.blocks = blocks;
+    level.blocks_size = 4;
+    
+    test_world.levels = &level;
+    test_world.cam_min_bi = 0;
+    test_world.cam_max_bi = 0;
+    test_world.col_min_bi = 0;
+    test_world.col_max_bi = 0;
+    
+    world_update_collision_bi(&test_world, 0);
+    
+    TEST_ASSERT_EQUAL_UINT(2, test_world.col_min_bi);
+    TEST_ASSERT_EQUAL_UINT(3, test_world.col_max_bi);
+}
+
+void test_world_update_collision_bi_updates(void) {
+    /* Create blocks where some are left of collision range, some overlap */
+    static Block blocks[6];
+    static Level level;
+    World test_world;
+
+    test_world.geo = create_geo(100, 0, 0);
+    blocks[0] = create_block(test_world.geo.x - test_world.geo.size - test_world.geo.size, 100);
+    blocks[1] = create_block(test_world.geo.x - test_world.geo.size, 100);
+    blocks[2] = create_block(test_world.geo.x, 100);
+    blocks[3] = create_block(test_world.geo.x + test_world.geo.size, 100);
+    blocks[4] = create_block(test_world.geo.x + test_world.geo.size + 10, 100);
+    blocks[5] = create_block(test_world.geo.x + 300, 100);
+    
+    level.blocks = blocks;
+    level.blocks_size = 4;
+    
+    test_world.levels = &level;
+    test_world.cam_min_bi = 0;
+    test_world.cam_max_bi = 0;
+    test_world.col_min_bi = 0;
+    test_world.col_max_bi = 0;
+
+    world_update_collision_bi(&test_world, 0);
+
+    TEST_ASSERT_EQUAL_UINT(2, test_world.col_min_bi);
+    TEST_ASSERT_EQUAL_UINT(2, test_world.col_max_bi);
+
+    test_world.geo.x = test_world.geo.x + test_world.geo.size;
+    world_update_collision_bi(&test_world, 0);
+
+    TEST_ASSERT_EQUAL_UINT(3, test_world.col_min_bi);
+    TEST_ASSERT_EQUAL_UINT(4, test_world.col_max_bi);
+}
+
+void test_world_update_collision_bi_same_x_different_heights(void) {
+    /* Create blocks at same x position but different heights */
+    static Block blocks[4];
+    static Level level;
+    World test_world;
+    
+    blocks[0] = create_block(100, 50);
+    blocks[1] = create_block(100, 100);
+    blocks[2] = create_block(100, 150);
+    blocks[3] = create_block(200, 100);
+    
+    level.blocks = blocks;
+    level.blocks_size = 3;
+    
+    test_world.levels = &level;
+    test_world.geo = create_geo(100, 0, 0);
+    test_world.cam_min_bi = 0;
+    test_world.cam_max_bi = 3;
+    test_world.col_min_bi = 0;
+    test_world.col_max_bi = 0;
+    
+    world_update_collision_bi(&test_world, 0);
+    
+    /* All blocks at x=100 should be in collision range */
+    TEST_ASSERT_EQUAL_UINT(0, test_world.col_min_bi);
+    TEST_ASSERT_EQUAL_UINT(2, test_world.col_max_bi);
+}
+
+/* Collision Update Spike Tests - spot check with spikes */
+void test_world_update_collision_si_same_x_different_heights(void) {
+    /* Create spikes at same x position but different heights */
+    static Spike spikes[4];
+    static Level level;
+    World test_world;
+    
+    spikes[0].x = 100;
+    spikes[0].y = 50;
+    spikes[0].size = SPIKE_SIZE;
+    spikes[0].sprite = SPIKE_SPRITE;
+    
+    spikes[1].x = 100;
+    spikes[1].y = 100;
+    spikes[1].size = SPIKE_SIZE;
+    spikes[1].sprite = SPIKE_SPRITE;
+    
+    spikes[2].x = 100;
+    spikes[2].y = 150;
+    spikes[2].size = SPIKE_SIZE;
+    spikes[2].sprite = SPIKE_SPRITE;
+    
+    spikes[3].x = 200;
+    spikes[3].y = 100;
+    spikes[3].size = SPIKE_SIZE;
+    spikes[3].sprite = SPIKE_SPRITE;
+    
+    level.spikes = spikes;
+    level.spikes_size = 3;
+    
+    test_world.levels = &level;
+    test_world.geo = create_geo(100, 0, 0);
+    test_world.cam_min_si = 0;
+    test_world.cam_max_si = 3;
+    test_world.col_min_si = 0;
+    test_world.col_max_si = 0;
+    
+    world_update_collision_si(&test_world, 0);
+    
+    /* All spikes at x=100 should be in collision range */
+    TEST_ASSERT_EQUAL_UINT(0, test_world.col_min_si);
+    TEST_ASSERT_EQUAL_UINT(2, test_world.col_max_si);
+}
+
+/* Collision Update Lava Tests - spot check with lava */
+void test_world_update_collision_li_same_x_different_heights(void) {
+    /* Create lava at same x position but different heights */
+    static Lava lava[4];
+    static Level level;
+    World test_world;
+    
+    lava[0].x = 100;
+    lava[0].y = 50;
+    lava[0].size = LAVA_SIZE;
+    lava[0].sprite = LAVA_SPRITE;
+    
+    lava[1].x = 100;
+    lava[1].y = 100;
+    lava[1].size = LAVA_SIZE;
+    lava[1].sprite = LAVA_SPRITE;
+    
+    lava[2].x = 100;
+    lava[2].y = 150;
+    lava[2].size = LAVA_SIZE;
+    lava[2].sprite = LAVA_SPRITE;
+    
+    lava[3].x = 200;
+    lava[3].y = 100;
+    lava[3].size = LAVA_SIZE;
+    lava[3].sprite = LAVA_SPRITE;
+    
+    level.lava = lava;
+    level.lava_size = 3;
+    
+    test_world.levels = &level;
+    test_world.geo = create_geo(100, 0, 0);
+    test_world.cam_min_li = 0;
+    test_world.cam_max_li = 3;
+    test_world.col_min_li = 0;
+    test_world.col_max_li = 0;
+    
+    world_update_collision_li(&test_world, 0);
+    
+    /* All lava at x=100 should be in collision range */
+    TEST_ASSERT_EQUAL_UINT(0, test_world.col_min_li);
+    TEST_ASSERT_EQUAL_UINT(2, test_world.col_max_li);
+}
+
 
 
 int main(void) {
@@ -839,6 +1098,14 @@ int main(void) {
     RUN_TEST(test_world_update_camera_li_min_is_zero_max_partial);
     RUN_TEST(test_world_update_camera_li_min_offset_max_partial);
     RUN_TEST(test_world_update_camera_li_left_and_right_span);
+    RUN_TEST(test_world_update_collision_bi_blocks_right_no_collision);
+    RUN_TEST(test_world_update_collision_bi_blocks_right_barrier);
+    RUN_TEST(test_world_update_collision_bi_min_is_zero_max_partial);
+    RUN_TEST(test_world_update_collision_bi_min_offset_max_partial);
+    RUN_TEST(test_world_update_collision_bi_updates);
+    RUN_TEST(test_world_update_collision_bi_same_x_different_heights);
+    RUN_TEST(test_world_update_collision_si_same_x_different_heights);
+    RUN_TEST(test_world_update_collision_li_same_x_different_heights);
 
     return UNITY_END();
 }
