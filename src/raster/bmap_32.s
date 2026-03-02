@@ -61,12 +61,17 @@ _plot_bitmap_32:
         mulu.w  #80,d0                          ; screen width in bytes
         adda.l  d0,a0                           ; add row offset
                 
-                ; Calculate and add col offset: col / 8 (pixels to bytes)
-        move.w  col(a6),d0
-        lsr.w   #3,d0                           ; divide by 8 (shift right 3 bits)
-        ext.l   d0                              ; extend to long
-        adda.l  d0,a0                           ; add col offset in bytes
+                ; Calculate col byte offset and bit shift
+        move.w  col(a6),d6                      ; d6 = col (pixel column)
+        move.w  d6,d5                           ; copy for bit calculation
+        lsr.w   #3,d6                           ; d6 = col / 8 (byte offset)
+        ext.l   d6
+        adda.l  d6,a0                           ; add col offset in bytes
                 
+        andi.w  #7,d5                           ; d5 = col % 8 (bit shift amount)
+        bne     unaligned_copy                  ; if not 0, need bit shifting
+                
+                ; BYTE-ALIGNED PATH (col % 8 == 0)
                 ; Check long word alignment for optimization
         move.l  a0,d1
         btst    #0,d1                           ; test if start address is odd
@@ -100,6 +105,78 @@ movem_loop:                                     ; (happy)
         unlk    a6
         rts
 
+shifted_copy:
+                ; Bit-shifted copy for non-byte-aligned x positions
+                ; Writes 5 destination bytes per row for a 32-bit source row,
+                ; while preserving unaffected bits in first/last destination bytes.
+        moveq   #8,d6
+        sub.w   d5,d6                           ; d6 = (8 - bit_offset)
+
+        move.w  height(a6),d7                   ; get height (number of rows)
+        subq.w  #1,d7                           ; adjust for dbra
+
+shift_row_loop:
+        movea.l a0,a2                           ; row destination pointer
+
+        moveq   #0,d0
+        moveq   #0,d1
+        moveq   #0,d2
+        moveq   #0,d3
+        move.b  (a1)+,d0                        ; b0
+        move.b  (a1)+,d1                        ; b1
+
+                ; out0 = b0 >> shift, merge with first destination byte
+        moveq   #-1,d4
+        lsl.w   d6,d4                           ; keep mask for high bits before sprite start
+        and.b   d4,(a2)
+        move.w  d0,d4
+        lsr.w   d5,d4
+        or.b    d4,(a2)
+        addq.l  #1,a2
+
+                ; out1 = (b0 << (8-shift)) | (b1 >> shift)
+        move.w  d0,d4
+        lsl.w   d6,d4
+        move.w  d1,d3
+        lsr.w   d5,d3
+        or.b    d3,d4
+        move.b  d4,(a2)+
+
+        move.b  (a1)+,d2                        ; b2
+
+                ; out2 = (b1 << (8-shift)) | (b2 >> shift)
+        move.w  d1,d4
+        lsl.w   d6,d4
+        move.w  d2,d3
+        lsr.w   d5,d3
+        or.b    d3,d4
+        move.b  d4,(a2)+
+
+        move.b  (a1)+,d3                        ; b3
+
+                ; out3 = (b2 << (8-shift)) | (b3 >> shift)
+        move.w  d2,d4
+        lsl.w   d6,d4
+        move.w  d3,d0
+        lsr.w   d5,d0
+        or.b    d0,d4
+        move.b  d4,(a2)+
+
+                ; out4 = b3 << (8-shift), merge with last destination byte
+        moveq   #-1,d0
+        lsr.w   d5,d0                           ; keep mask for low bits after sprite end
+        and.b   d0,(a2)
+        move.w  d3,d4
+        lsl.w   d6,d4
+        or.b    d4,(a2)
+
+        adda.w  #80,a0                          ; next screen row
+        dbra    d7,shift_row_loop
+
+        movem.l (sp)+,d0-d7/a0-a5
+        unlk    a6
+        rts
+
 long_copy:
                 ; Check if screen address is word-aligned (even)
         move.l  a0,d1
@@ -128,12 +205,83 @@ byte_copy:                                      ; Byte-by-byte copy for misalign
         move.w  height(a6),d7                   ; get height (number of rows)
         subq.w  #1,d7                           ; adjust for dbra
                 
-byte_loop: move.b (a1)+,(a0)+                   ; copy byte 1
+byte_loop: 
+        move.b  (a1)+,(a0)+                     ; copy byte 1
         move.b  (a1)+,(a0)+                     ; copy byte 2
         move.b  (a1)+,(a0)+                     ; copy byte 3
         move.b  (a1)+,(a0)                      ; copy byte 4
         adda.w  #77,a0                          ; move to next row (80 - 3 already advanced)
         dbra    d7,byte_loop
+                
+        movem.l (sp)+,d0-d7/a0-a5
+        unlk    a6
+        rts
+
+unaligned_copy:
+                ; NON-BYTE-ALIGNED PATH (col % 8 != 0)
+                ; Need to shift bitmap and write across 5 bytes per row
+                ; d5 = bit shift amount (1-7)
+                ; a0 = screen start position
+                ; a1 = bitmap data
+                
+        move.w  height(a6),d7                   ; get height
+        subq.w  #1,d7                           ; adjust for dbra
+                
+                ; For 32-bit shifting, we need to use a 64-bit approach
+                ; Load 4 bytes, shift them, and write across 5 bytes
+                
+shift_loop_32:
+                ; Load 32-bit bitmap data
+        move.l  (a1)+,d0                        ; d0 = bitmap long (32 pixels)
+                
+                ; We need to shift d0 right by d5 bits, but this will lose bits
+                ; So we use two registers to catch the overflow
+                                
+                ; First, extract the bits that will overflow into the 5th byte
+        move.l  d0,d1                           ; copy bitmap to d1
+        moveq   #8,d2                           ; d2 = 8
+        sub.w   d5,d2                           ; d2 = 8 - bit_shift (d2 will be used for masking)
+        lsl.l   d2,d1                           ; shift left to move overflow bits to high position
+                ; d1 now has the bits for the 5th byte in the high bits
+                
+                ; Shift the main bitmap data right by bit_shift
+        lsr.l   d5,d0                           ; shift right by bit_shift
+                ; d0 now has the 32 bits positioned correctly, but in 24+shift bits
+                
+                ; Extract individual bytes and write them using OR
+                ; Byte 0 (leftmost) - needs masking to preserve high bits
+        moveq   #-1,d4                          ; start with all 1s
+        lsl.w   d2,d4                           ; shift left by (8-d5) to create mask for high bits
+        and.b   d4,(a0)                         ; clear the bits we're about to write
+        move.l  d0,d3                           ; copy to d3
+        lsr.l   #8,d3                           ; shift right 24 bits
+        lsr.l   #8,d3
+        lsr.l   #8,d3
+        or.b    d3,(a0)                         ; OR into screen byte 0
+                
+                ; Byte 1
+        move.l  d0,d3
+        lsr.l   #8,d3                           ; shift right 16 bits
+        lsr.l   #8,d3
+        or.b    d3,1(a0)                        ; OR into screen byte 1
+                
+                ; Byte 2
+        move.l  d0,d3
+        lsr.l   #8,d3                           ; shift right 8 bits
+        or.b    d3,2(a0)                        ; OR into screen byte 2
+                
+                ; Byte 3
+        or.b    d0,3(a0)                        ; OR into screen byte 3 (low byte of d0)
+                
+                ; Byte 4 (rightmost, overflow bits) - needs masking to preserve low bits
+        move.l  #$ff,d4                         ; start with 0x0000FF
+        lsr.l   d5,d4                           ; shift right by d5 to create mask for low (8-d5) bits
+        and.b   d4,4(a0)                        ; preserve the low bits
+                ; d1 already has overflow bits in low byte bits 7-5 from the lsl.l above
+        or.b    d1,4(a0)                        ; OR into screen byte 4
+                
+        adda.w  #80,a0                          ; move to next row
+        dbra    d7,shift_loop_32
                 
         movem.l (sp)+,d0-d7/a0-a5
         unlk    a6

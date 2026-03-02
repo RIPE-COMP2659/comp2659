@@ -34,6 +34,37 @@ void test_clear_region(UINT8 *base)
 
     /* Test 6: Odd column alignment to test byte spanning */
     clear_region((UINT32 *)base, 200, 5, 15, 4);
+
+    /* Test 7: Non-byte-aligned edge masking with 8-pixel width - stacked with 1-pixel offset */
+    /* Draw solid rectangles to clear over */
+    plot_rectangle((UINT32 *)base, 250, 50, 8, 16);
+    plot_rectangle((UINT32 *)base, 258, 50, 8, 16);
+    plot_rectangle((UINT32 *)base, 266, 50, 8, 16);
+
+    /* Clear regions over them, each 1 pixel offset to test edge masking */
+    clear_region((UINT32 *)base, 250, 50, 8, 8);
+    clear_region((UINT32 *)base, 258, 51, 8, 8);
+    clear_region((UINT32 *)base, 266, 52, 8, 8);
+
+    /* Test 8: Non-byte-aligned edge masking with 16-pixel width - stacked with 1-pixel offset */
+    plot_rectangle((UINT32 *)base, 250, 100, 16, 32);
+    plot_rectangle((UINT32 *)base, 266, 100, 16, 32);
+    plot_rectangle((UINT32 *)base, 282, 100, 16, 32);
+
+    /* Clear regions over them, each 1 pixel offset to test edge masking */
+    clear_region((UINT32 *)base, 250, 100, 16, 16);
+    clear_region((UINT32 *)base, 266, 101, 16, 16);
+    clear_region((UINT32 *)base, 282, 102, 16, 16);
+
+    /* Test 9: Non-byte-aligned edge masking with 32-pixel width - stacked with 1-pixel offset */
+    plot_rectangle((UINT32 *)base, 250, 200, 32, 48);
+    plot_rectangle((UINT32 *)base, 282, 200, 32, 48);
+    plot_rectangle((UINT32 *)base, 314, 200, 32, 48);
+
+    /* Clear regions over them, each 1 pixel offset to test edge masking */
+    clear_region((UINT32 *)base, 250, 200, 32, 32);
+    clear_region((UINT32 *)base, 282, 201, 32, 32);
+    clear_region((UINT32 *)base, 314, 202, 32, 32);
 }
 
 void test_plot_pixel(UINT8 *base)
@@ -444,10 +475,10 @@ void test_plot_bitmap_8(UINT8 *base)
     plot_bitmap_8(base, 10, 25, smiley, 8);
 
     /* Test 4: Various positions across the screen */
-    plot_bitmap_8(base, 30, 0, cross, 8);
-    plot_bitmap_8(base, 30, 10, diagonal, 8);
-    plot_bitmap_8(base, 30, 20, checkerboard, 8);
-    plot_bitmap_8(base, 30, 30, smiley, 8);
+    plot_bitmap_8(base, 100, 100, solid_block, 8);
+    plot_bitmap_8(base, 108, 101, solid_block, 8);
+    plot_bitmap_8(base, 116, 102, solid_block, 8);
+    plot_bitmap_8(base, 30, 30, solid_block, 8);
 
     /* Test 5: Larger bitmap (even height, optimized) */
     plot_bitmap_8(base, 50, 8, arrow_down, 16);
@@ -598,9 +629,9 @@ void test_plot_bitmap_16(UINT8 *base)
     plot_bitmap_16(base, 10, 48, smiley_16, 16);
 
     /* Test 4: Various positions across the screen */
-    plot_bitmap_16(base, 30, 0, frame_16, 16);
-    plot_bitmap_16(base, 30, 20, diamond_16, 16);
-    plot_bitmap_16(base, 30, 40, checkerboard_16, 8);
+    plot_bitmap_16(base, 100, 100, solid_block_16, 16);
+    plot_bitmap_16(base, 116, 101, solid_block_16, 16);
+    plot_bitmap_16(base, 132, 102, solid_block_16, 8);
 
     /* Test 5: Multiple bitmaps in a row */
     plot_bitmap_16(base, 60, 0, solid_block_16, 8);
@@ -625,7 +656,6 @@ void test_plot_bitmap_16(UINT8 *base)
     plot_bitmap_16(base, 170, 48, diamond_16, 16);
 
     /* Test 9: Bounds checking - LEFT EDGE offsets (safe vertical: y=50-100) */
-    clear_screen((UINT32 *)base);
     plot_bitmap_16(base, 50, -16, solid_block_16, 8);  /* x=-16: 16px off */
     plot_bitmap_16(base, 60, -14, checkerboard_16, 8); /* x=-14: 14px off */
     plot_bitmap_16(base, 70, -12, frame_16, 16);       /* x=-12: 12px off */
@@ -810,12 +840,11 @@ void test_plot_bitmap_32(UINT8 *base)
     plot_bitmap_32(base, 140, 0, smiley_32, 15);
 
     /* Test 8: Various positions testing alignment */
-    plot_bitmap_32(base, 170, 0, arrow_32, 37);
-    plot_bitmap_32(base, 170, 48, arrow_32, 37);
-    plot_bitmap_32(base, 170, 96, arrow_32, 37);
+    plot_bitmap_32(base, 100, 100, checkerboard_32, 32);
+    plot_bitmap_32(base, 132, 101, checkerboard_32, 32);
+    plot_bitmap_32(base, 164, 102, checkerboard_32, 32);
 
-    /* Test 9: Bounds checking - LEFT EDGE offsets (safe vertical: y=50-100) */
-    clear_screen((UINT32 *)base);
+    /* Test 9: Bounds checking - LEFT EDGE offsets (safe verItical: y=50-100) */
     plot_bitmap_32(base, 50, -32, solid_block_32, 8);  /* x=-32: fully off left */
     plot_bitmap_32(base, 60, -30, checkerboard_32, 8); /* x=-30: 30px off */
     plot_bitmap_32(base, 70, -28, frame_32, 16);       /* x=-28: 28px off */
