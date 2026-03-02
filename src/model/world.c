@@ -253,8 +253,6 @@ void world_collision_geo_block(World *world, Block *block) {
         world->geo.is_landed = TRUE;
     } else if (collision == COLLISION_BOTTOM || collision == COLLISION_LEFT) {
         world->geo.is_dead = TRUE;
-    } else if (collision == COLLISION_NONE) {
-        world->geo.is_landed = FALSE;
     }
 }
 

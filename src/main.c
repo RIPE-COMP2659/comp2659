@@ -46,6 +46,9 @@ void test_rendering(UINT32 *base, Model model)
         plot_bitmap_32((UINT8 *)base, camera_get_relative_y(&world->camera, world->geo.y), camera_get_relative_x(&world->camera, world->geo.x), world->geo.sprite, world->geo.size);
 
         printf("Geo x: %d\n", world->geo.x);
+        printf("Geo is_landed: %d\n", world->geo.is_landed);
+        printf("Geo is_dead: %d\n", world->geo.is_dead);
+        printf("Geo ground_y: %d\n", world->geo.ground_y);
         Cnecin();
     }
 }
