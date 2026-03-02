@@ -16,8 +16,8 @@
 #define EVENT_LEVEL_DONE    3
 #define EVENT_OFF_PLATFORM  4
 
-#include "asynch.h"
-#include "synch.h"
+#include "async.h"
+#include "sync.h"
 #include "cond.h"
 
 #endif

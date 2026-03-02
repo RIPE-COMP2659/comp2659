@@ -1,14 +1,14 @@
 /*
- * asynch.h
+ * async.h
  *
  * PURPOSE: Prototypes for asynchronous (user input-triggered)
  *          event handlers.
  */
 
-#ifndef ASYNCH_H
-#define ASYNCH_H
+#ifndef ASYNC_H
+#define ASYNC_H
 
-#include "../geo.h"
+#include "../entities/geo.h"
 
 /*
  * on_jump_request
