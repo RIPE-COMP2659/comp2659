@@ -15,7 +15,7 @@ void test_rendering(UINT32 *base, Model model)
     unsigned int w_iter;
     int input;
 
-    for (w_iter = 0; w_iter < 200; w_iter++) {
+    for (w_iter = 0; w_iter < 400; w_iter++) {
         model_update(&model);
 
         clear_screen(base);
