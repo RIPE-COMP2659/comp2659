@@ -9,9 +9,9 @@
 #ifndef COND_H
 #define COND_H
 
-#include "../entities/geo.h"
-#include "../entities/level.h"
-#include "../entities/world.h"
+#include "../model/geo.h"
+#include "../model/level.h"
+#include "../model/world.h"
 
 /* Default ground height (bottom of the screen) */
 #define GROUND_Y 0

@@ -8,7 +8,7 @@
 #ifndef ASYNC_H
 #define ASYNC_H
 
-#include "../entities/geo.h"
+#include "../model/geo.h"
 
 /*
  * on_jump_request
