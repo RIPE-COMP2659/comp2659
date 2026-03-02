@@ -1,5 +1,5 @@
-#ifndef SYNCH_H
-#define SYNCH_H
+#ifndef SYNC_H
+#define SYNC_H
 
 #include "../entities/geo.h"
 #include "../entities/level.h"

@@ -1,11 +1,11 @@
 /*
- * synch.c
+ * sync.c
  *
  * PURPOSE: Implements synchronous (clock-triggered) event
  *          handlers, called once per frame (1/70th second).
  */
 
-#include "synch.h"
+#include "sync.h"
 #include "cond.h"
 
 /*

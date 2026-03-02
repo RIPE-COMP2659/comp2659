@@ -1,11 +1,11 @@
 /*
- * asynch.c
+ * async.c
  *
  * PURPOSE: Implements asynchronous (user input-triggered)
  *          event handlers. Currently handles jump requests.
  */
 
-#include "asynch.h"
+#include "async.h"
 
 /*
  * on_jump_request
