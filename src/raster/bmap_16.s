@@ -180,7 +180,7 @@ shift_loop_16:
         lsr.l   #8,d3                           ; shift right 8 bits to get high byte
         or.b    d3,(a0)                         ; OR into screen byte 0
                 
-                ; Byte 1 (middle) - fully overwritten, must clear first!
+                ; Byte 1 (middle) - fully overwritten
         clr.b   1(a0)                           ; clear the byte first
         or.b    d0,1(a0)                        ; OR into screen byte 1 (low byte of d0)
                 

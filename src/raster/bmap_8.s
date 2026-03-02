@@ -96,7 +96,7 @@ shift_loop: moveq #0,d0                         ; clear d0
         or.b    d0,(a0)                         ; OR bitmap bits into current screen byte
                 
                 ; Write to next byte with masking  
-        move.l  #$ff,d4                         ; start with 0x000000FF
+        move.l  #$ff,d4                         ; start with 0x0000FF
         lsr.l   d5,d4                           ; shift right by d5 to create mask for low bits
         and.b   d4,1(a0)                        ; preserve the low bits
         or.b    d1,1(a0)                        ; OR bitmap bits into next screen byte
