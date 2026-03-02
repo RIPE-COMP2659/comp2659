@@ -34,6 +34,7 @@ void world_update(World *world, unsigned int level_index) {
     geo_update(&world->geo);
     camera_update_coordinates(&world->camera, world->geo.x - CAMERA_OFFSET, SCREEN_HEIGHT);
     world_update_camera(world, level_index);
+    world_update_collisions(world, level_index);
 }
 
 World get_world(void) {
@@ -163,9 +164,34 @@ void world_update_camera_li(World *world, unsigned int level_index) {
 }
 
 void world_update_collisions(World *world, unsigned int level_index) {
+    Level *level = &world->levels[level_index];
+    unsigned int i;
+
     world_update_collision_bi(world, level_index);
     world_update_collision_si(world, level_index);
     world_update_collision_li(world, level_index);
+
+    /* Reset is_landed before checking blocks to determine if geo has support */
+    world->geo.is_landed = FALSE;
+    world_collision_geo_ground(world);
+
+    /* Iterate through blocks and handle collisions */
+    for (i = world->col_min_bi; i <= world->col_max_bi; i++) {
+        world_collision_geo_block(world, &level->blocks[i]);
+    }
+
+    /* Iterate through spikes and handle collisions */
+    for (i = world->col_min_si; i <= world->col_max_si; i++) {
+        world_collision_geo_spike(world, &level->spikes[i]);
+    }
+
+    /* Iterate through lava and handle collisions */
+    for (i = world->col_min_li; i <= world->col_max_li; i++) {
+        world_collision_geo_lava(world, &level->lava[i]);
+    }
+
+    /* Update landed status based on final ground_y after all collisions */
+    geo_update_landed(&world->geo);
 }
 
 void world_update_collision_bi(World *world, unsigned int level_index) {
@@ -233,6 +259,7 @@ void world_collision_geo_block(World *world, Block *block) {
     } else if (collision == COLLISION_BOTTOM || collision == COLLISION_LEFT) {
         world->geo.is_dead = TRUE;
     } else if (collision == COLLISION_NONE) {
+        /* No collision with this block, geo is not supported */
         world->geo.is_landed = FALSE;
     }
 }
