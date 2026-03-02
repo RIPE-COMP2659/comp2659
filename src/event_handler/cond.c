@@ -29,10 +29,21 @@ int check_collisions(World *world, unsigned int level_index) {
   unsigned int i;
   Level *level = &world->levels[level_index];
   Geo *geo = &world->geo;
+  unsigned int geo_right = geo->x + geo->size;
 
   /* Check spikes - any collision is death */
   for (i = world->cam_min_si; i <= world->cam_max_si && i < level->spikes_size;
        i++) {
+    /* Optimization: If obstacle is past Geo's reach, stop checking (sorted
+     * list) */
+    if (level->spikes[i].x > geo_right) {
+      break;
+    }
+    /* Optimization: If obstacle is already behind Geo, skip it */
+    if (level->spikes[i].x + level->spikes[i].size < geo->x) {
+      continue;
+    }
+
     world_collision_geo_spike(world, &level->spikes[i]);
     if (geo->is_dead == TRUE) {
       return EVENT_DEATH;
@@ -42,6 +53,13 @@ int check_collisions(World *world, unsigned int level_index) {
   /* Check lava - any collision is death */
   for (i = world->cam_min_li; i <= world->cam_max_li && i < level->lava_size;
        i++) {
+    if (level->lava[i].x > geo_right) {
+      break;
+    }
+    if (level->lava[i].x + level->lava[i].size < geo->x) {
+      continue;
+    }
+
     world_collision_geo_lava(world, &level->lava[i]);
     if (geo->is_dead == TRUE) {
       return EVENT_DEATH;
@@ -49,16 +67,20 @@ int check_collisions(World *world, unsigned int level_index) {
   }
 
   /* Check blocks - top is safe/land, side/bottom is death */
-  /* Note: world_collision_geo_block handles landing state */
   for (i = world->cam_min_bi; i <= world->cam_max_bi && i < level->blocks_size;
        i++) {
+    if (level->blocks[i].x > geo_right) {
+      break;
+    }
+    if (level->blocks[i].x + level->blocks[i].size < geo->x) {
+      continue;
+    }
+
     world_collision_geo_block(world, &level->blocks[i]);
     if (geo->is_dead == TRUE) {
       return EVENT_DEATH;
     }
     if (geo->is_landed == TRUE) {
-      /* Once landed, we still check others in case of death on same frame */
-      /* but for now we'll return landed event */
       return EVENT_LANDED;
     }
   }
