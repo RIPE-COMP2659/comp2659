@@ -34,6 +34,37 @@ void test_clear_region(UINT8 *base)
 
     /* Test 6: Odd column alignment to test byte spanning */
     clear_region((UINT32 *)base, 200, 5, 15, 4);
+
+    /* Test 7: Non-byte-aligned edge masking with 8-pixel width - stacked with 1-pixel offset */
+    /* Draw solid rectangles to clear over */
+    plot_rectangle((UINT32 *)base, 250, 50, 8, 16);
+    plot_rectangle((UINT32 *)base, 258, 50, 8, 16);
+    plot_rectangle((UINT32 *)base, 266, 50, 8, 16);
+
+    /* Clear regions over them, each 1 pixel offset to test edge masking */
+    clear_region((UINT32 *)base, 250, 50, 8, 8);
+    clear_region((UINT32 *)base, 258, 51, 8, 8);
+    clear_region((UINT32 *)base, 266, 52, 8, 8);
+
+    /* Test 8: Non-byte-aligned edge masking with 16-pixel width - stacked with 1-pixel offset */
+    plot_rectangle((UINT32 *)base, 250, 100, 16, 32);
+    plot_rectangle((UINT32 *)base, 266, 100, 16, 32);
+    plot_rectangle((UINT32 *)base, 282, 100, 16, 32);
+
+    /* Clear regions over them, each 1 pixel offset to test edge masking */
+    clear_region((UINT32 *)base, 250, 100, 16, 16);
+    clear_region((UINT32 *)base, 266, 101, 16, 16);
+    clear_region((UINT32 *)base, 282, 102, 16, 16);
+
+    /* Test 9: Non-byte-aligned edge masking with 32-pixel width - stacked with 1-pixel offset */
+    plot_rectangle((UINT32 *)base, 250, 200, 32, 48);
+    plot_rectangle((UINT32 *)base, 282, 200, 32, 48);
+    plot_rectangle((UINT32 *)base, 314, 200, 32, 48);
+
+    /* Clear regions over them, each 1 pixel offset to test edge masking */
+    clear_region((UINT32 *)base, 250, 200, 32, 32);
+    clear_region((UINT32 *)base, 282, 201, 32, 32);
+    clear_region((UINT32 *)base, 314, 202, 32, 32);
 }
 
 void test_plot_pixel(UINT8 *base)
