@@ -1,0 +1,284 @@
+# ============================================================================
+# Makefile for the Atari ST (cc68x) build
+#
+# This file should not be confused for the primary Makefile which is for gcc
+# builds. Two seperate files are maintained because otherwise the gcc make
+# would become very large and difficult to maintain.
+#
+# Atari ST build:   make atari
+# Run tests:        make test
+# Clean:            make clean
+# ============================================================================
+# TODO: Update above documentation
+
+# --- Variables and Configuration --------------------------------------------
+# Folders
+MODEL_FOLDER = model
+RASTER_FOLDER = raster
+TESTS_FOLDER = tests
+TESTS_MODEL_FOLDER = $(TESTS_FOLDER)\$(MODEL_FOLDER)
+TESTS_RASTER_FOLDER = $(TESTS_FOLDER)\$(RASTER_FOLDER)
+UNITY_FOLDER = $(TESTS_FOLDER)\unity
+
+# File Names, Base - Model
+BLOCK  = block
+SPIKE  = spike
+LAVA   = lava
+GEO    = geo
+LEVEL  = level
+WORLD  = world
+MODEL  = model
+MAIN   = main
+CAMERA = camera
+
+# File Names, Base - Raster
+CLR_SCN = clr_scn
+CLR_REG = clr_reg
+PLT_PXL = plt_pxl
+PLT_HOR = plt_hor
+PLT_VRT = plt_vrt
+PLT_LIN = plt_lin
+PLT_REC = plt_rec
+PLT_SQR = plt_sqr
+PLT_TRI = plt_tri
+BMAP_8  = bmap_8
+BMAP_16 = bmap_16
+BMAP_32 = bmap_32
+PLT_CHR = plt_chr
+PLT_STR = plt_str
+BOUNDS  = bounds
+PLT_CLIP = plt_clp
+
+# Global Variables
+ATARI_CC     = cc68x
+SHARED_FLAGS = -g
+
+# Program Configuration
+TOS_FLAGS      = $(SHARED_FLAGS) -c -I. -I$(MODEL_FOLDER) -I$(RASTER_FOLDER)
+RASTER_OBJECTS = $(CLR_SCN).o $(CLR_REG).o $(PLT_PXL).o $(PLT_HOR).o $(PLT_VRT).o $(PLT_LIN).o $(PLT_REC).o $(PLT_SQR).o $(PLT_TRI).o $(BMAP_8).o $(BMAP_16).o $(BMAP_32).o $(PLT_CHR).o $(PLT_STR).o $(BOUNDS).o $(PLT_CLIP).o
+TOS_OBJECTS    = $(BLOCK).o $(SPIKE).o $(LAVA).o $(GEO).o $(LEVEL).o $(WORLD).o $(MODEL).o $(CAMERA).o $(MAIN).o $(RASTER_OBJECTS)
+TOS_NAME       = prog.tos
+MAIN_FLAGS     = $(SHARED_FLAGS) -I. -I$(MODEL_FOLDER) -I$(RASTER_FOLDER)
+
+# Test Configuration
+# TODO: It's a bit silly, but pretty sure we're including all our .c files for each test.
+TEST_FLAGS = $(SHARED_FLAGS) -I. -I$(MODEL_FOLDER) -I$(UNITY_FOLDER) -DUNITY_EXCLUDE_STDINT_H -DUNITY_INT_WIDTH=16 -DUNITY_LONG_WIDTH=32 -DUNITY_POINTER_WIDTH=32 -DTESTING
+TEST_SRC   = $(MODEL_FOLDER)\$(BLOCK).c $(MODEL_FOLDER)\$(SPIKE).c $(MODEL_FOLDER)\$(LAVA).c $(MODEL_FOLDER)\$(GEO).c $(MODEL_FOLDER)\$(LEVEL).c $(MODEL_FOLDER)\$(WORLD).c $(MODEL_FOLDER)\$(MODEL).c $(MODEL_FOLDER)\$(CAMERA).c
+UNITY      = $(UNITY_FOLDER)\unity.c
+
+# Raster Test Configuration
+RASTER_TEST_FLAGS = $(SHARED_FLAGS) -I. -I$(RASTER_FOLDER) -I$(UNITY_FOLDER) -DUNITY_EXCLUDE_STDINT_H -DUNITY_INT_WIDTH=16 -DUNITY_LONG_WIDTH=32 -DUNITY_POINTER_WIDTH=32 -DTESTING
+
+# File Names, Tests - Model
+TBLOCK = t${BLOCK}
+TGEO   = t${GEO}
+TLAVA  = t${LAVA}
+TLEVEL = t${LEVEL}
+TSPIKE = t${SPIKE}
+TWORLD = t${WORLD}
+TCAMERA = t${CAMERA}
+
+# File Names, Tests - Raster
+TCLR_SCN = t${CLR_SCN}
+TCLR_REG = t${CLR_REG}
+TPLT_PXL = t${PLT_PXL}
+TPLT_HOR = t${PLT_HOR}
+TPLT_VRT = t${PLT_VRT}
+TPLT_LIN = t${PLT_LIN}
+TPLT_REC = t${PLT_REC}
+TPLT_SQR = t${PLT_SQR}
+TPLT_TRI = t${PLT_TRI}
+TBMAP_8  = t${BMAP_8}
+TBMAP_16 = t${BMAP_16}
+TBMAP_32 = t${BMAP_32}
+TPLT_CHR = t${PLT_CHR}
+TPLT_STR = t${PLT_STR}
+TBOUNDS  = t${BOUNDS}
+TPLT_CLIP = t${PLT_CLIP}
+
+
+# ----- Program Builds -------------------------------------------------------
+$(TOS_NAME): $(TOS_OBJECTS)
+	$(ATARI_CC) $(MAIN_FLAGS) $(TOS_OBJECTS) -o $(TOS_NAME)
+
+$(CAMERA).o: $(MODEL_FOLDER)\$(CAMERA).c $(MODEL_FOLDER)\$(CAMERA).h $(MODEL_FOLDER)\dtypes.h
+	$(ATARI_CC) $(TOS_FLAGS) $(MODEL_FOLDER)\$(CAMERA).c -o $(CAMERA).o
+
+$(BLOCK).o: $(MODEL_FOLDER)\$(BLOCK).c $(MODEL_FOLDER)\$(BLOCK).h $(MODEL_FOLDER)\dtypes.h
+	$(ATARI_CC) $(TOS_FLAGS) $(MODEL_FOLDER)\$(BLOCK).c -o $(BLOCK).o
+
+$(LAVA).o: $(MODEL_FOLDER)\$(LAVA).c $(MODEL_FOLDER)\$(LAVA).h $(MODEL_FOLDER)\dtypes.h
+	$(ATARI_CC) $(TOS_FLAGS) $(MODEL_FOLDER)\$(LAVA).c -o $(LAVA).o
+
+$(SPIKE).o: $(MODEL_FOLDER)\$(SPIKE).c $(MODEL_FOLDER)\$(SPIKE).h $(MODEL_FOLDER)\dtypes.h
+	$(ATARI_CC) $(TOS_FLAGS) $(MODEL_FOLDER)\$(SPIKE).c -o $(SPIKE).o
+
+$(GEO).o: $(MODEL_FOLDER)\$(GEO).c $(MODEL_FOLDER)\$(GEO).h $(MODEL_FOLDER)\dtypes.h
+	$(ATARI_CC) $(TOS_FLAGS) $(MODEL_FOLDER)\$(GEO).c -o $(GEO).o
+
+$(LEVEL).o: $(MODEL_FOLDER)\$(LEVEL).c $(MODEL_FOLDER)\$(LEVEL).h $(MODEL_FOLDER)\dtypes.h
+	$(ATARI_CC) $(TOS_FLAGS) $(MODEL_FOLDER)\$(LEVEL).c -o $(LEVEL).o
+
+$(WORLD).o: $(MODEL_FOLDER)\$(WORLD).c $(MODEL_FOLDER)\$(WORLD).h $(MODEL_FOLDER)\dtypes.h
+	$(ATARI_CC) $(TOS_FLAGS) $(MODEL_FOLDER)\$(WORLD).c -o $(WORLD).o
+
+$(MODEL).o: $(MODEL_FOLDER)\$(MODEL).c $(MODEL_FOLDER)\$(MODEL).h $(MODEL_FOLDER)\$(WORLD).h $(MODEL_FOLDER)\dtypes.h
+	$(ATARI_CC) $(TOS_FLAGS) $(MODEL_FOLDER)\$(MODEL).c -o $(MODEL).o
+
+$(MAIN).o: $(MAIN).c $(MODEL_FOLDER)\$(MODEL).h $(MODEL_FOLDER)\dtypes.h raster\raster.h
+	$(ATARI_CC) $(TOS_FLAGS) $(MAIN).c -o $(MAIN).o
+
+
+# ----- Test Builds ----------------------------------------------------------
+$(TBLOCK):
+	$(ATARI_CC) $(TEST_FLAGS) $(TESTS_MODEL_FOLDER)\$(TBLOCK).c $(TEST_SRC) $(UNITY) -o $(TBLOCK).ut
+
+$(TGEO):
+	$(ATARI_CC) $(TEST_FLAGS) $(TESTS_MODEL_FOLDER)\$(TGEO).c $(TEST_SRC) $(UNITY) -o $(TGEO).ut
+
+$(TLAVA):
+	$(ATARI_CC) $(TEST_FLAGS) $(TESTS_MODEL_FOLDER)\$(TLAVA).c $(TEST_SRC) $(UNITY) -o $(TLAVA).ut
+
+$(TLEVEL):
+	$(ATARI_CC) $(TEST_FLAGS) $(TESTS_MODEL_FOLDER)\$(TLEVEL).c $(TEST_SRC) $(UNITY) -o $(TLEVEL).ut
+
+$(TSPIKE):
+	$(ATARI_CC) $(TEST_FLAGS) $(TESTS_MODEL_FOLDER)\$(TSPIKE).c $(TEST_SRC) $(UNITY) -o $(TSPIKE).ut
+
+$(TWORLD):
+	$(ATARI_CC) $(TEST_FLAGS) $(TESTS_MODEL_FOLDER)\$(TWORLD).c $(TEST_SRC) $(UNITY) -o $(TWORLD).ut
+
+$(TCAMERA):
+	$(ATARI_CC) $(TEST_FLAGS) $(TESTS_MODEL_FOLDER)\$(TCAMERA).c $(TEST_SRC) $(UNITY) -o $(TCAMERA).ut
+
+
+# TODO: For some of these, there is cascading dependencies on objects, eg chr
+# ----- Raster Test Builds ---------------------------------------------------
+$(TCLR_SCN): $(CLR_SCN).o
+	$(ATARI_CC) $(RASTER_TEST_FLAGS) $(TESTS_RASTER_FOLDER)\$(TCLR_SCN).c $(CLR_SCN).o $(UNITY) -o $(TCLR_SCN).ut
+
+$(TCLR_REG): $(CLR_REG).o
+	$(ATARI_CC) $(RASTER_TEST_FLAGS) $(TESTS_RASTER_FOLDER)\$(TCLR_REG).c $(CLR_REG).o $(UNITY) -o $(TCLR_REG).ut
+
+$(TPLT_PXL): $(PLT_PXL).o
+	$(ATARI_CC) $(RASTER_TEST_FLAGS) $(TESTS_RASTER_FOLDER)\$(TPLT_PXL).c $(PLT_PXL).o $(UNITY) -o $(TPLT_PXL).ut
+
+$(TPLT_HOR): $(PLT_HOR).o
+	$(ATARI_CC) $(RASTER_TEST_FLAGS) $(TESTS_RASTER_FOLDER)\$(TPLT_HOR).c $(PLT_HOR).o $(UNITY) -o $(TPLT_HOR).ut
+
+$(TPLT_VRT): $(PLT_VRT).o
+	$(ATARI_CC) $(RASTER_TEST_FLAGS) $(TESTS_RASTER_FOLDER)\$(TPLT_VRT).c $(PLT_VRT).o $(UNITY) -o $(TPLT_VRT).ut
+
+$(TPLT_LIN): $(PLT_LIN).o
+	$(ATARI_CC) $(RASTER_TEST_FLAGS) $(TESTS_RASTER_FOLDER)\$(TPLT_LIN).c $(PLT_LIN).o $(UNITY) -o $(TPLT_LIN).ut
+
+$(TPLT_REC): $(PLT_REC).o
+	$(ATARI_CC) $(RASTER_TEST_FLAGS) $(TESTS_RASTER_FOLDER)\$(TPLT_REC).c $(PLT_REC).o $(UNITY) -o $(TPLT_REC).ut
+
+$(TPLT_SQR): $(PLT_SQR).o
+	$(ATARI_CC) $(RASTER_TEST_FLAGS) $(TESTS_RASTER_FOLDER)\$(TPLT_SQR).c $(PLT_SQR).o $(UNITY) -o $(TPLT_SQR).ut
+
+$(TPLT_TRI): $(PLT_TRI).o $(PLT_HOR).o
+	$(ATARI_CC) $(RASTER_TEST_FLAGS) $(TESTS_RASTER_FOLDER)\$(TPLT_TRI).c $(PLT_TRI).o $(PLT_HOR).o $(UNITY) -o $(TPLT_TRI).ut
+
+$(TBMAP_8): $(BMAP_8).o $(BOUNDS).o $(PLT_CLIP).o
+	$(ATARI_CC) $(RASTER_TEST_FLAGS) $(TESTS_RASTER_FOLDER)\$(TBMAP_8).c $(BMAP_8).o $(BOUNDS).o $(PLT_CLIP).o $(UNITY) -o $(TBMAP_8).ut
+
+$(TBMAP_16): $(BMAP_16).o $(BOUNDS).o $(PLT_CLIP).o
+	$(ATARI_CC) $(RASTER_TEST_FLAGS) $(TESTS_RASTER_FOLDER)\$(TBMAP_16).c $(BMAP_16).o $(BOUNDS).o $(PLT_CLIP).o $(UNITY) -o $(TBMAP_16).ut
+
+$(TBMAP_32): $(BMAP_32).o $(BOUNDS).o $(PLT_CLIP).o
+	$(ATARI_CC) $(RASTER_TEST_FLAGS) $(TESTS_RASTER_FOLDER)\$(TBMAP_32).c $(BMAP_32).o $(BOUNDS).o $(PLT_CLIP).o $(UNITY) -o $(TBMAP_32).ut
+
+$(TPLT_CHR): $(PLT_CHR).o $(BMAP_8).o $(BOUNDS).o $(PLT_CLIP).o
+	$(ATARI_CC) $(RASTER_TEST_FLAGS) $(TESTS_RASTER_FOLDER)\$(TPLT_CHR).c $(PLT_CHR).o $(BMAP_8).o $(BOUNDS).o $(PLT_CLIP).o $(UNITY) -o $(TPLT_CHR).ut
+
+$(TPLT_STR): $(PLT_STR).o $(PLT_CHR).o $(BMAP_8).o $(BOUNDS).o $(PLT_CLIP).o
+	$(ATARI_CC) $(RASTER_TEST_FLAGS) $(TESTS_RASTER_FOLDER)\$(TPLT_STR).c $(PLT_STR).o $(PLT_CHR).o $(BMAP_8).o $(BOUNDS).o $(PLT_CLIP).o $(UNITY) -o $(TPLT_STR).ut
+
+$(TBOUNDS): $(BOUNDS).o
+	$(ATARI_CC) $(RASTER_TEST_FLAGS) $(TESTS_RASTER_FOLDER)\$(TBOUNDS).c $(BOUNDS).o $(UNITY) -o $(TBOUNDS).ut
+
+$(TPLT_CLIP): $(PLT_CLIP).o
+	$(ATARI_CC) $(RASTER_TEST_FLAGS) $(TESTS_RASTER_FOLDER)\$(TPLT_CLIP).c $(PLT_CLIP).o $(UNITY) -o $(TPLT_CLIP).ut
+
+
+# ----- Test Execution -------------------------------------------------------
+test: $(TBLOCK) $(TGEO) $(TLAVA) $(TLEVEL) $(TSPIKE) $(TWORLD) $(TCLR_SCN) $(TCLR_REG) $(TPLT_PXL) $(TPLT_HOR) $(TPLT_VRT) $(TPLT_LIN) $(TPLT_REC) $(TPLT_SQR) $(TPLT_TRI) $(TBMAP_8) $(TBMAP_16) $(TBMAP_32) $(TPLT_CHR) $(TPLT_STR) $(TBOUNDS) $(TPLT_CLIP)
+	$(TBLOCK).ut
+	$(TGEO).ut
+	$(TLAVA).ut
+	$(TLEVEL).ut
+	$(TSPIKE).ut
+	$(TWORLD).ut
+	$(TCLR_SCN).ut
+	$(TCLR_REG).ut
+	$(TPLT_PXL).ut
+	$(TPLT_HOR).ut
+	$(TPLT_VRT).ut
+	$(TPLT_LIN).ut
+	$(TPLT_REC).ut
+	$(TPLT_SQR).ut
+	$(TPLT_TRI).ut
+	$(TBMAP_8).ut
+	$(TBMAP_16).ut
+	$(TBMAP_32).ut
+	$(TPLT_CHR).ut
+	$(TPLT_STR).ut
+	$(TBOUNDS).ut
+	$(TPLT_CLIP).ut
+
+
+# ----- Raster Library Builds ------------------------------------------------
+$(CLR_SCN).o: $(RASTER_FOLDER)\$(CLR_SCN).s
+	$(ATARI_CC) $(SHARED_FLAGS) -c $(RASTER_FOLDER)\$(CLR_SCN).s -o $(CLR_SCN).o
+
+$(CLR_REG).o: $(RASTER_FOLDER)\$(CLR_REG).s
+	$(ATARI_CC) $(SHARED_FLAGS) -c $(RASTER_FOLDER)\$(CLR_REG).s -o $(CLR_REG).o
+
+$(PLT_PXL).o: $(RASTER_FOLDER)\$(PLT_PXL).s
+	$(ATARI_CC) $(SHARED_FLAGS) -c $(RASTER_FOLDER)\$(PLT_PXL).s -o $(PLT_PXL).o
+
+$(PLT_HOR).o: $(RASTER_FOLDER)\$(PLT_HOR).s
+	$(ATARI_CC) $(SHARED_FLAGS) -c $(RASTER_FOLDER)\$(PLT_HOR).s -o $(PLT_HOR).o
+
+$(PLT_VRT).o: $(RASTER_FOLDER)\$(PLT_VRT).s
+	$(ATARI_CC) $(SHARED_FLAGS) -c $(RASTER_FOLDER)\$(PLT_VRT).s -o $(PLT_VRT).o
+
+$(PLT_LIN).o: $(RASTER_FOLDER)\$(PLT_LIN).s
+	$(ATARI_CC) $(SHARED_FLAGS) -c $(RASTER_FOLDER)\$(PLT_LIN).s -o $(PLT_LIN).o
+
+$(PLT_REC).o: $(RASTER_FOLDER)\$(PLT_REC).s
+	$(ATARI_CC) $(SHARED_FLAGS) -c $(RASTER_FOLDER)\$(PLT_REC).s -o $(PLT_REC).o
+
+$(PLT_SQR).o: $(RASTER_FOLDER)\$(PLT_SQR).s
+	$(ATARI_CC) $(SHARED_FLAGS) -c $(RASTER_FOLDER)\$(PLT_SQR).s -o $(PLT_SQR).o
+
+$(PLT_TRI).o: $(RASTER_FOLDER)\$(PLT_TRI).s
+	$(ATARI_CC) $(SHARED_FLAGS) -c $(RASTER_FOLDER)\$(PLT_TRI).s -o $(PLT_TRI).o
+
+$(BMAP_8).o: $(RASTER_FOLDER)\$(BMAP_8).s
+	$(ATARI_CC) $(SHARED_FLAGS) -c $(RASTER_FOLDER)\$(BMAP_8).s -o $(BMAP_8).o
+
+$(BMAP_16).o: $(RASTER_FOLDER)\$(BMAP_16).s
+	$(ATARI_CC) $(SHARED_FLAGS) -c $(RASTER_FOLDER)\$(BMAP_16).s -o $(BMAP_16).o
+
+$(BMAP_32).o: $(RASTER_FOLDER)\$(BMAP_32).s
+	$(ATARI_CC) $(SHARED_FLAGS) -c $(RASTER_FOLDER)\$(BMAP_32).s -o $(BMAP_32).o
+
+$(PLT_CHR).o: $(RASTER_FOLDER)\$(PLT_CHR).s
+	$(ATARI_CC) $(SHARED_FLAGS) -c $(RASTER_FOLDER)\$(PLT_CHR).s -o $(PLT_CHR).o
+
+$(PLT_STR).o: $(RASTER_FOLDER)\$(PLT_STR).s
+	$(ATARI_CC) $(SHARED_FLAGS) -c $(RASTER_FOLDER)\$(PLT_STR).s -o $(PLT_STR).o
+
+$(BOUNDS).o: $(RASTER_FOLDER)\$(BOUNDS).s
+	$(ATARI_CC) $(SHARED_FLAGS) -c $(RASTER_FOLDER)\$(BOUNDS).s -o $(BOUNDS).o
+
+$(PLT_CLIP).o: $(RASTER_FOLDER)\$(PLT_CLIP).s
+	$(ATARI_CC) $(SHARED_FLAGS) -c $(RASTER_FOLDER)\$(PLT_CLIP).s -o $(PLT_CLIP).o
+
+
+# ----- Output ---------------------------------------------------------------
+# Otherwise the Make can think that the commands are files.
+.PHONY: test $(TBLOCK) $(TGEO) $(TLAVA) $(TLEVEL) $(TSPIKE) $(TWORLD) $(TCLR_SCN) $(TCLR_REG) $(TPLT_PXL) $(TPLT_HOR) $(TPLT_VRT) $(TPLT_LIN) $(TPLT_REC) $(TPLT_SQR) $(TPLT_TRI) $(TBMAP_8) $(TBMAP_16) $(TBMAP_32) $(TPLT_CHR) $(TPLT_STR) $(TBOUNDS) $(TPLT_CLIP)

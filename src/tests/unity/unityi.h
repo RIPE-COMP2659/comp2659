@@ -5,8 +5,8 @@
     SPDX-License-Identifier: MIT
 ========================================================================= */
 
-#ifndef UNITY_INTERNALS_H
-#define UNITY_INTERNALS_H
+#ifndef UNITYI_H
+#define UNITYI_H
 
 #ifdef UNITY_INCLUDE_CONFIG_H
 #include "unity_config.h"
