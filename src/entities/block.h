@@ -17,10 +17,10 @@
  *     A pointer to the block's sprite
 */
 typedef struct {
-  unsigned int x;
-  unsigned int y;
-  unsigned int size;
-  const unsigned int (*sprite)[BLOCK_SIZE / WORD];
+    unsigned int x;
+    unsigned int y;
+    unsigned int size;
+    const unsigned int (*sprite)[BLOCK_SIZE / WORD];
 } Block;
 
 /**
