@@ -3,7 +3,7 @@
 ;
 ; INPUT: Address(UINT32*): to the start of the screen
 ;        Position(row,col): the coordinates of the top left pixel of the region
-;        Length: the lenth (number of rows) in pixels of the region
+;        Length: the length (number of rows) in pixels of the region
 ;        Width: the width (number of columns) in pixels of the region
 ;
 ; OUTPUT: None
@@ -30,6 +30,11 @@ width   equ     18
 _clear_region:  
         link    a6,#0
         movem.l d0-d7/a0-a6,-(sp)
+
+        tst.w   length(a6)                      ; nothing to clear if length == 0
+        beq     done
+        tst.w   width(a6)                       ; nothing to clear if width == 0
+        beq     done
 
         movea.l base(a6),a0                     ; get base address
                 
@@ -72,33 +77,106 @@ row_loop_32: move.l d1,(a0)                     ; write 1 long (4 bytes)
         unlk    a6
         rts
 
-unoptimized:    
-                ; Generic clear region - calculate bytes needed for col through col+width-1
-                ; Formula: ceil((col+width)/8) - floor(col/8)
-                
-        move.w  col(a6),d6                      ; get col in pixels
-        add.w   width(a6),d6                    ; d6 = col + width
-        addq.w  #7,d6                           ; d6 = col + width + 7 (for ceiling division)
-        lsr.w   #3,d6                           ; d6 = (col + width + 7) / 8 = ceiling((col+width)/8)
-                
-        move.w  col(a6),d5                      ; get col in pixels  
-        lsr.w   #3,d5                           ; d5 = col / 8 = floor(col/8)
-                
-        sub.w   d5,d6                           ; d6 = ceiling - floor = num_bytes
-        subq.w  #1,d6                           ; adjust for dbra
-                
-        move.w  length(a6),d7                   ; outer loop: rows (in pixels)
+unoptimized:
+                ; Generic clear with edge masking for non-byte-aligned regions.
+                ; d2 = start_bit (col % 8)
+                ; d3 = end_bit ((col + width) % 8)
+                ; d6 = num_bytes = ceil((start_bit + width)/8)
+
+        move.w  col(a6),d2
+        andi.w  #7,d2                           ; d2 = start_bit
+
+        move.w  col(a6),d3
+        add.w   width(a6),d3
+        andi.w  #7,d3                           ; d3 = end_bit
+
+        move.w  d2,d6
+        add.w   width(a6),d6
+        addq.w  #7,d6
+        lsr.w   #3,d6                           ; d6 = number of bytes touched per row
+
+        move.w  length(a6),d7
         subq.w  #1,d7                           ; adjust for dbra
-                
-row_loop: movea.l a0,a1                         ; save row start position
-        move.w  d6,d5                           ; restore column counter
-                
-col_loop: clr.b (a1)+                           ; clear one byte, advance
-        dbra    d5,col_loop
-                
-        adda.w  #80,a0                          ; move to next row
+
+row_loop:
+        movea.l a0,a1                           ; row start pointer
+        move.w  d6,d5                           ; d5 = bytes remaining in this row
+
+        cmpi.w  #1,d5
+        beq     single_byte_row
+
+                ; First byte: partial clear if start_bit != 0, else full clear
+        tst.w   d2
+        beq     first_full_byte
+        moveq   #-1,d4
+        moveq   #8,d0
+        sub.w   d2,d0                           ; d0 = 8 - start_bit
+        lsl.w   d0,d4                           ; keep high bits before region start
+        and.b   d4,(a1)+
+        subq.w  #1,d5
+        bra     after_first_byte
+
+first_full_byte:
+        clr.b   (a1)+
+        subq.w  #1,d5
+
+after_first_byte:
+                ; Reserve last byte if it is partial
+        tst.w   d3
+        beq     clear_middle_and_last_full
+        subq.w  #1,d5
+
+clear_middle_partial_last:
+        tst.w   d5
+        beq     apply_last_partial
+clear_middle_partial_last_loop:
+        clr.b   (a1)+
+        subq.w  #1,d5
+        bne     clear_middle_partial_last_loop
+
+apply_last_partial:
+        move.w  #$00ff,d4
+        lsr.w   d3,d4                           ; keep low bits after region end
+        and.b   d4,(a1)
+        bra     next_row
+
+clear_middle_and_last_full:
+        tst.w   d5
+        beq     next_row
+clear_middle_and_last_full_loop:
+        clr.b   (a1)+
+        subq.w  #1,d5
+        bne     clear_middle_and_last_full_loop
+        bra     next_row
+
+single_byte_row:
+                ; Region fits in one byte: preserve bits before start and after end.
+                ; preserve_mask = high_preserve | low_preserve
+        moveq   #0,d4
+
+        tst.w   d2
+        beq     single_skip_high
+        moveq   #-1,d0
+        moveq   #8,d1
+        sub.w   d2,d1                           ; d1 = 8 - start_bit
+        lsl.w   d1,d0                           ; high_preserve
+        or.w    d0,d4
+
+single_skip_high:
+        tst.w   d3
+        beq     single_apply
+        move.w  #$00ff,d0
+        lsr.w   d3,d0                           ; low_preserve
+        or.w    d0,d4
+
+single_apply:
+        and.b   d4,(a1)
+
+next_row:
+        adda.w  #80,a0
         dbra    d7,row_loop
-                
+
+done:
         movem.l (sp)+,d0-d7/a0-a6
         unlk    a6
         rts

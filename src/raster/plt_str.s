@@ -28,7 +28,7 @@ CHAR_WIDTH equ  8                               ; characters are 8 pixels wide
 
 _plot_string:
         link    a6,#0
-        movem.l d0-d7/a0-a5,-(sp)
+        movem.l d0-d3/a0-a1,-(sp)
 
         move.l  str(a6),a5                      ; get string pointer into preserved register
         move.w  col(a6),d6                      ; current column position
@@ -54,7 +54,7 @@ char_loop:
         bra     char_loop
                 
 done:
-        movem.l (sp)+,d0-d7/a0-a5
+        movem.l (sp)+,d0-d3/a0-a1
         unlk    a6
         rts
 

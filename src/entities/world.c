@@ -24,7 +24,9 @@ World create_world(Level* levels, Geo geo, unsigned int ground_y) {
 World get_world(void) {
 	Level* levels = get_levels();
 	unsigned int ground_y = 32;
-	Geo geo = create_geo((SCREEN_WIDTH / 4), ground_y + GEO_SIZE, ground_y);
+    /* TODO: Should probably not be hard coded for starting x */
+    /* TODO: Added some additional height to test the start, can be removed */
+	Geo geo = create_geo(161, ground_y + GEO_SIZE + GEO_SIZE, ground_y);
 
 	return create_world(levels, geo, ground_y);
 }

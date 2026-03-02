@@ -22,6 +22,8 @@
         xref    _check_bounds
         xref    _plot_clipped_bitmap
 
+SCREEN_HEIGHT equ       400                             ; Screen height in pixels
+
 base    equ     8             
 row     equ     12               
 col     equ     14
@@ -39,6 +41,45 @@ _plot_bitmap_16:
 ;                       This will avoid read/writes to memory, which costs us clock cycles
 ;--------------------------------------------------------------------------------------------
                 ; Check bounds first
+
+
+ ; Vertical clipping first - check if top edge is off screen
+        move.w  row(a6),d0
+        bge.s   check_bottom                            ; If row >= 0, skip top clip
+
+                ; Handle top clipping (row < 0)
+        move.w  d0,d1
+        neg.w   d1                                      ; d1 = pixels off top (|row|)
+        cmp.w   height(a6),d1                           ; Is the whole bitmap off top?
+        bge     done                                    ; If so, entirely off screen, skip drawing
+
+                ; Partially off top
+        add.w   d0,height(a6)                           ; Decrease height by clipped rows
+        clr.w   row(a6)                                 ; Set row to 0 (top of screen)
+
+                ; Advance bitmap pointer (2 bytes per row for 16-bit)
+        move.l  bitmap(a6),a0
+        ext.l   d1                                      ; Extend word to long for address math
+        lsl.l   #1,d1                                   ; Multiply by 2 (2 bytes per row)
+        adda.l  d1,a0                                   ; Advance pointer
+        move.l  a0,bitmap(a6)                           ; Save updated bitmap pointer
+
+check_bottom:
+        move.w  row(a6),d0
+        cmp.w   #SCREEN_HEIGHT,d0
+        bge     done                                    ; If row >= SCREEN_HEIGHT, entirely off bottom
+
+        add.w   height(a6),d0                           ; d0 = row + height (bottom edge Y)
+        cmp.w   #SCREEN_HEIGHT,d0
+        ble.s   v_clip_done                             ; If bottom edge <= SCREEN_HEIGHT, skip bottom clip
+
+                ; Partially off bottom
+        move.w  #SCREEN_HEIGHT,d0
+        sub.w   row(a6),d0                              ; d0 = SCREEN_HEIGHT - row
+        move.w  d0,height(a6)                           ; Update height to fit exactly on screen
+
+v_clip_done:
+        
         move.w  #16,-(sp)                       ; push width (16 pixels)
         move.w  height(a6),-(sp)                ; push height
         move.w  col(a6),-(sp)                   ; push col
@@ -62,12 +103,17 @@ _plot_bitmap_16:
         mulu.w  #80,d0                          ; screen width in bytes
         adda.l  d0,a0                           ; add row offset
                 
-                ; Calculate and add col offset: col / 8 (pixels to bytes)
-        move.w  col(a6),d0
-        lsr.w   #3,d0                           ; divide by 8 (shift right 3 bits)
-        ext.l   d0                              ; extend to long
-        adda.l  d0,a0                           ; add col offset in bytes
+                ; Calculate col byte offset and bit shift
+        move.w  col(a6),d6                      ; d6 = col (pixel column)
+        move.w  d6,d5                           ; copy for bit calculation
+        lsr.w   #3,d6                           ; d6 = col / 8 (byte offset)
+        ext.l   d6
+        adda.l  d6,a0                           ; add col offset in bytes
                 
+        andi.w  #7,d5                           ; d5 = col % 8 (bit shift amount)
+        bne     unaligned_copy                  ; if not 0, need bit shifting
+                
+                ; BYTE-ALIGNED PATH (col % 8 == 0)
                 ; Check long word alignment for optimization
         move.l  a0,d1
         btst    #0,d1                           ; test if start address is odd
@@ -135,6 +181,58 @@ byte_loop: move.b (a1)+,(a0)+                   ; copy first byte
         move.b  (a1)+,(a0)                      ; copy second byte
         adda.w  #79,a0                          ; move to next row (80 - 1 already advanced)
         dbra    d7,byte_loop
+                
+        movem.l (sp)+,d0-d7/a0-a5
+        unlk    a6
+        rts
+
+unaligned_copy:
+                ; NON-BYTE-ALIGNED PATH (col % 8 != 0)
+                ; Need to shift bitmap and write across 3 bytes per row
+                ; d5 = bit shift amount (1-7)
+                ; a0 = screen start position
+                ; a1 = bitmap data
+                
+        move.w  height(a6),d7                   ; get height
+        subq.w  #1,d7                           ; adjust for dbra
+                
+                ; Calculate (8-d5) for left shifting
+        moveq   #8,d6
+        sub.w   d5,d6                           ; d6 = 8 - bit_shift
+                
+shift_loop_16:
+                ; Load 16-bit bitmap data
+        moveq   #0,d0
+        move.w  (a1)+,d0                        ; d0 = bitmap word (16 pixels)
+                
+                ; Extract bits that will overflow into the 3rd byte
+        move.l  d0,d1                           ; copy bitmap to d1
+        lsl.l   d6,d1                           ; shift left to move overflow bits to high position
+                ; d1 now has the overflow bits in the low byte
+                
+                ; Shift the main bitmap data right by bit_shift
+        lsr.l   d5,d0                           ; shift right by bit_shift
+                
+                ; Byte 0 (leftmost) - needs masking to preserve high bits
+        moveq   #-1,d4                          ; start with all 1s
+        lsl.w   d6,d4                           ; shift left by (8-d5) to create mask for high bits
+        and.b   d4,(a0)                         ; preserve the high bits
+        move.l  d0,d3                           ; copy to d3
+        lsr.l   #8,d3                           ; shift right 8 bits to get high byte
+        or.b    d3,(a0)                         ; OR into screen byte 0
+                
+                ; Byte 1 (middle) - fully overwritten
+        clr.b   1(a0)                           ; clear the byte first
+        or.b    d0,1(a0)                        ; OR into screen byte 1 (low byte of d0)
+                
+                ; Byte 2 (rightmost) - needs masking to preserve low bits
+        move.l  #$ff,d4                         ; start with 0x000000FF
+        lsr.l   d5,d4                           ; shift right by d5 to create mask for low bits
+        and.b   d4,2(a0)                        ; preserve the low bits
+        or.b    d1,2(a0)                        ; OR overflow bits into screen byte 2
+                
+        adda.w  #80,a0                          ; move to next row
+        dbra    d7,shift_loop_16
                 
         movem.l (sp)+,d0-d7/a0-a5
         unlk    a6
