@@ -13,6 +13,7 @@ void test_rendering(UINT32 *base, Model model)
     World *world = &model.world;
     unsigned int i;
     unsigned int w_iter;
+    int input;
 
     for (w_iter = 0; w_iter < 200; w_iter++) {
         model_update(&model);
@@ -49,6 +50,13 @@ void test_rendering(UINT32 *base, Model model)
         printf("Geo is_landed: %d\n", world->geo.is_landed);
         printf("Geo is_dead: %d\n", world->geo.is_dead);
         printf("Geo ground_y: %d\n", world->geo.ground_y);
+
+        /* Temporary */
+        input = Cnecin();
+        printf("Input: %d\n", input);
+        if (input == 32) { /* ESC key to exit */
+            geo_jump(&world->geo);
+        }
         Cnecin();
     }
 }
