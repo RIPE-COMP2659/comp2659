@@ -1,6 +1,6 @@
 #include <stdio.h> /* Temporary printf import */
 #include <osbind.h>
-#include "entities/world.h"
+#include "entities/model.h"
 #include "raster/raster.h"
 
 #define BYTES_PER_SCREEN 32000
@@ -8,43 +8,44 @@
 /* Only works on Atari ST, comment out starting here */
 /* End commenting out here */
 
-void test_rendering(UINT32 *base, World world)
+void test_rendering(UINT32 *base, Model model)
 {
+    World *world = &model.world;
     unsigned int i;
     unsigned int w_iter;
 
     for (w_iter = 0; w_iter < 200; w_iter++) {
-        world_update(&world, 0);
+        model_update(&model);
 
         clear_screen(base);
 
         /* Test Plotting Ground */
         /* TODO: These are getting incompatible pointer type warnings, left for another time, it works */
         /* TODO: Without hardcoding 0, this causes a crash. */
-        plot_rectangle((UINT32 *)base, camera_get_relative_y(&world.camera, world.ground_y), 0, 4, SCREEN_WIDTH);
+        plot_rectangle((UINT32 *)base, camera_get_relative_y(&world->camera, world->ground_y), 0, 4, SCREEN_WIDTH);
 
         /* Test Blocks */
-        for (i = world.cam_min_bi; i < world.cam_max_bi; i++) {
-            Block block = world.levels[0].blocks[i];
-            plot_bitmap_32((UINT8 *)base, camera_get_relative_y(&world.camera, block.y), camera_get_relative_x(&world.camera, block.x), block.sprite, block.size);
+        for (i = world->cam_min_bi; i < world->cam_max_bi; i++) {
+            Block block = world->levels[0].blocks[i];
+            plot_bitmap_32((UINT8 *)base, camera_get_relative_y(&world->camera, block.y), camera_get_relative_x(&world->camera, block.x), block.sprite, block.size);
         }
 
         /* Test Spikes */
-        for (i = world.cam_min_si; i < world.cam_max_si; i++) {
-            Spike spike = world.levels[0].spikes[i];
-            plot_bitmap_32((UINT8 *)base, camera_get_relative_y(&world.camera, spike.y), camera_get_relative_x(&world.camera, spike.x), spike.sprite, spike.size);
+        for (i = world->cam_min_si; i < world->cam_max_si; i++) {
+            Spike spike = world->levels[0].spikes[i];
+            plot_bitmap_32((UINT8 *)base, camera_get_relative_y(&world->camera, spike.y), camera_get_relative_x(&world->camera, spike.x), spike.sprite, spike.size);
         }
 
         /* Test Lava */
-        for (i = world.cam_min_li; i < world.cam_max_li; i++) {
-            Lava lava = world.levels[0].lava[i];
-            plot_bitmap_32((UINT8 *)base, camera_get_relative_y(&world.camera, lava.y), camera_get_relative_x(&world.camera, lava.x), lava.sprite, lava.size);
+        for (i = world->cam_min_li; i < world->cam_max_li; i++) {
+            Lava lava = world->levels[0].lava[i];
+            plot_bitmap_32((UINT8 *)base, camera_get_relative_y(&world->camera, lava.y), camera_get_relative_x(&world->camera, lava.x), lava.sprite, lava.size);
         }
 
         /* Test Geo */
-        plot_bitmap_32((UINT8 *)base, camera_get_relative_y(&world.camera, world.geo.y), camera_get_relative_x(&world.camera, world.geo.x), world.geo.sprite, world.geo.size);
+        plot_bitmap_32((UINT8 *)base, camera_get_relative_y(&world->camera, world->geo.y), camera_get_relative_x(&world->camera, world->geo.x), world->geo.sprite, world->geo.size);
 
-        printf("Geo x: %d\n", world.geo.x);
+        printf("Geo x: %d\n", world->geo.x);
         Cnecin();
     }
 }
@@ -98,9 +99,10 @@ void test_clear_region(UINT8 *base)
 int main(void) {
     /* For now, just a placeholder */
     UINT8 *base = (UINT8 *)Physbase();
-    World world = get_world();
+    Model model = get_model();
+    World *world = &model.world;
 
-    test_rendering((UINT32 *)base, world);
+    test_rendering((UINT32 *)base, model);
 
     disable_cursor();
 
@@ -117,47 +119,47 @@ int main(void) {
     printf("Running main!\n");
 
     printf("Level has %u block size \n", 
-        world.levels[0].blocks[0].size
+        world->levels[0].blocks[0].size
     );
 
-    printf("Geo x: %d\n", world.geo.x);
-    printf("Geo y: %d\n", world.geo.y);
-    printf("Geo dx: %d\n", world.geo.dx);
-    printf("Geo dy: %d\n", world.geo.dy);
-    printf("Geo ddy: %d\n", world.geo.ddy);
-    printf("Geo is_landed: %d\n", world.geo.is_landed);
+    printf("Geo x: %d\n", world->geo.x);
+    printf("Geo y: %d\n", world->geo.y);
+    printf("Geo dx: %d\n", world->geo.dx);
+    printf("Geo dy: %d\n", world->geo.dy);
+    printf("Geo ddy: %d\n", world->geo.ddy);
+    printf("Geo is_landed: %d\n", world->geo.is_landed);
 
-    geo_update(&world.geo);
-    printf("Geo is_landed: %d\n", world.geo.is_landed);
-    geo_update(&world.geo);
-    printf("Geo is_landed: %d\n", world.geo.is_landed);
-    geo_update(&world.geo);
+    geo_update(&world->geo);
+    printf("Geo is_landed: %d\n", world->geo.is_landed);
+    geo_update(&world->geo);
+    printf("Geo is_landed: %d\n", world->geo.is_landed);
+    geo_update(&world->geo);
 
-    printf("Geo x: %d\n", world.geo.x);
-    printf("Geo y: %d\n", world.geo.y);
-    printf("Geo dx: %d\n", world.geo.dx);
-    printf("Geo dy: %d\n", world.geo.dy);
-    printf("Geo ddy: %d\n", world.geo.ddy);
-    printf("Geo is_landed: %d\n", world.geo.is_landed);
+    printf("Geo x: %d\n", world->geo.x);
+    printf("Geo y: %d\n", world->geo.y);
+    printf("Geo dx: %d\n", world->geo.dx);
+    printf("Geo dy: %d\n", world->geo.dy);
+    printf("Geo ddy: %d\n", world->geo.ddy);
+    printf("Geo is_landed: %d\n", world->geo.is_landed);
 
-    geo_jump(&world.geo);
-    geo_update(&world.geo);
+    geo_jump(&world->geo);
+    geo_update(&world->geo);
 
-    printf("Geo x after jump and move: %d\n", world.geo.x);
-    printf("Geo y after jump and move: %d\n", world.geo.y);
-    printf("Geo dx: %d\n", world.geo.dx);
-    printf("Geo dy: %d\n", world.geo.dy);
-    printf("Geo ddy: %d\n", world.geo.ddy);
-    printf("Geo is_landed: %d\n", world.geo.is_landed);
+    printf("Geo x after jump and move: %d\n", world->geo.x);
+    printf("Geo y after jump and move: %d\n", world->geo.y);
+    printf("Geo dx: %d\n", world->geo.dx);
+    printf("Geo dy: %d\n", world->geo.dy);
+    printf("Geo ddy: %d\n", world->geo.ddy);
+    printf("Geo is_landed: %d\n", world->geo.is_landed);
 
-    geo_jump(&world.geo);
-    geo_jump(&world.geo);
-    geo_jump(&world.geo);
-    geo_update(&world.geo);
+    geo_jump(&world->geo);
+    geo_jump(&world->geo);
+    geo_jump(&world->geo);
+    geo_update(&world->geo);
 
-    printf("Geo x after move: %d\n", world.geo.x);
-    printf("Geo y after move: %d\n", world.geo.y);
-    printf("Geo is_landed: %d\n", world.geo.is_landed);
+    printf("Geo x after move: %d\n", world->geo.x);
+    printf("Geo y after move: %d\n", world->geo.y);
+    printf("Geo is_landed: %d\n", world->geo.is_landed);
 
     return 0;
 }
