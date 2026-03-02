@@ -444,10 +444,10 @@ void test_plot_bitmap_8(UINT8 *base)
     plot_bitmap_8(base, 10, 25, smiley, 8);
 
     /* Test 4: Various positions across the screen */
-    plot_bitmap_8(base, 30, 0, cross, 8);
-    plot_bitmap_8(base, 30, 10, diagonal, 8);
-    plot_bitmap_8(base, 30, 20, checkerboard, 8);
-    plot_bitmap_8(base, 30, 30, smiley, 8);
+    plot_bitmap_8(base, 100, 100, solid_block, 8);
+    plot_bitmap_8(base, 108, 101, solid_block, 8);
+    plot_bitmap_8(base, 116, 102, solid_block, 8);
+    plot_bitmap_8(base, 30, 30, solid_block, 8);
 
     /* Test 5: Larger bitmap (even height, optimized) */
     plot_bitmap_8(base, 50, 8, arrow_down, 16);
@@ -598,9 +598,9 @@ void test_plot_bitmap_16(UINT8 *base)
     plot_bitmap_16(base, 10, 48, smiley_16, 16);
 
     /* Test 4: Various positions across the screen */
-    plot_bitmap_16(base, 30, 0, frame_16, 16);
-    plot_bitmap_16(base, 30, 20, diamond_16, 16);
-    plot_bitmap_16(base, 30, 40, checkerboard_16, 8);
+    plot_bitmap_16(base, 100, 100, solid_block_16, 16);
+    plot_bitmap_16(base, 116, 101, solid_block_16, 16);
+    plot_bitmap_16(base, 132, 102, solid_block_16, 8);
 
     /* Test 5: Multiple bitmaps in a row */
     plot_bitmap_16(base, 60, 0, solid_block_16, 8);
@@ -625,7 +625,6 @@ void test_plot_bitmap_16(UINT8 *base)
     plot_bitmap_16(base, 170, 48, diamond_16, 16);
 
     /* Test 9: Bounds checking - LEFT EDGE offsets (safe vertical: y=50-100) */
-    clear_screen((UINT32 *)base);
     plot_bitmap_16(base, 50, -16, solid_block_16, 8);  /* x=-16: 16px off */
     plot_bitmap_16(base, 60, -14, checkerboard_16, 8); /* x=-14: 14px off */
     plot_bitmap_16(base, 70, -12, frame_16, 16);       /* x=-12: 12px off */
