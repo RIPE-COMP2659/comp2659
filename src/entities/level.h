@@ -24,5 +24,5 @@ Level create_level(
 );
 Level get_level1(void);
 Level get_level2(void);
-Level *get_levels(void);
+Level* get_levels(void);
 void level_placeholder(void);
