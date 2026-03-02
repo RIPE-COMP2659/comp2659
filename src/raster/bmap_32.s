@@ -274,7 +274,7 @@ shift_loop_32:
         or.b    d0,3(a0)                        ; OR into screen byte 3 (low byte of d0)
                 
                 ; Byte 4 (rightmost, overflow bits) - needs masking to preserve low bits
-        move.l  #$ff,d4                         ; start with 0x000000FF
+        move.l  #$ff,d4                         ; start with 0x0000FF
         lsr.l   d5,d4                           ; shift right by d5 to create mask for low (8-d5) bits
         and.b   d4,4(a0)                        ; preserve the low bits
                 ; d1 already has overflow bits in low byte bits 7-5 from the lsl.l above
