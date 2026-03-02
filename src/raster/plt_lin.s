@@ -10,200 +10,165 @@
 ;
 ; void plot_line(UINT32 *base, UINT16 start_row, UINT16 start_col, UINT16 end_row, UINT16 end_col, UINT16 color);
 ;________________________________________________________________
-; Implements Bresenham's line drawing algorithm
-;
-;                                   --- Using the routine is not recommended. ---
-;
-; Source: https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
-;
-; Contact @sudonym-i if you will need to use this routine.
+; Implements Bresenham's line drawing algorithm with per-pixel clipping.
 
-        xdef    _plot_line
-
-base    equ     8               
-start_row equ   12              
-start_col equ   14              
-end_row equ     16              
-end_col equ     18              
-color   equ     20             
-
+	xdef	_plot_line
 
 _plot_line:
-        link    a6,#0
-        movem.l d0-d7/a0-a1,-(sp)
-                
-                ; Save color in a1 (using address register to free up data registers)
-        move.w  color(a6),d0
-        andi.w  #1,d0                           ; ensure color is 0 or 1
-        movea.w d0,a1                           ; a1 = color (preserved)
-                
-                ; Initialize current position
-        move.w  start_row(a6),d4                ; current_row
-        move.w  start_col(a6),d5                ; current_col
-                
-                ; Calculate dx = abs(end_col - start_col)
-        move.w  end_col(a6),d0
-        move.w  start_col(a6),d1
-        sub.w   d1,d0                           ; d0 = end_col - start_col
-        bge.s   dx_positive
-        neg.w   d0                              ; d0 = abs(dx)
+	link	a6,#0
+	movem.l	d0-d7/a0-a1,-(sp)
+		
+	; Save color in a1
+	move.w	20(a6),d0			; color
+	andi.w	#1,d0				; ensure color is 0 or 1
+	movea.w	d0,a1				; a1 = color (preserved)
+		
+	; Initialize current position
+	move.w	12(a6),d4			; d4 = current_row
+	move.w	14(a6),d5			; d5 = current_col
+		
+	; Calculate dx = abs(end_col - start_col)
+	move.w	18(a6),d0			; end_col
+	move.w	14(a6),d1			; start_col
+	sub.w	d1,d0				; d0 = end_col - start_col
+	bge	dx_positive
+	neg.w	d0				; d0 = abs(dx)
 dx_positive:
-        move.w  d0,d6                           ; d6 = dx (preserved)
-                
-                ; Calculate dy = abs(end_row - start_row)
-        move.w  end_row(a6),d0
-        move.w  start_row(a6),d1
-        sub.w   d1,d0                           ; d0 = end_row - start_row
-        bge.s   dy_positive
-        neg.w   d0                              ; d0 = abs(dy)
+	move.w	d0,d6				; d6 = dx
+		
+	; Calculate dy = abs(end_row - start_row)
+	move.w	16(a6),d0			; end_row
+	move.w	12(a6),d1			; start_row
+	sub.w	d1,d0				; d0 = end_row - start_row
+	bge	dy_positive
+	neg.w	d0				; d0 = abs(dy)
 dy_positive:
-        move.w  d0,d7                           ; d7 = dy (preserved)
-                
-                ; Determine step direction for x (col)
-        move.w  end_col(a6),d0
-        cmp.w   start_col(a6),d0
-        bge.s   step_x_positive
-        moveq   #-1,d2                          ; step_x = -1
-        bra.s   check_y_step
-step_x_positive:
-        moveq   #1,d2                           ; step_x = 1
-                
+	move.w	d0,d7				; d7 = dy
+		
+	; Determine step direction for x (col)
+	moveq	#1,d2				; step_x = 1
+	move.w	18(a6),d0
+	cmp.w	14(a6),d0
+	bge	check_y_step
+	moveq	#-1,d2				; step_x = -1
+		
 check_y_step:
-                ; Determine step direction for y (row)
-        move.w  end_row(a6),d0
-        cmp.w   start_row(a6),d0
-        bge.s   step_y_positive
-        moveq   #-1,d3                          ; step_y = -1
-        bra.s   init_bresenham
-step_y_positive:
-        moveq   #1,d3                           ; step_y = 1
-                
+	; Determine step direction for y (row)
+	moveq	#1,d3				; step_y = 1
+	move.w	16(a6),d0
+	cmp.w	12(a6),d0
+	bge	init_bresenham
+	moveq	#-1,d3				; step_y = -1
+		
 init_bresenham:
-                ; Register allocation:
-                ; a1 = color (preserved)
-                ; d1 = error
-                ; d2 = step_x, d3 = step_y
-                ; d4 = current_row, d5 = current_col
-                ; d6 = dx (preserved), d7 = dy (preserved)
-                
-                ; Determine if line is more horizontal or vertical
-        cmp.w   d7,d6
-        bge     horiz_line                      ; if dx >= dy, horizontal-ish
-                
-                ; Vertical-ish line (dy > dx)
-                ; error = dx - dy
-        move.w  d6,d1
-        sub.w   d7,d1                           ; d1 = error
-                
-vert_loop:
-                ; Plot pixel at (d4, d5) with color in a1
-        movea.l base(a6),a0
-                
-                ; Calculate row offset: row * 80
-        move.w  d4,d0
-        mulu.w  #80,d0
-        adda.l  d0,a0
-                
-                ; Calculate col byte offset: col / 8
-        move.w  d5,d0
-        lsr.w   #3,d0
-        adda.w  d0,a0
-                
-                ; Calculate bit position: 7 - (col % 8)
-        move.w  d5,d0
-        andi.w  #7,d0
-        neg.w   d0
-        addi.w  #7,d0                           ; d0 = bit position
-                
-                ; Plot the pixel with the stored color
-        move.w  a1,-(sp)                        ; push color onto stack
-        tst.w   (sp)+                           ; test and pop
-        beq.s   vert_plot_black
-        bset    d0,(a0)                         ; white
-        bra.s   vert_check_end
-vert_plot_black:
-        bclr    d0,(a0)                         ; black
-                
-vert_check_end:
-                ; Check if we've reached the end
-        cmp.w   end_row(a6),d4
-        beq     line_done
-                
-                ; Update error and position
-        tst.w   d1
-        bmi.s   vert_no_x_step
-                
-                ; error >= 0: step in x direction
-        add.w   d2,d5                           ; current_col += step_x
-        move.w  d7,d0
-        lsl.w   #1,d0
-        sub.w   d0,d1                           ; error -= 2*dy
-                
-vert_no_x_step:
-        add.w   d3,d4                           ; current_row += step_y
-        move.w  d6,d0
-        lsl.w   #1,d0
-        add.w   d0,d1                           ; error += 2*dx
-        bra     vert_loop
-                
-horiz_line:
-                ; Horizontal-ish line (dx >= dy)
-                ; error = dy - dx
-        move.w  d7,d1
-        sub.w   d6,d1                           ; d1 = error
-                
-horiz_loop:
-                ; Plot pixel at (d4, d5) with color in a1
-        movea.l base(a6),a0
-                
-                ; Calculate row offset: row * 80
-        move.w  d4,d0
-        mulu.w  #80,d0
-        adda.l  d0,a0
-                
-                ; Calculate col byte offset: col / 8
-        move.w  d5,d0
-        lsr.w   #3,d0
-        adda.w  d0,a0
-                
-                ; Calculate bit position: 7 - (col % 8)
-        move.w  d5,d0
-        andi.w  #7,d0
-        neg.w   d0
-        addi.w  #7,d0                           ; d0 = bit position
-                
-                ; Plot the pixel with the stored color
-        move.w  a1,-(sp)                        ; push color onto stack
-        tst.w   (sp)+                           ; test and pop
-        beq.s   horiz_plot_black
-        bset    d0,(a0)                         ; white
-        bra.s   horiz_check_end
-horiz_plot_black:
-        bclr    d0,(a0)                         ; black
-                
-horiz_check_end:
-                ; Check if we've reached the end
-        cmp.w   end_col(a6),d5
-        beq.s   line_done
-                
-                ; Update error and position
-        tst.w   d1
-        bmi.s   horiz_no_y_step
-                
-                ; error >= 0: step in y direction
-        add.w   d3,d4                           ; current_row += step_y
-        move.w  d6,d0
-        lsl.w   #1,d0
-        sub.w   d0,d1                           ; error -= 2*dx
-                
-horiz_no_y_step:
-        add.w   d2,d5                           ; current_col += step_x
-        move.w  d7,d0
-        lsl.w   #1,d0
-        add.w   d0,d1                           ; error += 2*dy
-        bra.s   horiz_loop
-                
+	; Register allocation:
+	; a1 = color (preserved)
+	; d1 = error
+	; d2 = step_x, d3 = step_y
+	; d4 = current_row, d5 = current_col
+	; d6 = dx (preserved), d7 = dy (preserved)
+
+	; Determine if line is more horizontal or vertical
+	cmp.w	d7,d6
+	blt	v_loop_start			; if dx < dy, go to vertical loop
+		
+h_loop_start:
+	; Horizontal-ish line (dx >= dy)
+	; error = 2*dy - dx
+	move.w	d7,d1
+	lsl.w	#1,d1
+	sub.w	d6,d1				; d1 = 2dy - dx
+h_loop:
+	bsr	plot_pixel_clipped
+	cmp.w	18(a6),d5			; current_col == end_col?
+	beq	line_done
+	
+	tst.w	d1				; error < 0?
+	blt	h_no_y
+	
+	add.w	d3,d4				; row += step_y
+	move.w	d7,d0
+	sub.w	d6,d0				; dy - dx
+	lsl.w	#1,d0				; 2(dy - dx)
+	add.w	d0,d1				; error += 2(dy - dx)
+	bra	h_step_x
+h_no_y:
+	move.w	d7,d0
+	lsl.w	#1,d0				; 2*dy
+	add.w	d0,d1				; error += 2*dy
+h_step_x:
+	add.w	d2,d5				; col += step_x
+	bra	h_loop
+
+v_loop_start:
+	; Vertical-ish line (dy > dx)
+	; error = 2*dx - dy
+	move.w	d6,d1
+	lsl.w	#1,d1
+	sub.w	d7,d1				; d1 = 2dx - dy
+v_loop:
+	bsr	plot_pixel_clipped
+	cmp.w	16(a6),d4			; current_row == end_row?
+	beq	line_done
+	
+	tst.w	d1				; error < 0?
+	blt	v_no_x
+	
+	add.w	d2,d5				; col += step_x
+	move.w	d6,d0
+	sub.w	d7,d0				; dx - dy
+	lsl.w	#1,d0				; 2(dx - dy)
+	add.w	d0,d1				; error += 2(dx - dy)
+	bra	v_step_y
+v_no_x:
+	move.w	d6,d0
+	lsl.w	#1,d0				; 2*dx
+	add.w	d0,d1				; error += 2*dx
+v_step_y:
+	add.w	d3,d4				; row += step_y
+	bra	v_loop
+
 line_done:
-        movem.l (sp)+,d0-d7/a0-a1
-        unlk    a6
-        rts
+	movem.l	(sp)+,d0-d7/a0-a1
+	unlk	a6
+	rts
+
+; --- Internal Helper: Plot Pixel at (d4, d5) with Clipping ---
+plot_pixel_clipped:
+	; Bounds checking
+	tst.w	d4				; row < 0?
+	blt	pixel_out
+	cmpi.w	#400,d4				; row >= 400?
+	bge	pixel_out
+	tst.w	d5				; col < 0?
+	blt	pixel_out
+	cmpi.w	#640,d5				; col >= 640?
+	bge	pixel_out
+
+	; Pixel is on screen, calculate address and plot
+	movem.l	d0-d1/a0,-(sp)			; preserve working registers
+	movea.l	8(a6),a0			; base address
+	
+	move.w	d4,d0				; row
+	mulu.w	#80,d0				; row * 80 bytes
+	adda.l	d0,a0
+	
+	move.w	d5,d0				; col
+	move.w	d0,d1				; copy col for bit math
+	lsr.w	#3,d0				; col / 8 (byte offset)
+	adda.w	d0,a0				; a0 = final byte address
+	
+	andi.w	#7,d1				; col % 8
+	not.w	d1
+	andi.w	#7,d1				; bit position = 7 - (col % 8)
+	
+	move.w	a1,d0				; check color
+	beq	plot_pixel_black
+	bset	d1,(a0)				; set bit to 1 (white)
+	bra	plot_pixel_exit
+plot_pixel_black:
+	bclr	d1,(a0)				; clear bit to 0 (black)
+plot_pixel_exit:
+	movem.l	(sp)+,d0-d1/a0			; restore registers
+pixel_out:
+	rts

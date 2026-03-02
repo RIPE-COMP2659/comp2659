@@ -52,7 +52,7 @@ plot_left_clip:
         move.w  width(a6),d4                    ; original bitmap width
 
         ; Adjust bitmap pointer: skip (abs(col)/8) bytes per row
-                ; For simplicity, we'll handle this in the plotting routine
+                ; This will be handled in the plotting routine
         bsr     do_plot_left_clip
         bra     done_clip
 
