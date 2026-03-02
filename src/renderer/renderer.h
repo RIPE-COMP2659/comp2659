@@ -1,7 +1,7 @@
 #ifndef RENDERER_H
 #define RENDERER_H
 
-#include "../entities/world.h"
+#include "../model/world.h"
 #include "../raster/raster.h"
 
 /* * Master render function: Renders a single frame based on the world snapshot. */

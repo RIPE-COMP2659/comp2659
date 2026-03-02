@@ -1,10 +1,36 @@
-#include <stdio.h>
+#include <stdio.h> /* Temporary printf import */
 #include <osbind.h>
-#include "entities/model.h"
+#include "model/model.h"
 #include "raster/raster.h"
 #include "renderer/renderer.h"
 
 #define BYTES_PER_SCREEN 32000
+
+/* Only works on Atari ST, comment out starting here */
+/* End commenting out here */
+
+void test_rendering(UINT8 *base, Model *model)
+{
+    World *world = &model->world;
+    unsigned int w_iter;
+
+    for (w_iter = 0; w_iter < 200; w_iter++) {
+        /* 1. Update Model Logic */
+        model_update(model);
+
+        /* 2. Clear Buffer */
+        clear_screen((UINT32 *)base);
+
+        /* 3. Render World State using the new renderer module */
+        render(world, base);
+
+        /* Debug Info */
+        printf("Geo x: %d (Frame: %d)\n", world->geo.x, w_iter);
+        
+        /* Wait for input to step through frames (optional) */
+        /* Cnecin(); */
+    }
+}
 
 void disable_cursor()
 {
@@ -50,34 +76,15 @@ void test_clear_region(UINT8 *base)
     clear_region((UINT32 *)base, 200, 5, 15, 4);
 }
 
-void test_rendering(UINT8 *base, Model *model)
-{
-    World *world = &model->world;
-    unsigned int w_iter;
-
-    for (w_iter = 0; w_iter < 200; w_iter++) {
-        /* 1. Update Model Logic */
-        model_update(model);
-
-        /* 2. Clear Buffer */
-        clear_screen((UINT32 *)base);
-
-        /* 3. Render World State */
-        render(world, base);
-
-        /* Debug Info */
-        printf("Geo x: %d (Frame: %d)\n", world->geo.x, w_iter);
-        
-        /* Wait for input to step through frames */
-        Cnecin();
-    }
-}
-
 int main(void) {
+    /* For now, just a placeholder */
     UINT8 *base = (UINT8 *)Physbase();
     Model model = get_model();
     World *world = &model.world;
 
+    /* Run the rendering test loop (now properly encapsulated) */
+    test_rendering(base, &model);
+    
     disable_cursor();
 
     /* Test 1: Clear Screen */
@@ -90,12 +97,8 @@ int main(void) {
     test_clear_region(base);
     Cnecin();
 
-    printf("Running main rendering test!\n");
+    printf("Running main!\n");
 
-    /* Test 3: Run the 200-frame rendering loop */
-    test_rendering(base, &model);
-
-    /* Test 4: Physical logic verification */
     printf("Level has %u block size \n", 
         world->levels[0].blocks[0].size
     );
