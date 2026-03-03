@@ -11,12 +11,18 @@ World create_world(Level* levels, Geo geo, unsigned int ground_y) {
     world.geo = geo;
     world.camera = create_camera(0, SCREEN_HEIGHT);
     world.ground_y = ground_y;
-    world.cam_min_bi = 0; /* block index */
-    world.cam_max_bi = 0; /* block index */
-    world.cam_min_si = 0; /* spike index */
-    world.cam_max_si = 0; /* spike index */
-    world.cam_min_li = 0; /* lava index */
-    world.cam_max_li = 0; /* lava index */
+    world.cam_min_bi = 0; /* block index, camera */
+    world.cam_max_bi = 0; /* block index, camera */
+    world.cam_min_si = 0; /* spike index, camera */
+    world.cam_max_si = 0; /* spike index, camera */
+    world.cam_min_li = 0; /* lava index, camera */
+    world.cam_max_li = 0; /* lava index, camera */
+    world.col_min_bi = 0; /* block index, collision */
+    world.col_max_bi = 0; /* block index, collision */
+    world.col_min_si = 0; /* spike index, collision */
+    world.col_max_si = 0; /* spike index, collision */
+    world.col_min_li = 0; /* lava index, collision */
+    world.col_max_li = 0; /* lava index, collision */
 
     world_update_camera(&world, 0);
 
@@ -28,6 +34,7 @@ void world_update(World *world, unsigned int level_index) {
     geo_update(&world->geo);
     camera_update_coordinates(&world->camera, world->geo.x - CAMERA_OFFSET, SCREEN_HEIGHT);
     world_update_camera(world, level_index);
+    world_update_collisions(world, level_index);
 }
 
 World get_world(void) {
@@ -41,11 +48,12 @@ World get_world(void) {
 }
 
 /* Generic helper function to update camera indices for any entity type */
-static void update_camera_indices(
-    unsigned int *cam_min,
-    unsigned int *cam_max,
-    unsigned int camera_left,
-    unsigned int camera_right,
+/* Generic helper function to update entity indices within a given range */
+static void update_entity_indices(
+    unsigned int *min,
+    unsigned int *max,
+    unsigned int range_left,
+    unsigned int range_right,
     unsigned int entity_count,
     unsigned int (*get_x)(void*, unsigned int),
     unsigned int (*get_size)(void*, unsigned int),
@@ -53,22 +61,22 @@ static void update_camera_indices(
 ) {
     unsigned int i;
 
-    /* Find max first: iterate from current max to find last entity with left edge on screen */
-    i = *cam_max;
-    while (i <= entity_count && get_x(entities, i) < camera_right) {
+    /* Find max first: iterate from current max to find last entity with left edge within range */
+    i = *max;
+    while (i <= entity_count && get_x(entities, i) < range_right) {
         i++;
     }
 
-    /* Set max to the last entity before the one that's off screen */
-    *cam_max = (i > 0) ? i - 1 : 0;
+    /* Set max to the last entity before the one that's out of range */
+    *max = (i > 0) ? i - 1 : 0;
 
-    /* Find min: iterate from current min (up to new max) to find first entity with right edge on screen */
-    i = *cam_min;
-    while (i <= *cam_max && get_x(entities, i) + get_size(entities, i) <= camera_left) {
+    /* Find min: iterate from current min (up to new max) to find first entity with right edge within range */
+    i = *min;
+    while (i <= *max && get_x(entities, i) + get_size(entities, i) <= range_left) {
         i++;
     }
 
-    *cam_min = i;
+    *min = i;
 }
 
 /* Helper functions for blocks */
@@ -109,7 +117,7 @@ void world_update_camera_bi(World *world, unsigned int level_index) {
     unsigned int camera_left = world->camera.x;
     unsigned int camera_right = world->camera.x + world->camera.width;
 
-    update_camera_indices(
+    update_entity_indices(
         &world->cam_min_bi,
         &world->cam_max_bi,
         camera_left,
@@ -126,7 +134,7 @@ void world_update_camera_si(World *world, unsigned int level_index) {
     unsigned int camera_left = world->camera.x;
     unsigned int camera_right = world->camera.x + world->camera.width;
 
-    update_camera_indices(
+    update_entity_indices(
         &world->cam_min_si,
         &world->cam_max_si,
         camera_left,
@@ -143,11 +151,93 @@ void world_update_camera_li(World *world, unsigned int level_index) {
     unsigned int camera_left = world->camera.x;
     unsigned int camera_right = world->camera.x + world->camera.width;
 
-    update_camera_indices(
+    update_entity_indices(
         &world->cam_min_li,
         &world->cam_max_li,
         camera_left,
         camera_right,
+        level->lava_size,
+        get_lava_x,
+        get_lava_size,
+        level->lava
+    );
+}
+
+void world_update_collisions(World *world, unsigned int level_index) {
+    Level *level = &world->levels[level_index];
+    unsigned int i;
+
+    world_update_collision_bi(world, level_index);
+    world_update_collision_si(world, level_index);
+    world_update_collision_li(world, level_index);
+
+    /* Reset is_landed before checking blocks to determine if geo has support */
+    world->geo.is_landed = FALSE;
+    world_collision_geo_ground(world);
+
+    /* Iterate through blocks and handle collisions */
+    for (i = world->col_min_bi; i <= world->col_max_bi; i++) {
+        world_collision_geo_block(world, &level->blocks[i]);
+    }
+
+    /* Iterate through spikes and handle collisions */
+    for (i = world->col_min_si; i <= world->col_max_si; i++) {
+        world_collision_geo_spike(world, &level->spikes[i]);
+    }
+
+    /* Iterate through lava and handle collisions */
+    for (i = world->col_min_li; i <= world->col_max_li; i++) {
+        world_collision_geo_lava(world, &level->lava[i]);
+    }
+
+    /* Update landed status based on final ground_y after all collisions */
+    geo_update_landed(&world->geo);
+}
+
+void world_update_collision_bi(World *world, unsigned int level_index) {
+    Level *level = &world->levels[level_index];
+    unsigned int collision_left = world->geo.x;
+    unsigned int collision_right = world->geo.x + world->geo.size;
+
+    update_entity_indices(
+        &world->col_min_bi,
+        &world->col_max_bi,
+        collision_left,
+        collision_right,
+        level->blocks_size,
+        get_block_x,
+        get_block_size,
+        level->blocks
+    );
+}
+
+void world_update_collision_si(World *world, unsigned int level_index) {
+    Level *level = &world->levels[level_index];
+    unsigned int collision_left = world->geo.x;
+    unsigned int collision_right = world->geo.x + world->geo.size;
+
+    update_entity_indices(
+        &world->col_min_si,
+        &world->col_max_si,
+        collision_left,
+        collision_right,
+        level->spikes_size,
+        get_spike_x,
+        get_spike_size,
+        level->spikes
+    );
+}
+
+void world_update_collision_li(World *world, unsigned int level_index) {
+    Level *level = &world->levels[level_index];
+    unsigned int collision_left = world->geo.x;
+    unsigned int collision_right = world->geo.x + world->geo.size;
+
+    update_entity_indices(
+        &world->col_min_li,
+        &world->col_max_li,
+        collision_left,
+        collision_right,
         level->lava_size,
         get_lava_x,
         get_lava_size,
@@ -169,6 +259,7 @@ void world_collision_geo_block(World *world, Block *block) {
     } else if (collision == COLLISION_BOTTOM || collision == COLLISION_LEFT) {
         world->geo.is_dead = TRUE;
     } else if (collision == COLLISION_NONE) {
+        /* No collision with this block, geo is not supported */
         world->geo.is_landed = FALSE;
     }
 }
