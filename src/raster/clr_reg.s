@@ -30,19 +30,17 @@ width   equ     18
 _clear_region: 
 
         link    a6,#0
-        movem.l d0-d7/a0-a6,-(sp)
+        movem.l d0-d7/a0-a5,-(sp)
 
                 ; Check vertical bounds
 
                 ; Vertical clipping first - check if top edge is off screen
         move.w  row(a6),d0
-        tst.w   d0
         bge     check_bottom
 
                 ; Handle top clipping (row < 0)
         move.w  length(a6),d1
         add.w   d0,d1                           ; d1 = length + row (row is negative)
-        tst.w   d1
         ble     done                            ; If still <= 0, entirely off screen
         move.w  d1,length(a6)                  ; Update length to clipped height
         clr.w   row(a6)                         ; Set row to 0 (top of screen)
@@ -106,7 +104,7 @@ row_loop_32: move.l d1,(a0)                     ; write 1 long (4 bytes)
         adda.w  #80,a0                          ; move to next row (80 bytes per row)
         dbra    d7,row_loop_32
                 
-        movem.l (sp)+,d0-d7/a0-a6
+        movem.l (sp)+,d0-d7/a0-a5
         unlk    a6
         rts
 
@@ -210,7 +208,7 @@ next_row:
         dbra    d7,row_loop
 
 done:
-        movem.l (sp)+,d0-d7/a0-a6
+        movem.l (sp)+,d0-d7/a0-a5
         unlk    a6
         rts
 
