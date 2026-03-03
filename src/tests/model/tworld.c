@@ -48,6 +48,7 @@ void test_world_collision_geo_block_top(void) {
 void test_world_collision_geo_block_bottom(void) {
     block.y = world.geo.y + world.geo.size;
     world.geo.y = block.y - block.size;
+    world.geo.dy = 1;
 
     /* Test that geo is colliding with a block above it and to the left */
     block.x = world.geo.x - block.size / 2;

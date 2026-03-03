@@ -8,6 +8,10 @@
 #define TRUE 0
 #define FALSE -1
 
+/* Colours */
+#define BLACK 1
+#define WHITE 0
+
 /* Collision types */
 /* TODO: There's probably a better way to use typdef or enum*/
 #define COLLISION_TOP 1
