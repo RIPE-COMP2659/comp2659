@@ -1,12 +1,17 @@
 #include "level.h"
 
+/* Constants for level sizes */
+#define NUM_LEVELS 2
+
+/* Level one */
 #define L1_BLOCKS_SIZE 12
 #define L1_SPIKES_SIZE 2
 #define L1_LAVA_SIZE 5
+
+/* Level two */
 #define L2_BLOCKS_SIZE 2
 #define L2_SPIKES_SIZE 1
 #define L2_LAVA_SIZE 1
-#define NUM_LEVELS 2
 
 Level create_level(
     Block* blocks,
@@ -17,17 +22,17 @@ Level create_level(
     unsigned int lava_size,
     unsigned int end_x
 ) {
-	Level level;
+    Level level;
 
-	level.blocks = blocks;
-	level.spikes = spikes;
-	level.lava = lava;
+    level.blocks = blocks;
+    level.spikes = spikes;
+    level.lava = lava;
     level.blocks_size = blocks_size;
     level.spikes_size = spikes_size;
     level.lava_size = lava_size;
-	level.end_x = end_x;
+    level.end_x = end_x;
 
-	return level;
+    return level;
 }
 
 Level get_level1(void) {
@@ -100,7 +105,4 @@ Level* get_levels(void) {
     levels[1] = get_level2();
 
     return levels;
-}
-
-void level_placeholder(void) {
 }
