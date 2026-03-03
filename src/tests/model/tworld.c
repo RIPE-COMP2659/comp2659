@@ -13,10 +13,7 @@ void setUp(void) {
     spike.y = world.ground_y + SPIKE_SIZE;
     spike.size = SPIKE_SIZE;
     spike.sprite = SPIKE_SPRITE;
-    lava.x = world.geo.x;
-    lava.y = world.ground_y + LAVA_SIZE;
-    lava.size = LAVA_SIZE;
-    lava.sprite = LAVA_SPRITE;
+    lava = create_lava(world.geo.x, world.ground_y + LAVA_SIZE);
 }
 
 void tearDown(void) {
@@ -679,12 +676,12 @@ void test_world_update_camera_si_left_and_right_span(void) {
 
 void test_world_update_camera_li_lava_outside_view(void) {
     /* Create lava completely outside camera view */
-    static Lava lava[2] = {
-        {1000, 100, LAVA_SIZE, LAVA_SPRITE},
-        {1100, 100, LAVA_SIZE, LAVA_SPRITE}
-    };
+    static Lava lava[2];
     static Level level;
     World test_world;
+
+    lava[0] = create_lava(1000, 100);
+    lava[1] = create_lava(1100, 100);
     
     level.lava = lava;
     level.lava_size = 1;
@@ -703,14 +700,14 @@ void test_world_update_camera_li_lava_outside_view(void) {
 
 void test_world_update_camera_li_lava_span_entire_array(void) {
     /* Create lava that span entire array and all visible */
-    static Lava lava[4] = {
-        {0, 100, LAVA_SIZE, LAVA_SPRITE},
-        {100, 100, LAVA_SIZE, LAVA_SPRITE},
-        {200, 100, LAVA_SIZE, LAVA_SPRITE},
-        {300, 100, LAVA_SIZE, LAVA_SPRITE}
-    };
+    static Lava lava[4];
     static Level level;
     World test_world;
+
+    lava[0] = create_lava(0, 100);
+    lava[1] = create_lava(100, 100);
+    lava[2] = create_lava(200, 100);
+    lava[3] = create_lava(300, 100);
     
     level.lava = lava;
     level.lava_size = 3;
@@ -729,14 +726,14 @@ void test_world_update_camera_li_lava_span_entire_array(void) {
 
 void test_world_update_camera_li_min_is_zero_max_partial(void) {
     /* Create lava where first ones are visible, last is not */
-    static Lava lava[4] = {
-        {50, 100, LAVA_SIZE, LAVA_SPRITE},
-        {100, 100, LAVA_SIZE, LAVA_SPRITE},
-        {200, 100, LAVA_SIZE, LAVA_SPRITE},
-        {1000, 100, LAVA_SIZE, LAVA_SPRITE}
-    };
+    static Lava lava[4];
     static Level level;
     World test_world;
+
+    lava[0] = create_lava(50, 100);
+    lava[1] = create_lava(100, 100);
+    lava[2] = create_lava(200, 100);
+    lava[3] = create_lava(1000, 100);
     
     level.lava = lava;
     level.lava_size = 3;
@@ -755,15 +752,15 @@ void test_world_update_camera_li_min_is_zero_max_partial(void) {
 
 void test_world_update_camera_li_min_offset_max_partial(void) {
     /* Create lava where some are left of camera, some inside */
-    static Lava lava[5] = {
-        {0, 100, LAVA_SIZE, LAVA_SPRITE},
-        {50, 100, LAVA_SIZE, LAVA_SPRITE},
-        {100, 100, LAVA_SIZE, LAVA_SPRITE},
-        {200, 100, LAVA_SIZE, LAVA_SPRITE},
-        {400, 100, LAVA_SIZE, LAVA_SPRITE}
-    };
+    static Lava lava[5];
     static Level level;
     World test_world;
+
+    lava[0] = create_lava(0, 100);
+    lava[1] = create_lava(50, 100);
+    lava[2] = create_lava(100, 100);
+    lava[3] = create_lava(200, 100);
+    lava[4] = create_lava(400, 100);
     
     level.lava = lava;
     level.lava_size = 4;
@@ -782,15 +779,15 @@ void test_world_update_camera_li_min_offset_max_partial(void) {
 
 void test_world_update_camera_li_left_and_right_span(void) {
     /* Create lava with some left of camera, some visible, some right of camera */
-    static Lava lava[5] = {
-        {0, 100, LAVA_SIZE, LAVA_SPRITE},
-        {50, 100, LAVA_SIZE, LAVA_SPRITE},
-        {100, 100, LAVA_SIZE, LAVA_SPRITE},
-        {200, 100, LAVA_SIZE, LAVA_SPRITE},
-        {1000, 100, LAVA_SIZE, LAVA_SPRITE}
-    };
+    static Lava lava[5];
     static Level level;
     World test_world;
+
+    lava[0] = create_lava(0, 100);
+    lava[1] = create_lava(50, 100);
+    lava[2] = create_lava(100, 100);
+    lava[3] = create_lava(200, 100);
+    lava[4] = create_lava(1000, 100);
     
     level.lava = lava;
     level.lava_size = 4;
@@ -1029,25 +1026,10 @@ void test_world_update_collision_li_same_x_different_heights(void) {
     static Level level;
     World test_world;
     
-    lava[0].x = 100;
-    lava[0].y = 50;
-    lava[0].size = LAVA_SIZE;
-    lava[0].sprite = LAVA_SPRITE;
-    
-    lava[1].x = 100;
-    lava[1].y = 100;
-    lava[1].size = LAVA_SIZE;
-    lava[1].sprite = LAVA_SPRITE;
-    
-    lava[2].x = 100;
-    lava[2].y = 150;
-    lava[2].size = LAVA_SIZE;
-    lava[2].sprite = LAVA_SPRITE;
-    
-    lava[3].x = 200;
-    lava[3].y = 100;
-    lava[3].size = LAVA_SIZE;
-    lava[3].sprite = LAVA_SPRITE;
+    lava[0] = create_lava(100, 50);
+    lava[1] = create_lava(100, 100);
+    lava[2] = create_lava(100, 150);
+    lava[3] = create_lava(200, 100);
     
     level.lava = lava;
     level.lava_size = 3;

@@ -32,18 +32,13 @@ Level create_level(
 
 Level get_level1(void) {
     static Block level_blocks[L1_BLOCKS_SIZE];
+    static Lava level_lava[L1_LAVA_SIZE];
     static Spike level_spikes[L1_SPIKES_SIZE] = {
         {256, 64, SPIKE_SIZE, SPIKE_SPRITE},
         {512, 64, SPIKE_SIZE, SPIKE_SPRITE}
     };
-    static Lava level_lava[L1_LAVA_SIZE] = {
-        {320, 32, LAVA_SIZE, LAVA_SPRITE},
-        {352, 32, LAVA_SIZE, LAVA_SPRITE},
-        {384, 32, LAVA_SIZE, LAVA_SPRITE},
-        {416, 32, LAVA_SIZE, LAVA_SPRITE},
-        {448, 32, LAVA_SIZE, LAVA_SPRITE}
-    };
 
+    /* Block initialization */
     level_blocks[0] = create_block(288, 64);
     level_blocks[1] = create_block(352, 96);
     level_blocks[2] = create_block(416, 96);
@@ -56,6 +51,13 @@ Level get_level1(void) {
     level_blocks[9] = create_block(768, 96);
     level_blocks[10] = create_block(800, 96);
     level_blocks[11] = create_block(832, 96);
+
+    /* Lava initialization */
+    level_lava[0] = create_lava(320, 32);
+    level_lava[1] = create_lava(352, 32);
+    level_lava[2] = create_lava(384, 32);
+    level_lava[3] = create_lava(416, 32);
+    level_lava[4] = create_lava(448, 32);
 
     return create_level(
         level_blocks,
@@ -73,12 +75,12 @@ Level get_level2(void) {
     static Spike level_spikes[L2_SPIKES_SIZE] = {
         {300, 400, SPIKE_SIZE, SPIKE_SPRITE}
     };
-    static Lava level_lava[L2_LAVA_SIZE] = {
-        {500, 600, LAVA_SIZE, LAVA_SPRITE}
-    };
+    static Lava level_lava[L2_LAVA_SIZE];
 
     level_blocks[0] = create_block(100, 100);
     level_blocks[1] = create_block(200, 200);
+
+    level_lava[0] = create_lava(500, 600);
 
     return create_level(
         level_blocks,
