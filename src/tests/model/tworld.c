@@ -9,10 +9,7 @@ World world;
 void setUp(void) {
     world = get_world();
     block = create_block(world.geo.x, world.ground_y + BLOCK_SIZE);
-    spike.x = world.geo.x;
-    spike.y = world.ground_y + SPIKE_SIZE;
-    spike.size = SPIKE_SIZE;
-    spike.sprite = SPIKE_SPRITE;
+    spike = create_spike(world.geo.x, world.ground_y + SPIKE_SIZE);
     lava = create_lava(world.geo.x, world.ground_y + LAVA_SIZE);
 }
 
@@ -448,7 +445,7 @@ void test_world_update_camera_bi_blocks_span_entire_array(void) {
     blocks[3] = create_block(300, 100);
     
     level.blocks = blocks;
-    level.blocks_size = 3;
+    level.blocks_size = 4;
     
     test_world.levels = &level;
     test_world.camera.x = 0;
@@ -502,7 +499,7 @@ void test_world_update_camera_bi_min_offset_max_partial(void) {
     blocks[4] = create_block(400, 100);
     
     level.blocks = blocks;
-    level.blocks_size = 4;
+    level.blocks_size = 5;
     
     test_world.levels = &level;
     test_world.camera.x = 100;
@@ -546,13 +543,12 @@ void test_world_update_camera_bi_left_and_right_span(void) {
 
 void test_world_update_camera_si_spikes_outside_view(void) {
     /* Create spikes completely outside camera view */
-    static Spike spikes[2] = {
-        {1000, 100, SPIKE_SIZE, SPIKE_SPRITE},
-        {1100, 100, SPIKE_SIZE, SPIKE_SPRITE}
-    };
+    static Spike spikes[2];
     static Level level;
     World test_world;
-    
+
+    spikes[0] = create_spike(1000, 100);
+    spikes[1] = create_spike(1100, 100);
     level.spikes = spikes;
     level.spikes_size = 1;
     
@@ -570,17 +566,16 @@ void test_world_update_camera_si_spikes_outside_view(void) {
 
 void test_world_update_camera_si_spikes_span_entire_array(void) {
     /* Create spikes that span entire array and all visible */
-    static Spike spikes[4] = {
-        {0, 100, SPIKE_SIZE, SPIKE_SPRITE},
-        {100, 100, SPIKE_SIZE, SPIKE_SPRITE},
-        {200, 100, SPIKE_SIZE, SPIKE_SPRITE},
-        {300, 100, SPIKE_SIZE, SPIKE_SPRITE}
-    };
+    static Spike spikes[4];
     static Level level;
     World test_world;
-    
+
+    spikes[0] = create_spike(0, 100);
+    spikes[1] = create_spike(100, 100);
+    spikes[2] = create_spike(200, 100);
+    spikes[3] = create_spike(300, 100);
     level.spikes = spikes;
-    level.spikes_size = 3;
+    level.spikes_size = 4;
     
     test_world.levels = &level;
     test_world.camera.x = 0;
@@ -596,18 +591,18 @@ void test_world_update_camera_si_spikes_span_entire_array(void) {
 
 void test_world_update_camera_si_min_is_zero_max_partial(void) {
     /* Create spikes where first ones are visible, last is not */
-    static Spike spikes[4] = {
-        {50, 100, SPIKE_SIZE, SPIKE_SPRITE},
-        {100, 100, SPIKE_SIZE, SPIKE_SPRITE},
-        {200, 100, SPIKE_SIZE, SPIKE_SPRITE},
-        {1000, 100, SPIKE_SIZE, SPIKE_SPRITE}
-    };
+    static Spike spikes[4];
     static Level level;
     World test_world;
-    
+
+    spikes[0] = create_spike(50, 100);
+    spikes[1] = create_spike(100, 100);
+    spikes[2] = create_spike(200, 100);
+    spikes[3] = create_spike(1000, 100);
+
     level.spikes = spikes;
-    level.spikes_size = 3;
-    
+    level.spikes_size = 4;
+
     test_world.levels = &level;
     test_world.camera.x = 0;
     test_world.camera.width = SCREEN_WIDTH;
@@ -622,19 +617,19 @@ void test_world_update_camera_si_min_is_zero_max_partial(void) {
 
 void test_world_update_camera_si_min_offset_max_partial(void) {
     /* Create spikes where some are left of camera, some inside */
-    static Spike spikes[5] = {
-        {0, 100, SPIKE_SIZE, SPIKE_SPRITE},
-        {50, 100, SPIKE_SIZE, SPIKE_SPRITE},
-        {100, 100, SPIKE_SIZE, SPIKE_SPRITE},
-        {200, 100, SPIKE_SIZE, SPIKE_SPRITE},
-        {400, 100, SPIKE_SIZE, SPIKE_SPRITE}
-    };
+    static Spike spikes[5];
     static Level level;
     World test_world;
-    
+
+    spikes[0] = create_spike(0, 100);
+    spikes[1] = create_spike(50, 100);
+    spikes[2] = create_spike(100, 100);
+    spikes[3] = create_spike(200, 100);
+    spikes[4] = create_spike(400, 100);
+
     level.spikes = spikes;
-    level.spikes_size = 4;
-    
+    level.spikes_size = 5;
+
     test_world.levels = &level;
     test_world.camera.x = 100;
     test_world.camera.width = SCREEN_WIDTH;
@@ -649,19 +644,19 @@ void test_world_update_camera_si_min_offset_max_partial(void) {
 
 void test_world_update_camera_si_left_and_right_span(void) {
     /* Create spikes with some left of camera, some visible, some right of camera */
-    static Spike spikes[5] = {
-        {0, 100, SPIKE_SIZE, SPIKE_SPRITE},
-        {50, 100, SPIKE_SIZE, SPIKE_SPRITE},
-        {100, 100, SPIKE_SIZE, SPIKE_SPRITE},
-        {200, 100, SPIKE_SIZE, SPIKE_SPRITE},
-        {1000, 100, SPIKE_SIZE, SPIKE_SPRITE}
-    };
+    static Spike spikes[5];
     static Level level;
     World test_world;
-    
+
+    spikes[0] = create_spike(0, 100);
+    spikes[1] = create_spike(50, 100);
+    spikes[2] = create_spike(100, 100);
+    spikes[3] = create_spike(200, 100);
+    spikes[4] = create_spike(1000, 100);
+
     level.spikes = spikes;
-    level.spikes_size = 4;
-    
+    level.spikes_size = 5;
+
     test_world.levels = &level;
     test_world.camera.x = 100;
     test_world.camera.width = SCREEN_WIDTH;
@@ -684,7 +679,7 @@ void test_world_update_camera_li_lava_outside_view(void) {
     lava[1] = create_lava(1100, 100);
     
     level.lava = lava;
-    level.lava_size = 1;
+    level.lava_size = 2;
     
     test_world.levels = &level;
     test_world.camera.x = 0;
@@ -710,7 +705,7 @@ void test_world_update_camera_li_lava_span_entire_array(void) {
     lava[3] = create_lava(300, 100);
     
     level.lava = lava;
-    level.lava_size = 3;
+    level.lava_size = 4;
     
     test_world.levels = &level;
     test_world.camera.x = 0;
@@ -736,7 +731,7 @@ void test_world_update_camera_li_min_is_zero_max_partial(void) {
     lava[3] = create_lava(1000, 100);
     
     level.lava = lava;
-    level.lava_size = 3;
+    level.lava_size = 4;
     
     test_world.levels = &level;
     test_world.camera.x = 0;
@@ -763,7 +758,7 @@ void test_world_update_camera_li_min_offset_max_partial(void) {
     lava[4] = create_lava(400, 100);
     
     level.lava = lava;
-    level.lava_size = 4;
+    level.lava_size = 5;
     
     test_world.levels = &level;
     test_world.camera.x = 100;
@@ -790,7 +785,7 @@ void test_world_update_camera_li_left_and_right_span(void) {
     lava[4] = create_lava(1000, 100);
     
     level.lava = lava;
-    level.lava_size = 4;
+    level.lava_size = 5;
     
     test_world.levels = &level;
     test_world.camera.x = 100;
@@ -818,7 +813,7 @@ void test_world_update_collision_bi_blocks_right_no_collision(void) {
     blocks[2] = create_block(150, 100);
 
     level.blocks = blocks;
-    level.blocks_size = 2;
+    level.blocks_size = 3;
 
     test_world.cam_min_bi = 0;
     test_world.cam_max_bi = 0;
@@ -844,7 +839,7 @@ void test_world_update_collision_bi_blocks_right_barrier(void) {
     blocks[2] = create_block(150, 100);
 
     level.blocks = blocks;
-    level.blocks_size = 2;
+    level.blocks_size = 3;
     test_world.cam_min_bi = 0;
     test_world.cam_max_bi = 0;
     test_world.col_min_bi = 0;
@@ -869,7 +864,7 @@ void test_world_update_collision_bi_min_is_zero_max_partial(void) {
     blocks[3] = create_block(test_world.geo.x + 100, 100);
 
     level.blocks = blocks;
-    level.blocks_size = 3;
+    level.blocks_size = 4;
 
     test_world.levels = &level;
 
@@ -898,7 +893,7 @@ void test_world_update_collision_bi_min_offset_max_partial(void) {
     blocks[4] = create_block(test_world.geo.x + 300, 100);
     
     level.blocks = blocks;
-    level.blocks_size = 4;
+    level.blocks_size = 5;
     
     test_world.levels = &level;
     test_world.cam_min_bi = 0;
@@ -927,7 +922,7 @@ void test_world_update_collision_bi_updates(void) {
     blocks[5] = create_block(test_world.geo.x + 300, 100);
     
     level.blocks = blocks;
-    level.blocks_size = 4;
+    level.blocks_size = 6;
     
     test_world.levels = &level;
     test_world.cam_min_bi = 0;
@@ -959,7 +954,7 @@ void test_world_update_collision_bi_same_x_different_heights(void) {
     blocks[3] = create_block(200, 100);
     
     level.blocks = blocks;
-    level.blocks_size = 3;
+    level.blocks_size = 4;
     
     test_world.levels = &level;
     test_world.geo = create_geo(100, 0, 0);
@@ -981,39 +976,24 @@ void test_world_update_collision_si_same_x_different_heights(void) {
     static Spike spikes[4];
     static Level level;
     World test_world;
-    
-    spikes[0].x = 100;
-    spikes[0].y = 50;
-    spikes[0].size = SPIKE_SIZE;
-    spikes[0].sprite = SPIKE_SPRITE;
-    
-    spikes[1].x = 100;
-    spikes[1].y = 100;
-    spikes[1].size = SPIKE_SIZE;
-    spikes[1].sprite = SPIKE_SPRITE;
-    
-    spikes[2].x = 100;
-    spikes[2].y = 150;
-    spikes[2].size = SPIKE_SIZE;
-    spikes[2].sprite = SPIKE_SPRITE;
-    
-    spikes[3].x = 200;
-    spikes[3].y = 100;
-    spikes[3].size = SPIKE_SIZE;
-    spikes[3].sprite = SPIKE_SPRITE;
-    
+
+    spikes[0] = create_spike(100, 50);
+    spikes[1] = create_spike(100, 100);
+    spikes[2] = create_spike(100, 150);
+    spikes[3] = create_spike(200, 100);
+
     level.spikes = spikes;
-    level.spikes_size = 3;
-    
+    level.spikes_size = 4;
+
     test_world.levels = &level;
     test_world.geo = create_geo(100, 0, 0);
     test_world.cam_min_si = 0;
-    test_world.cam_max_si = 3;
+    test_world.cam_max_si = 0;
     test_world.col_min_si = 0;
     test_world.col_max_si = 0;
-    
+
     world_update_collision_si(&test_world, 0);
-    
+
     /* All spikes at x=100 should be in collision range */
     TEST_ASSERT_EQUAL_UINT(0, test_world.col_min_si);
     TEST_ASSERT_EQUAL_UINT(2, test_world.col_max_si);
