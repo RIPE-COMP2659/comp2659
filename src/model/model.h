@@ -9,6 +9,18 @@
  */
 typedef struct {
     World world;
+    unsigned int cam_min_bi; /* block index, camera */
+    unsigned int cam_max_bi; /* block index, camera */
+    unsigned int cam_min_si; /* spike index, camera */
+    unsigned int cam_max_si; /* spike index, camera */
+    unsigned int cam_min_li; /* lava index, camera */
+    unsigned int cam_max_li; /* lava index, camera */
+    unsigned int col_min_bi; /* block index, collision */
+    unsigned int col_max_bi; /* block index, collision */
+    unsigned int col_min_si; /* spike index, collision */
+    unsigned int col_max_si; /* spike index, collision */
+    unsigned int col_min_li; /* lava index, collision */
+    unsigned int col_max_li; /* lava index, collision */
 } Model;
 
 /**
@@ -34,3 +46,11 @@ Model get_model(void);
  *    None
  */
 void model_update(Model *model);
+
+void model_update_camera_bi(Model *model, unsigned int level_index);
+void model_update_camera_si(Model *model, unsigned int level_index);
+void model_update_camera_li(Model *model, unsigned int level_index);
+
+void model_update_collision_bi(Model *model, unsigned int level_index);
+void model_update_collision_si(Model *model, unsigned int level_index);
+void model_update_collision_li(Model *model, unsigned int level_index);
