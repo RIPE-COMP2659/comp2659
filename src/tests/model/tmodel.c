@@ -17,15 +17,16 @@ void test_world_update_camera_bi_blocks_outside_view(void) {
     blocks[1] = create_block(1100, 100);
     
     level.blocks = blocks;
-    level.blocks_size = 1;
+    level.blocks_size = 2;
     
     test_model.world.levels = &level;
+    test_model.world.level_index = 0;
     test_model.world.camera.x = 0;
     test_model.world.camera.width = SCREEN_WIDTH;
     test_model.cam_min_bi = 0;
     test_model.cam_max_bi = 0;
     
-    model_update_camera_bi(&test_model, 0);
+    model_update_camera_bi(&test_model);
     
     TEST_ASSERT_EQUAL_UINT(0, test_model.cam_min_bi);
     TEST_ASSERT_EQUAL_UINT(0, test_model.cam_max_bi);
@@ -46,12 +47,13 @@ void test_world_update_camera_bi_blocks_span_entire_array(void) {
     level.blocks_size = 4;
     
     test_model.world.levels = &level;
+    test_model.world.level_index = 0;
     test_model.world.camera.x = 0;
     test_model.world.camera.width = SCREEN_WIDTH;
     test_model.cam_min_bi = 0;
     test_model.cam_max_bi = 0;
     
-    model_update_camera_bi(&test_model, 0);
+    model_update_camera_bi(&test_model);
     
     TEST_ASSERT_EQUAL_UINT(0, test_model.cam_min_bi);
     TEST_ASSERT_EQUAL_UINT(3, test_model.cam_max_bi);
@@ -72,12 +74,13 @@ void test_world_update_camera_bi_min_is_zero_max_partial(void) {
     level.blocks_size = 3;
     
     test_model.world.levels = &level;
+    test_model.world.level_index = 0;
     test_model.world.camera.x = 0;
     test_model.world.camera.width = SCREEN_WIDTH;
     test_model.cam_min_bi = 0;
     test_model.cam_max_bi = 0;
     
-    model_update_camera_bi(&test_model, 0);
+    model_update_camera_bi(&test_model);
     
     TEST_ASSERT_EQUAL_UINT(0, test_model.cam_min_bi);
     TEST_ASSERT_EQUAL_UINT(2, test_model.cam_max_bi);
@@ -99,13 +102,12 @@ void test_world_update_camera_bi_min_offset_max_partial(void) {
     level.blocks = blocks;
     level.blocks_size = 5;
     
-    test_model.world.levels = &level;
-    test_model.world.camera.x = 100;
+    test_model.world.levels = &level;    test_model.world.level_index = 0;    test_model.world.camera.x = 100;
     test_model.world.camera.width = SCREEN_WIDTH;
     test_model.cam_min_bi = 0;
     test_model.cam_max_bi = 0;
     
-    model_update_camera_bi(&test_model, 0);
+    model_update_camera_bi(&test_model);
     
     TEST_ASSERT_EQUAL_UINT(2, test_model.cam_min_bi);
     TEST_ASSERT_EQUAL_UINT(4, test_model.cam_max_bi);
@@ -128,12 +130,13 @@ void test_world_update_camera_bi_left_and_right_span(void) {
     level.blocks_size = 4;
     
     test_model.world.levels = &level;
+    test_model.world.level_index = 0;
     test_model.world.camera.x = 100;
     test_model.world.camera.width = SCREEN_WIDTH;
     test_model.cam_min_bi = 0;
     test_model.cam_max_bi = 0;
     
-    model_update_camera_bi(&test_model, 0);
+    model_update_camera_bi(&test_model);
     
     TEST_ASSERT_EQUAL_UINT(2, test_model.cam_min_bi);
     TEST_ASSERT_EQUAL_UINT(3, test_model.cam_max_bi);
@@ -151,12 +154,13 @@ void test_world_update_camera_si_spikes_outside_view(void) {
     level.spikes_size = 1;
     
     test_model.world.levels = &level;
+    test_model.world.level_index = 0;
     test_model.world.camera.x = 0;
     test_model.world.camera.width = SCREEN_WIDTH;
     test_model.cam_min_si = 0;
     test_model.cam_max_si = 0;
     
-    model_update_camera_si(&test_model, 0);
+    model_update_camera_si(&test_model);
     
     TEST_ASSERT_EQUAL_UINT(0, test_model.cam_min_si);
     TEST_ASSERT_EQUAL_UINT(0, test_model.cam_max_si);
@@ -176,12 +180,13 @@ void test_world_update_camera_si_spikes_span_entire_array(void) {
     level.spikes_size = 4;
     
     test_model.world.levels = &level;
+    test_model.world.level_index = 0;
     test_model.world.camera.x = 0;
     test_model.world.camera.width = SCREEN_WIDTH;
     test_model.cam_min_si = 0;
     test_model.cam_max_si = 0;
     
-    model_update_camera_si(&test_model, 0);
+    model_update_camera_si(&test_model);
     
     TEST_ASSERT_EQUAL_UINT(0, test_model.cam_min_si);
     TEST_ASSERT_EQUAL_UINT(3, test_model.cam_max_si);
@@ -202,12 +207,13 @@ void test_world_update_camera_si_min_is_zero_max_partial(void) {
     level.spikes_size = 4;
 
     test_model.world.levels = &level;
+    test_model.world.level_index = 0;
     test_model.world.camera.x = 0;
     test_model.world.camera.width = SCREEN_WIDTH;
     test_model.cam_min_si = 0;
     test_model.cam_max_si = 0;
     
-    model_update_camera_si(&test_model, 0);
+    model_update_camera_si(&test_model);
     
     TEST_ASSERT_EQUAL_UINT(0, test_model.cam_min_si);
     TEST_ASSERT_EQUAL_UINT(2, test_model.cam_max_si);
@@ -229,12 +235,13 @@ void test_world_update_camera_si_min_offset_max_partial(void) {
     level.spikes_size = 5;
 
     test_model.world.levels = &level;
+    test_model.world.level_index = 0;
     test_model.world.camera.x = 100;
     test_model.world.camera.width = SCREEN_WIDTH;
     test_model.cam_min_si = 0;
     test_model.cam_max_si = 0;
     
-    model_update_camera_si(&test_model, 0);
+    model_update_camera_si(&test_model);
     
     TEST_ASSERT_EQUAL_UINT(2, test_model.cam_min_si);
     TEST_ASSERT_EQUAL_UINT(4, test_model.cam_max_si);
@@ -256,12 +263,13 @@ void test_world_update_camera_si_left_and_right_span(void) {
     level.spikes_size = 5;
 
     test_model.world.levels = &level;
+    test_model.world.level_index = 0;
     test_model.world.camera.x = 100;
     test_model.world.camera.width = SCREEN_WIDTH;
     test_model.cam_min_si = 0;
     test_model.cam_max_si = 0;
     
-    model_update_camera_si(&test_model, 0);
+    model_update_camera_si(&test_model);
     
     TEST_ASSERT_EQUAL_UINT(2, test_model.cam_min_si);
     TEST_ASSERT_EQUAL_UINT(3, test_model.cam_max_si);
@@ -280,12 +288,13 @@ void test_world_update_camera_li_lava_outside_view(void) {
     level.lava_size = 2;
     
     test_model.world.levels = &level;
+    test_model.world.level_index = 0;
     test_model.world.camera.x = 0;
     test_model.world.camera.width = SCREEN_WIDTH;
     test_model.cam_min_li = 0;
     test_model.cam_max_li = 0;
     
-    model_update_camera_li(&test_model, 0);
+    model_update_camera_li(&test_model);
     
     TEST_ASSERT_EQUAL_UINT(0, test_model.cam_min_li);
     TEST_ASSERT_EQUAL_UINT(0, test_model.cam_max_li);
@@ -306,12 +315,13 @@ void test_world_update_camera_li_lava_span_entire_array(void) {
     level.lava_size = 4;
     
     test_model.world.levels = &level;
+    test_model.world.level_index = 0;
     test_model.world.camera.x = 0;
     test_model.world.camera.width = SCREEN_WIDTH;
     test_model.cam_min_li = 0;
     test_model.cam_max_li = 0;
     
-    model_update_camera_li(&test_model, 0);
+    model_update_camera_li(&test_model);
     
     TEST_ASSERT_EQUAL_UINT(0, test_model.cam_min_li);
     TEST_ASSERT_EQUAL_UINT(3, test_model.cam_max_li);
@@ -332,12 +342,13 @@ void test_world_update_camera_li_min_is_zero_max_partial(void) {
     level.lava_size = 4;
     
     test_model.world.levels = &level;
+    test_model.world.level_index = 0;
     test_model.world.camera.x = 0;
     test_model.world.camera.width = SCREEN_WIDTH;
     test_model.cam_min_li = 0;
     test_model.cam_max_li = 0;
     
-    model_update_camera_li(&test_model, 0);
+    model_update_camera_li(&test_model);
     
     TEST_ASSERT_EQUAL_UINT(0, test_model.cam_min_li);
     TEST_ASSERT_EQUAL_UINT(2, test_model.cam_max_li);
@@ -359,12 +370,13 @@ void test_world_update_camera_li_min_offset_max_partial(void) {
     level.lava_size = 5;
     
     test_model.world.levels = &level;
+    test_model.world.level_index = 0;
     test_model.world.camera.x = 100;
     test_model.world.camera.width = SCREEN_WIDTH;
     test_model.cam_min_li = 0;
     test_model.cam_max_li = 0;
     
-    model_update_camera_li(&test_model, 0);
+    model_update_camera_li(&test_model);
     
     TEST_ASSERT_EQUAL_UINT(2, test_model.cam_min_li);
     TEST_ASSERT_EQUAL_UINT(4, test_model.cam_max_li);
@@ -386,12 +398,13 @@ void test_world_update_camera_li_left_and_right_span(void) {
     level.lava_size = 5;
     
     test_model.world.levels = &level;
+    test_model.world.level_index = 0;
     test_model.world.camera.x = 100;
     test_model.world.camera.width = SCREEN_WIDTH;
     test_model.cam_min_li = 0;
     test_model.cam_max_li = 0;
     
-    model_update_camera_li(&test_model, 0);
+    model_update_camera_li(&test_model);
     
     TEST_ASSERT_EQUAL_UINT(2, test_model.cam_min_li);
     TEST_ASSERT_EQUAL_UINT(3, test_model.cam_max_li);

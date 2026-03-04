@@ -46,11 +46,12 @@ Model get_model(void);
  *    None
  */
 void model_update(Model *model);
+void model_update_camera(Model *model);
 
-void model_update_camera_bi(Model *model, unsigned int level_index);
-void model_update_camera_si(Model *model, unsigned int level_index);
-void model_update_camera_li(Model *model, unsigned int level_index);
+void model_update_camera_bi(Model *model);
+void model_update_camera_si(Model *model);
+void model_update_camera_li(Model *model);
 
-void model_update_collision_bi(Model *model, unsigned int level_index);
-void model_update_collision_si(Model *model, unsigned int level_index);
-void model_update_collision_li(Model *model, unsigned int level_index);
+void model_update_collision_bi(Model *model);
+void model_update_collision_si(Model *model);
+void model_update_collision_li(Model *model);

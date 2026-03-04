@@ -58,8 +58,6 @@ void world_update_collisions(
     geo_update_landed(&world->geo);
 }
 
-
-/* TODO: Move these to a generic helper */
 void world_collisions_geo_blocks(World *world, Block *blocks, unsigned int col_min_bi, unsigned int col_max_bi) {
     unsigned int i;
     for (i = col_min_bi; i <= col_max_bi; i++) {

@@ -20,18 +20,18 @@ Model get_model(void) {
 
 /** TODO: Should not need index for level once we have internal management */
 void model_update(Model *model) {
-    model_update_camera(model, 0);
+    model_update_camera(model);
     world_update(&model->world);
-    model_update_collision_bi(model, 0);
-    model_update_collision_si(model, 0);
-    model_update_collision_li(model, 0);
+    model_update_collision_bi(model);
+    model_update_collision_si(model);
+    model_update_collision_li(model);
     world_update_collisions(&model->world, model->col_min_bi, model->col_max_bi, model->col_min_si, model->col_max_si, model->col_min_li, model->col_max_li);
 }
 
-void model_update_camera(Model *model, unsigned int level_index) {
-    model_update_camera_bi(model, level_index);
-    model_update_camera_si(model, level_index);
-    model_update_camera_li(model, level_index);
+void model_update_camera(Model *model) {
+    model_update_camera_bi(model);
+    model_update_camera_si(model);
+    model_update_camera_li(model);
 }
 
 /* Generic helper function to update entity indices within a given range */
@@ -92,8 +92,8 @@ static unsigned int get_lava_size(void *lava, unsigned int index) {
     return ((Lava*)lava)[index].size;
 }
 
-void model_update_camera_bi(Model *model, unsigned int level_index) {
-    Level *level = &model->world.levels[level_index];
+void model_update_camera_bi(Model *model) {
+    Level *level = &model->world.levels[model->world.level_index];
     unsigned int camera_left = model->world.camera.x;
     unsigned int camera_right = model->world.camera.x + model->world.camera.width;
 
@@ -109,8 +109,8 @@ void model_update_camera_bi(Model *model, unsigned int level_index) {
     );
 }
 
-void model_update_camera_si(Model *model, unsigned int level_index) {
-    Level *level = &model->world.levels[level_index];
+void model_update_camera_si(Model *model) {
+    Level *level = &model->world.levels[model->world.level_index];
     unsigned int camera_left = model->world.camera.x;
     unsigned int camera_right = model->world.camera.x + model->world.camera.width;
 
@@ -126,8 +126,8 @@ void model_update_camera_si(Model *model, unsigned int level_index) {
     );
 }
 
-void model_update_camera_li(Model *model, unsigned int level_index) {
-    Level *level = &model->world.levels[level_index];
+void model_update_camera_li(Model *model) {
+    Level *level = &model->world.levels[model->world.level_index];
     unsigned int camera_left = model->world.camera.x;
     unsigned int camera_right = model->world.camera.x + model->world.camera.width;
 
@@ -143,8 +143,8 @@ void model_update_camera_li(Model *model, unsigned int level_index) {
     );
 }
 
-void model_update_collision_bi(Model *model, unsigned int level_index) {
-    Level *level = &model->world.levels[level_index];
+void model_update_collision_bi(Model *model) {
+    Level *level = &model->world.levels[model->world.level_index];
     unsigned int collision_left = model->world.geo.x;
     unsigned int collision_right = model->world.geo.x + model->world.geo.size;
 
@@ -160,8 +160,8 @@ void model_update_collision_bi(Model *model, unsigned int level_index) {
     );
 }
 
-void model_update_collision_si(Model *model, unsigned int level_index) {
-    Level *level = &model->world.levels[level_index];
+void model_update_collision_si(Model *model) {
+    Level *level = &model->world.levels[model->world.level_index];
     unsigned int collision_left = model->world.geo.x;
     unsigned int collision_right = model->world.geo.x + model->world.geo.size;
 
@@ -177,8 +177,8 @@ void model_update_collision_si(Model *model, unsigned int level_index) {
     );
 }
 
-void model_update_collision_li(Model *model, unsigned int level_index) {
-    Level *level = &model->world.levels[level_index];
+void model_update_collision_li(Model *model) {
+    Level *level = &model->world.levels[model->world.level_index];
     unsigned int collision_left = model->world.geo.x;
     unsigned int collision_right = model->world.geo.x + model->world.geo.size;
 
