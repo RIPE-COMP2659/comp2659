@@ -8,14 +8,15 @@ typedef struct {
     Geo geo;
     unsigned int ground_y;
     Camera camera;
+    unsigned int level_index;
+    unsigned int levels_size;
 } World;
 
 World create_world(Level *levels, Geo geo, unsigned int ground_y);
 World get_world(void);
-void world_update(World *world, unsigned int level_index);
+void world_update(World *world);
 void world_update_collisions(
     World *world,
-    unsigned int level_index,
     unsigned int block_min,
     unsigned int block_max,
     unsigned int spike_min,

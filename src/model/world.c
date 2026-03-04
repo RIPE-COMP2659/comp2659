@@ -2,6 +2,7 @@
 
 #define CAMERA_OFFSET 160
 
+/* TODO: Level index management */
 /* TODO: Levels must be in ascending x value order or logic will break */
 /* Make sure levels adhere to this upon creation */
 World create_world(Level* levels, Geo geo, unsigned int ground_y) {
@@ -11,12 +12,14 @@ World create_world(Level* levels, Geo geo, unsigned int ground_y) {
     world.geo = geo;
     world.camera = create_camera(0, SCREEN_HEIGHT);
     world.ground_y = ground_y;
+    world.level_index = 0;
+    world.levels_size = 2;
 
     return world;
 }
 
 /* TODO: World to keep track of it's own level index */
-void world_update(World *world, unsigned int level_index) {
+void world_update(World *world) {
     geo_update(&world->geo);
     camera_update_coordinates(&world->camera, world->geo.x - CAMERA_OFFSET, SCREEN_HEIGHT);
 }
@@ -34,7 +37,6 @@ World get_world(void) {
 
 void world_update_collisions(
     World *world,
-    unsigned int level_index,
     unsigned int block_min,
     unsigned int block_max,
     unsigned int spike_min,
@@ -42,8 +44,7 @@ void world_update_collisions(
     unsigned int lava_min,
     unsigned int lava_max
 ) {
-    Level *level = &world->levels[level_index];
-    unsigned int i;
+    Level *level = &world->levels[world->level_index];
 
     /* Reset is_landed before checking blocks to determine if geo has support */
     world->geo.is_landed = FALSE;
