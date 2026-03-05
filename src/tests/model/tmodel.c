@@ -1,6 +1,10 @@
 #include "unity.h"
 #include "model.h"
 
+/* TODO: Update the tests for using create methods where possible */
+/* TODO: Update the tests for the collision checking */
+/* TODO: Update the tests for model_update */
+
 void setUp(void) {
 }
 

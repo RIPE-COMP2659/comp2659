@@ -18,14 +18,17 @@ Model get_model(void) {
     return model;
 }
 
-/** TODO: Should not need index for level once we have internal management */
 void model_update(Model *model) {
     model_update_camera(model);
     world_update(&model->world);
+    model_update_collision(model);
+    world_update_collisions(&model->world, model->col_min_bi, model->col_max_bi, model->col_min_si, model->col_max_si, model->col_min_li, model->col_max_li);
+}
+
+void model_update_collision(Model *model) {
     model_update_collision_bi(model);
     model_update_collision_si(model);
     model_update_collision_li(model);
-    world_update_collisions(&model->world, model->col_min_bi, model->col_max_bi, model->col_min_si, model->col_max_si, model->col_min_li, model->col_max_li);
 }
 
 void model_update_camera(Model *model) {
