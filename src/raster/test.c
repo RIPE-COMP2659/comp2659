@@ -17,8 +17,15 @@ void test_clear_region(UINT8 *base)
     /* Fill screen with white first */
     fill_screen((UINT32 *)base, -1);
 
-    /* Test 1: 48x48 optimized path - word aligned */
-    clear_region((UINT32 *)base, 0, 0, 48, 48);
+    clear_region((UINT32 *)base, -2, 100, 48, 48);
+    clear_region((UINT32 *)base, -10, 100, 48, 48);
+    clear_region((UINT32 *)base, 410, 100, 48, 48);
+    clear_region((UINT32 *)base, 401, 100, 48, 48);
+
+
+
+   clear_region((UINT32 *)base, 0, 0, 48, 48);
+
 
     /* Test 2: 48x48 optimized path - different position */
     clear_region((UINT32 *)base, 50, 80, 48, 48);

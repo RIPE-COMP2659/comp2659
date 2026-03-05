@@ -43,7 +43,7 @@ _plot_bitmap_32:
 
                 ; Vertical clipping first - check if top edge is off screen
         move.w  row(a6),d0
-        bge.s   check_bottom                    ; If row >= 0, skip top clip
+        bge   check_bottom                    ; If row >= 0, skip top clip
 
                 ; Handle top clipping (row < 0)
         move.w  d0,d1
@@ -69,7 +69,7 @@ check_bottom:
 
         add.w   height(a6),d0                   ; d0 = row + height (bottom edge Y)
         cmp.w   #SCREEN_HEIGHT,d0
-        ble.s   v_clip_done                     ; If bottom edge <= SCREEN_HEIGHT, skip bottom clip
+        ble   v_clip_done                     ; If bottom edge <= SCREEN_HEIGHT, skip bottom clip
 
                 ; Partially off bottom
         move.w  #SCREEN_HEIGHT,d0

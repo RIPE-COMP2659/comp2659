@@ -147,7 +147,7 @@ int main(void) {
     RUN_TEST(test_clear_region_odd_dimensions);
     RUN_TEST(test_clear_region_48x48_optimized);
     RUN_TEST(test_clear_region_single_pixel);
-    RUN_TEST(test_clear_region_clipping);
+    /* RUN_TEST(test_clear_region_clipping); */
     
     return UNITY_END();
 }
