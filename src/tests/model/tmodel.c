@@ -410,6 +410,9 @@ void test_world_update_camera_li_left_and_right_span(void) {
     TEST_ASSERT_EQUAL_UINT(3, test_model.cam_max_li);
 }
 
+/* Collision function testing */
+/* Update testing */
+
 int main(void) {
     UNITY_BEGIN();
 

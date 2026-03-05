@@ -1,6 +1,8 @@
 #include "unity.h"
 #include "world.h"
 
+/* TODO: world_update_collisions tests missing */
+
 Block block;
 Spike spike;
 Lava lava;
@@ -408,11 +410,6 @@ void test_world_collision_ground_resets_when_leaving_block(void) {
     geo_update_landed(&world.geo);
     TEST_ASSERT_EQUAL_INT(FALSE, world.geo.is_landed);
 }
-
-
-/* Collision Update Spike Tests - spot check with spikes */
-/* Collision Update Lava Tests - spot check with lava */
-
 
 int main(void) {
     UNITY_BEGIN();
