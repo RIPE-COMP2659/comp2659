@@ -2,6 +2,7 @@
 #include <osbind.h>
 #include "model/model.h"
 #include "raster/raster.h"
+#include "events/events.h"
 
 #define BYTES_PER_SCREEN 32000
 
@@ -14,9 +15,10 @@ void test_rendering(UINT32 *base, Model model)
     unsigned int i;
     unsigned int w_iter;
     int input;
+    signed int current_event;
 
     for (w_iter = 0; w_iter < 400; w_iter++) {
-        model_update(&model);
+        on_clock_tick(&model);
 
         clear_screen(base);
 
@@ -51,11 +53,16 @@ void test_rendering(UINT32 *base, Model model)
         printf("Geo is_dead: %d\n", world->geo.is_dead);
         printf("Geo ground_y: %d\n", world->geo.ground_y);
 
+        current_event = check_level_complete(&model);
+        if (current_event == EVENT_LEVEL_DONE) {
+            printf("Level Complete!\n");
+        }
+
         /* Temporary */
         input = Cnecin();
         printf("Input: %d\n", input);
         if (input == 32) { /* ESC key to exit */
-            geo_jump(&world->geo);
+            on_jump_request(&model);
         }
         Cnecin();
     }
