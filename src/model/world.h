@@ -1,3 +1,6 @@
+#ifndef WORLD_H
+#define WORLD_H
+
 #include "camera.h"
 #include "geo.h"
 #include "level.h"
@@ -214,3 +217,5 @@ void world_collision_geo_lava(World *world, Lava *lava);
  *         The world to check for collisions in
  */
 void world_collision_geo_ground(World *world);
+
+#endif

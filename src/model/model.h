@@ -1,3 +1,6 @@
+#ifndef MODEL_H
+#define MODEL_H
+
 #include "world.h"
 
 /**
@@ -131,3 +134,5 @@ void model_update_collision_si(Model *model);
  *         Pointer to the model to update
  */
 void model_update_collision_li(Model *model);
+
+#endif

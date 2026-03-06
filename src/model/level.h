@@ -1,3 +1,6 @@
+#ifndef LEVEL_H
+#define LEVEL_H
+
 #include "block.h"
 #include "lava.h"
 #include "spike.h"
@@ -88,3 +91,5 @@ Level get_level2(void);
  *    Level*: The array of levels
  */
 Level* get_levels(void);
+
+#endif

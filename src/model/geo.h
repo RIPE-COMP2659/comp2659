@@ -1,3 +1,6 @@
+#ifndef GEO_H
+#define GEO_H
+
 #include "dtypes.h"
 
 /* The length and width of geo in pixels */
@@ -117,3 +120,5 @@ void geo_update(Geo *geo);
  *         The Geo to update landed status for
  */
 void geo_update_landed(Geo *geo);
+
+#endif
