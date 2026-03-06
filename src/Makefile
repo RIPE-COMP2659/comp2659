@@ -40,7 +40,7 @@ TEST_EXECS = $(TEST_SRC_FILES:tests/model/%.c=%$(EXE_EXT))
 
 # Main program sources
 MAIN_EXE = main$(EXE_EXT)
-MAIN_SRC = main.c model/block.c model/spike.c model/lava.c model/geo.c model/level.c model/world.c
+MAIN_SRC = main.c model/model.c model/block.c model/spike.c model/lava.c model/geo.c model/level.c model/world.c
 
 # Default target
 all: main

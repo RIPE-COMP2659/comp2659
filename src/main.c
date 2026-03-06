@@ -26,19 +26,19 @@ void test_rendering(UINT32 *base, Model model)
         plot_rectangle((UINT32 *)base, camera_get_relative_y(&world->camera, world->ground_y), 0, 4, SCREEN_WIDTH);
 
         /* Test Blocks */
-        for (i = world->cam_min_bi; i < world->cam_max_bi; i++) {
+        for (i = model.cam_min_bi; i < model.cam_max_bi; i++) {
             Block block = world->levels[0].blocks[i];
             plot_bitmap_32((UINT8 *)base, camera_get_relative_y(&world->camera, block.y), camera_get_relative_x(&world->camera, block.x), block.sprite, block.size);
         }
 
         /* Test Spikes */
-        for (i = world->cam_min_si; i < world->cam_max_si; i++) {
+        for (i = model.cam_min_si; i < model.cam_max_si; i++) {
             Spike spike = world->levels[0].spikes[i];
             plot_bitmap_32((UINT8 *)base, camera_get_relative_y(&world->camera, spike.y), camera_get_relative_x(&world->camera, spike.x), spike.sprite, spike.size);
         }
 
         /* Test Lava */
-        for (i = world->cam_min_li; i < world->cam_max_li; i++) {
+        for (i = model.cam_min_li; i < model.cam_max_li; i++) {
             Lava lava = world->levels[0].lava[i];
             plot_bitmap_32((UINT8 *)base, camera_get_relative_y(&world->camera, lava.y), camera_get_relative_x(&world->camera, lava.x), lava.sprite, lava.size);
         }

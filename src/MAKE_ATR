@@ -76,6 +76,7 @@ TLAVA  = t${LAVA}
 TLEVEL = t${LEVEL}
 TSPIKE = t${SPIKE}
 TWORLD = t${WORLD}
+TMODEL = t${MODEL}
 TCAMERA = t${CAMERA}
 
 # File Names, Tests - Raster
@@ -122,7 +123,7 @@ $(LEVEL).o: $(MODEL_FOLDER)\$(LEVEL).c $(MODEL_FOLDER)\$(LEVEL).h $(MODEL_FOLDER
 $(WORLD).o: $(MODEL_FOLDER)\$(WORLD).c $(MODEL_FOLDER)\$(WORLD).h $(MODEL_FOLDER)\dtypes.h
 	$(ATARI_CC) $(TOS_FLAGS) $(MODEL_FOLDER)\$(WORLD).c -o $(WORLD).o
 
-$(MODEL).o: $(MODEL_FOLDER)\$(MODEL).c $(MODEL_FOLDER)\$(MODEL).h $(MODEL_FOLDER)\$(WORLD).h $(MODEL_FOLDER)\dtypes.h
+$(MODEL).o: $(MODEL_FOLDER)\$(MODEL).c $(MODEL_FOLDER)\$(MODEL).h $(MODEL_FOLDER)\dtypes.h
 	$(ATARI_CC) $(TOS_FLAGS) $(MODEL_FOLDER)\$(MODEL).c -o $(MODEL).o
 
 $(MAIN).o: $(MAIN).c $(MODEL_FOLDER)\$(MODEL).h $(MODEL_FOLDER)\dtypes.h raster\raster.h
@@ -147,6 +148,9 @@ $(TSPIKE):
 
 $(TWORLD):
 	$(ATARI_CC) $(TEST_FLAGS) $(TESTS_MODEL_FOLDER)\$(TWORLD).c $(TEST_SRC) $(UNITY) -o $(TWORLD).ut
+
+$(TMODEL):
+	$(ATARI_CC) $(TEST_FLAGS) $(TESTS_MODEL_FOLDER)\$(TMODEL).c $(TEST_SRC) $(UNITY) -o $(TMODEL).ut
 
 $(TCAMERA):
 	$(ATARI_CC) $(TEST_FLAGS) $(TESTS_MODEL_FOLDER)\$(TCAMERA).c $(TEST_SRC) $(UNITY) -o $(TCAMERA).ut
@@ -204,13 +208,14 @@ $(TPLT_CLIP): $(PLT_CLIP).o
 
 
 # ----- Test Execution -------------------------------------------------------
-test: $(TBLOCK) $(TGEO) $(TLAVA) $(TLEVEL) $(TSPIKE) $(TWORLD) $(TCLR_SCN) $(TCLR_REG) $(TPLT_PXL) $(TPLT_HOR) $(TPLT_VRT) $(TPLT_LIN) $(TPLT_REC) $(TPLT_SQR) $(TPLT_TRI) $(TBMAP_8) $(TBMAP_16) $(TBMAP_32) $(TPLT_CHR) $(TPLT_STR) $(TBOUNDS) $(TPLT_CLIP)
+test: $(TBLOCK) $(TGEO) $(TLAVA) $(TLEVEL) $(TSPIKE) $(TWORLD) $(TMODEL) $(TCLR_SCN) $(TCLR_REG) $(TPLT_PXL) $(TPLT_HOR) $(TPLT_VRT) $(TPLT_LIN) $(TPLT_REC) $(TPLT_SQR) $(TPLT_TRI) $(TBMAP_8) $(TBMAP_16) $(TBMAP_32) $(TPLT_CHR) $(TPLT_STR) $(TBOUNDS) $(TPLT_CLIP)
 	$(TBLOCK).ut
 	$(TGEO).ut
 	$(TLAVA).ut
 	$(TLEVEL).ut
 	$(TSPIKE).ut
 	$(TWORLD).ut
+	$(TMODEL).ut
 	$(TCLR_SCN).ut
 	$(TCLR_REG).ut
 	$(TPLT_PXL).ut

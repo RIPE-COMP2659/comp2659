@@ -173,6 +173,7 @@ void test_geo_check_square_collision_top_collision(void) {
     unsigned int small_offset = object_size / 4;
     geo.x = 100;
     geo.y = 100;
+    geo.dy = -1;
 
     /* Object below geo and to the right */
     collision_result = geo_check_square_collision(&geo, geo.x + big_offset, geo.y - geo.size + small_offset, object_size);
@@ -194,6 +195,7 @@ void test_geo_check_square_collision_bottom_collision(void) {
     unsigned int small_offset = object_size / 4;
     geo.x = 100;
     geo.y = 100;
+    geo.dy = 1;
 
     /* Object above geo and to the right */
     collision_result = geo_check_square_collision(&geo, geo.x + big_offset, geo.y + object_size - small_offset, object_size);
