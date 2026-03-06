@@ -40,14 +40,20 @@ Model get_model(void);
 
 /**
  * Updates the model by delegating to model_update_camera, world_update,
- * model_update_collision, and world_update_collisions in order. The main
- * game world updating loop
+ * model_update_collision, world_update_collisions, model_check_death in
+ * order. The main game world updating loop
  *
  * Params:
  *     Model *model:
  *         Pointer to the model to update
  */
 void model_update(Model *model);
+
+/**
+ * Checks if Geo is dead, and if so, resets the level. Called each frame in
+ * model_update after updating the world and collisions
+ */
+void model_check_death(Model *model);
 
 /**
  * Updates the camera indices within the model, delegating to each of the

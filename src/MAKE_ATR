@@ -21,6 +21,7 @@ UNITY_FOLDER = $(TESTS_FOLDER)\unity
 
 # File Names, Base - Events
 ASYNC = async
+COND = cond
 
 # File Names, Base - Model
 BLOCK  = block
@@ -58,7 +59,7 @@ SHARED_FLAGS = -g
 # Program Configuration
 TOS_FLAGS      = $(SHARED_FLAGS) -c -I. -I$(MODEL_FOLDER) -I$(RASTER_FOLDER) -I$(EVENTS_FOLDER)
 MODEL_OBJECTS  = $(BLOCK).o $(SPIKE).o $(LAVA).o $(GEO).o $(LEVEL).o $(WORLD).o $(MODEL).o $(CAMERA).o $(MAIN).o
-EVENTS_OBJECTS = $(MODEL_OBJECTS) $(ASYNC).o
+EVENTS_OBJECTS = $(MODEL_OBJECTS) $(ASYNC).o $(COND).o
 RASTER_OBJECTS = $(CLR_SCN).o $(CLR_REG).o $(PLT_PXL).o $(PLT_HOR).o $(PLT_VRT).o $(PLT_LIN).o $(PLT_REC).o $(PLT_SQR).o $(PLT_TRI).o $(BMAP_8).o $(BMAP_16).o $(BMAP_32).o $(PLT_CHR).o $(PLT_STR).o $(BOUNDS).o $(PLT_CLIP).o
 TOS_OBJECTS    = $(MODEL_OBJECTS) $(RASTER_OBJECTS)
 
@@ -74,13 +75,14 @@ UNITY      = $(UNITY_FOLDER)\unity.c
 
 # Events Test Configuration
 EVENTS_TEST_FLAGS = $(SHARED_FLAGS) -I. -I$(MODEL_FOLDER) -I$(EVENTS_FOLDER) -I$(UNITY_FOLDER) -DUNITY_EXCLUDE_STDINT_H -DUNITY_INT_WIDTH=16 -DUNITY_LONG_WIDTH=32 -DUNITY_POINTER_WIDTH=32 -DTESTING
-EVENTS_TEST_SRC = $(TEST_SRC) $(EVENTS_FOLDER)\$(ASYNC).c
+EVENTS_TEST_SRC = $(TEST_SRC) $(EVENTS_FOLDER)\$(ASYNC).c $(EVENTS_FOLDER)\$(COND).c
 
 # Raster Test Configuration
 RASTER_TEST_FLAGS = $(SHARED_FLAGS) -I. -I$(RASTER_FOLDER) -I$(UNITY_FOLDER) -DUNITY_EXCLUDE_STDINT_H -DUNITY_INT_WIDTH=16 -DUNITY_LONG_WIDTH=32 -DUNITY_POINTER_WIDTH=32 -DTESTING
 
 # File Names, Tests - Events
 TASYNC = t${ASYNC}
+TCOND = t${COND}
 
 # File Names, Tests - Model
 TBLOCK = t${BLOCK}
@@ -145,6 +147,9 @@ $(MAIN).o: $(MAIN).c $(MODEL_FOLDER)\$(MODEL).h $(MODEL_FOLDER)\dtypes.h raster\
 $(ASYNC).o: $(EVENTS_FOLDER)\$(ASYNC).c $(EVENTS_FOLDER)\$(ASYNC).h $(MODEL_FOLDER)\dtypes.h
 	$(ATARI_CC) $(TOS_FLAGS) $(EVENTS_FOLDER)\$(ASYNC).c -o $(ASYNC).o
 
+$(COND).o: $(EVENTS_FOLDER)\$(COND).c $(EVENTS_FOLDER)\$(COND).h $(MODEL_FOLDER)\dtypes.h
+	$(ATARI_CC) $(TOS_FLAGS) $(EVENTS_FOLDER)\$(COND).c -o $(COND).o
+
 
 # ----- Test Builds ----------------------------------------------------------
 $(TBLOCK):
@@ -175,6 +180,9 @@ $(TCAMERA):
 # ----- Events Test Builds ---------------------------------------------------
 $(TASYNC):
 	$(ATARI_CC) $(EVENTS_TEST_FLAGS) $(TESTS_EVENTS_FOLDER)\$(TASYNC).c $(EVENTS_TEST_SRC) $(UNITY) -o $(TASYNC).ut
+
+$(TCOND):
+	$(ATARI_CC) $(EVENTS_TEST_FLAGS) $(TESTS_EVENTS_FOLDER)\$(TCOND).c $(EVENTS_TEST_SRC) $(UNITY) -o $(TCOND).ut
 
 
 # TODO: For some of these, there is cascading dependencies on objects, eg chr
@@ -229,7 +237,7 @@ $(TPLT_CLIP): $(PLT_CLIP).o
 
 
 # ----- Test Execution -------------------------------------------------------
-test: $(TBLOCK) $(TGEO) $(TLAVA) $(TLEVEL) $(TSPIKE) $(TWORLD) $(TMODEL) $(TCAMERA) $(TASYNC) $(TCLR_SCN) $(TCLR_REG) $(TPLT_PXL) $(TPLT_HOR) $(TPLT_VRT) $(TPLT_LIN) $(TPLT_REC) $(TPLT_SQR) $(TPLT_TRI) $(TBMAP_8) $(TBMAP_16) $(TBMAP_32) $(TPLT_CHR) $(TPLT_STR) $(TBOUNDS) $(TPLT_CLIP)
+test: $(TBLOCK) $(TGEO) $(TLAVA) $(TLEVEL) $(TSPIKE) $(TWORLD) $(TMODEL) $(TCAMERA) $(TASYNC) $(TCOND) $(TCLR_SCN) $(TCLR_REG) $(TPLT_PXL) $(TPLT_HOR) $(TPLT_VRT) $(TPLT_LIN) $(TPLT_REC) $(TPLT_SQR) $(TPLT_TRI) $(TBMAP_8) $(TBMAP_16) $(TBMAP_32) $(TPLT_CHR) $(TPLT_STR) $(TBOUNDS) $(TPLT_CLIP)
 	$(TBLOCK).ut
 	$(TGEO).ut
 	$(TLAVA).ut
@@ -239,6 +247,7 @@ test: $(TBLOCK) $(TGEO) $(TLAVA) $(TLEVEL) $(TSPIKE) $(TWORLD) $(TMODEL) $(TCAME
 	$(TMODEL).ut
 	$(TCAMERA).ut
 	$(TASYNC).ut
+	$(TCOND).ut
 	$(TCLR_SCN).ut
 	$(TCLR_REG).ut
 	$(TPLT_PXL).ut
@@ -308,4 +317,4 @@ $(PLT_CLIP).o: $(RASTER_FOLDER)\$(PLT_CLIP).s
 
 # ----- Output ---------------------------------------------------------------
 # Otherwise the Make can think that the commands are files.
-.PHONY: test $(TBLOCK) $(TGEO) $(TLAVA) $(TLEVEL) $(TSPIKE) $(TWORLD) $(TMODEL) $(TCAMERA) $(TCLR_SCN) $(TCLR_REG) $(TPLT_PXL) $(TPLT_HOR) $(TPLT_VRT) $(TPLT_LIN) $(TPLT_REC) $(TPLT_SQR) $(TPLT_TRI) $(TBMAP_8) $(TBMAP_16) $(TBMAP_32) $(TPLT_CHR) $(TPLT_STR) $(TBOUNDS) $(TPLT_CLIP)
+.PHONY: test $(TBLOCK) $(TGEO) $(TLAVA) $(TLEVEL) $(TSPIKE) $(TWORLD) $(TMODEL) $(TCAMERA) $(TASYNC) $(TCOND) $(TCLR_SCN) $(TCLR_REG) $(TPLT_PXL) $(TPLT_HOR) $(TPLT_VRT) $(TPLT_LIN) $(TPLT_REC) $(TPLT_SQR) $(TPLT_TRI) $(TBMAP_8) $(TBMAP_16) $(TBMAP_32) $(TPLT_CHR) $(TPLT_STR) $(TBOUNDS) $(TPLT_CLIP)
