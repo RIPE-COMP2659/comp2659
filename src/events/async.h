@@ -4,23 +4,15 @@
  * PURPOSE: Prototypes for asynchronous (user input-triggered)
  *          event handlers.
  */
+#include "../model/model.h"
 
-#ifndef ASYNC_H
-#define ASYNC_H
-
-#include "../model/geo.h"
-
-/*
- * on_jump_request
+/**
+ * Handles the asynchronous jump event triggered by the spacebar. Delegates
+ * to geo_jump
  *
- * PURPOSE: Handles the asynchronous jump event triggered by
- *          the spacebar. Only allows a jump when Geo is on
- *          a surface (dy == 0).
- *
- * INPUT:   geo — pointer to the player Geo struct
- *
- * OUTPUT:  None (modifies geo in place via geo_jump)
+ * Params:
+ *     Model *model:
+ *         The model that contains geo to be passed to geo_jump, assumed to
+ *         be non-null
  */
-void on_jump_request(Geo *geo);
-
-#endif
+void on_jump_request(Model *model);
