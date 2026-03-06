@@ -1,3 +1,6 @@
+#ifndef LAVA_H
+#define LAVA_H
+
 #include "dtypes.h"
 
 /* TODO: Lava is an individual block and should be a big object to optimize
@@ -40,3 +43,5 @@ typedef struct {
  *     Lava: A lava tile with the given x and y values
  */
 Lava create_lava(unsigned int x, unsigned int y);
+
+#endif

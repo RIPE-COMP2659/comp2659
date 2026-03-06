@@ -1,3 +1,6 @@
+#ifndef WORLD_H
+#define WORLD_H
+
 #include "camera.h"
 #include "geo.h"
 #include "level.h"
@@ -55,6 +58,18 @@ World create_world(Level *levels, Geo geo, unsigned int ground_y);
  *     World: The default world with default levels, geo, and ground_y
  */
 World get_world(void);
+
+/**
+ * Resets the current level by resetting geo's position to the start of the
+ * level and setting is_dead to false. Note that this does not reset the
+ * camera, as it will be updated on the next world_update call, and does not
+ * reset any blocks, spikes, or lava, as they are static in our current levels
+ *
+ * Params:
+ *     World *world:
+ *         The world to reset the level in
+ */
+void world_reset_level(World *world);
 
 /**
  * Updates the world by updating the geo and camera coordinates, does not
@@ -214,3 +229,5 @@ void world_collision_geo_lava(World *world, Lava *lava);
  *         The world to check for collisions in
  */
 void world_collision_geo_ground(World *world);
+
+#endif

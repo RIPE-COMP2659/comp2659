@@ -1,3 +1,6 @@
+#ifndef SPIKE_H
+#define SPIKE_H
+
 #include "dtypes.h"
 
 /* The size of a spike, length and width, in pixels */
@@ -38,3 +41,5 @@ typedef struct {
  *         A spike struct with the given x and y, and default size and sprite
  */
 Spike create_spike(unsigned int x, unsigned int y);
+
+#endif

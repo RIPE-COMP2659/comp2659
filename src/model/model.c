@@ -23,6 +23,13 @@ void model_update(Model *model) {
     world_update(&model->world);
     model_update_collision(model);
     world_update_collisions(&model->world, model->col_min_bi, model->col_max_bi, model->col_min_si, model->col_max_si, model->col_min_li, model->col_max_li);
+    model_check_death(model);
+}
+
+void model_check_death(Model *model) {
+    if (model->world.geo.is_dead == TRUE) {
+        world_reset_level(&model->world);
+    }
 }
 
 void model_update_collision(Model *model) {

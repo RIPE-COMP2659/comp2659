@@ -33,6 +33,12 @@ World get_world(void) {
     return create_world(levels, geo, ground_y);
 }
 
+void world_reset_level(World *world) {
+    world->geo.x = CAMERA_OFFSET;
+    world->geo.y = world->ground_y + GEO_SIZE;
+    world->geo.is_dead = FALSE;
+}
+
 void world_update(World *world) {
     geo_update(&world->geo);
     camera_update_coordinates(
