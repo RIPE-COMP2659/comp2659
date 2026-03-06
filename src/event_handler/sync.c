@@ -22,13 +22,14 @@
  *
  * ASSUMPTIONS: world is not NULL
  */
-void on_clock_tick(World *world, unsigned int level_index) {
-  /* 1. Update Geo's position and velocity */
-  geo_update(&world->geo);
+void on_clock_tick(World *world, unsigned int level_index)
+{
+    /* 1. Update Geo's position and velocity */
+    geo_update(&world->geo);
 
-  /* 2. Update camera position and entity visibility indices */
-  world_update_camera(world, level_index);
+    /* 2. Update camera position and entity visibility indices */
+    world_update_camera(world, level_index);
 
-  /* 3. Check for collisions using tracked block boundaries */
-  check_collisions(world, level_index);
+    /* 3. Check for collisions using tracked block boundaries */
+    check_collisions(world, level_index);
 }
