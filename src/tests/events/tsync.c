@@ -3,7 +3,7 @@
 
 Model test_model;
 unsigned int original_geo_x;
-signed int original_geo_y;
+unsigned int original_geo_y;
 
 void setUp(void) {
     test_model = get_model();
