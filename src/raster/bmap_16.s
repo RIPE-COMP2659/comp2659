@@ -22,7 +22,7 @@
         xref    _check_bounds
         xref    _plot_clipped_bitmap
 
-SCREEN_HEIGHT equ       400                             ; Screen height in pixels
+SCREEN_HEIGHT equ 400                           ; Screen height in pixels
 
 base    equ     8             
 row     equ     12               
@@ -43,40 +43,40 @@ _plot_bitmap_16:
                 ; Check bounds first
 
 
- ; Vertical clipping first - check if top edge is off screen
+; Vertical clipping first - check if top edge is off screen
         move.w  row(a6),d0
-        bge.s   check_bottom                            ; If row >= 0, skip top clip
+        bge.s   check_bottom                    ; If row >= 0, skip top clip
 
                 ; Handle top clipping (row < 0)
         move.w  d0,d1
-        neg.w   d1                                      ; d1 = pixels off top (|row|)
-        cmp.w   height(a6),d1                           ; Is the whole bitmap off top?
-        bge     done                                    ; If so, entirely off screen, skip drawing
+        neg.w   d1                              ; d1 = pixels off top (|row|)
+        cmp.w   height(a6),d1                   ; Is the whole bitmap off top?
+        bge     done                            ; If so, entirely off screen, skip drawing
 
                 ; Partially off top
-        add.w   d0,height(a6)                           ; Decrease height by clipped rows
-        clr.w   row(a6)                                 ; Set row to 0 (top of screen)
+        add.w   d0,height(a6)                   ; Decrease height by clipped rows
+        clr.w   row(a6)                         ; Set row to 0 (top of screen)
 
                 ; Advance bitmap pointer (2 bytes per row for 16-bit)
         move.l  bitmap(a6),a0
-        ext.l   d1                                      ; Extend word to long for address math
-        lsl.l   #1,d1                                   ; Multiply by 2 (2 bytes per row)
-        adda.l  d1,a0                                   ; Advance pointer
-        move.l  a0,bitmap(a6)                           ; Save updated bitmap pointer
+        ext.l   d1                              ; Extend word to long for address math
+        lsl.l   #1,d1                           ; Multiply by 2 (2 bytes per row)
+        adda.l  d1,a0                           ; Advance pointer
+        move.l  a0,bitmap(a6)                   ; Save updated bitmap pointer
 
 check_bottom:
         move.w  row(a6),d0
         cmp.w   #SCREEN_HEIGHT,d0
-        bge     done                                    ; If row >= SCREEN_HEIGHT, entirely off bottom
+        bge     done                            ; If row >= SCREEN_HEIGHT, entirely off bottom
 
-        add.w   height(a6),d0                           ; d0 = row + height (bottom edge Y)
+        add.w   height(a6),d0                   ; d0 = row + height (bottom edge Y)
         cmp.w   #SCREEN_HEIGHT,d0
-        ble.s   v_clip_done                             ; If bottom edge <= SCREEN_HEIGHT, skip bottom clip
+        ble.s   v_clip_done                     ; If bottom edge <= SCREEN_HEIGHT, skip bottom clip
 
                 ; Partially off bottom
         move.w  #SCREEN_HEIGHT,d0
-        sub.w   row(a6),d0                              ; d0 = SCREEN_HEIGHT - row
-        move.w  d0,height(a6)                           ; Update height to fit exactly on screen
+        sub.w   row(a6),d0                      ; d0 = SCREEN_HEIGHT - row
+        move.w  d0,height(a6)                   ; Update height to fit exactly on screen
 
 v_clip_done:
         

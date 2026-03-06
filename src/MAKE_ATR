@@ -5,9 +5,6 @@
 # builds. Two seperate files are maintained because otherwise the gcc make
 # would become very large and difficult to maintain.
 #
-# Atari ST build:   make atari
-# Run tests:        make test
-# Clean:            make clean
 # ============================================================================
 # TODO: Update above documentation
 
@@ -19,6 +16,7 @@ RENDERER_FOLDER = renderer
 TESTS_FOLDER = tests
 TESTS_ENTITIES_FOLDER = $(TESTS_FOLDER)\$(ENTITIES_FOLDER)
 TESTS_RASTER_FOLDER = $(TESTS_FOLDER)\$(RASTER_FOLDER)
+TESTS_EVENTS_FOLDER = $(TESTS_FOLDER)\${EVENTS_FOLDER}
 UNITY_FOLDER = $(TESTS_FOLDER)\unity
 
 # File Names, Base - Entities
@@ -68,6 +66,10 @@ TEST_FLAGS = $(SHARED_FLAGS) -I. -I$(ENTITIES_FOLDER) -I$(UNITY_FOLDER) -DUNITY_
 TEST_SRC   = $(ENTITIES_FOLDER)\$(BLOCK).c $(ENTITIES_FOLDER)\$(SPIKE).c $(ENTITIES_FOLDER)\$(LAVA).c $(ENTITIES_FOLDER)\$(GEO).c $(ENTITIES_FOLDER)\$(LEVEL).c $(ENTITIES_FOLDER)\$(WORLD).c $(ENTITIES_FOLDER)\$(CAMERA).c
 UNITY      = $(UNITY_FOLDER)\unity.c
 
+# Events Test Configuration
+EVENTS_TEST_FLAGS = $(SHARED_FLAGS) -I. -I$(MODEL_FOLDER) -I$(EVENTS_FOLDER) -I$(UNITY_FOLDER) -DUNITY_EXCLUDE_STDINT_H -DUNITY_INT_WIDTH=16 -DUNITY_LONG_WIDTH=32 -DUNITY_POINTER_WIDTH=32 -DTESTING
+EVENTS_TEST_SRC = $(TEST_SRC) $(EVENTS_FOLDER)\$(ASYNC).c $(EVENTS_FOLDER)\$(COND).c $(EVENTS_FOLDER)\$(SYNC).c
+
 # Raster Test Configuration
 RASTER_TEST_FLAGS = $(SHARED_FLAGS) -I. -I$(RASTER_FOLDER) -I$(UNITY_FOLDER) -DUNITY_EXCLUDE_STDINT_H -DUNITY_INT_WIDTH=16 -DUNITY_LONG_WIDTH=32 -DUNITY_POINTER_WIDTH=32 -DTESTING
 
@@ -78,6 +80,7 @@ TLAVA  = t${LAVA}
 TLEVEL = t${LEVEL}
 TSPIKE = t${SPIKE}
 TWORLD = t${WORLD}
+TMODEL = t${MODEL}
 TCAMERA = t${CAMERA}
 
 TREND     = t_rend
@@ -133,6 +136,15 @@ $(RENDERER).o: $(RENDERER_FOLDER)\$(RENDERER).c $(RENDERER_FOLDER)\$(RENDERER).h
 
 $(MAIN).o: $(MAIN).c $(ENTITIES_FOLDER)\$(WORLD).h $(ENTITIES_FOLDER)\dtypes.h raster\raster.h
 	$(ATARI_CC) $(TOS_FLAGS) $(MAIN).c -o $(MAIN).o
+
+$(ASYNC).o: $(EVENTS_FOLDER)\$(ASYNC).c $(EVENTS_FOLDER)\$(ASYNC).h $(MODEL_FOLDER)\dtypes.h
+	$(ATARI_CC) $(TOS_FLAGS) $(EVENTS_FOLDER)\$(ASYNC).c -o $(ASYNC).o
+
+$(COND).o: $(EVENTS_FOLDER)\$(COND).c $(EVENTS_FOLDER)\$(COND).h $(MODEL_FOLDER)\dtypes.h
+	$(ATARI_CC) $(TOS_FLAGS) $(EVENTS_FOLDER)\$(COND).c -o $(COND).o
+
+$(SYNC).o: $(EVENTS_FOLDER)\$(SYNC).c $(EVENTS_FOLDER)\$(SYNC).h $(MODEL_FOLDER)\dtypes.h
+	$(ATARI_CC) $(TOS_FLAGS) $(EVENTS_FOLDER)\$(SYNC).c -o $(SYNC).o
 
 
 # ----- Test Builds ----------------------------------------------------------
@@ -219,6 +231,11 @@ test: $(TBLOCK) $(TGEO) $(TLAVA) $(TLEVEL) $(TSPIKE) $(TWORLD) $(TCLR_SCN) $(TCL
 	$(TLEVEL).ut
 	$(TSPIKE).ut
 	$(TWORLD).ut
+	$(TMODEL).ut
+	$(TCAMERA).ut
+	$(TASYNC).ut
+	$(TCOND).ut
+	$(TSYNC).ut
 	$(TCLR_SCN).ut
 	$(TCLR_REG).ut
 	$(TPLT_PXL).ut
@@ -287,7 +304,6 @@ $(BOUNDS).o: $(RASTER_FOLDER)\$(BOUNDS).s
 $(PLT_CLIP).o: $(RASTER_FOLDER)\$(PLT_CLIP).s
 	$(ATARI_CC) $(SHARED_FLAGS) -c $(RASTER_FOLDER)\$(PLT_CLIP).s -o $(PLT_CLIP).o
 
-
 # ----- Output ---------------------------------------------------------------
 # Otherwise the Make can think that the commands are files.
-.PHONY: test $(TBLOCK) $(TGEO) $(TLAVA) $(TLEVEL) $(TSPIKE) $(TWORLD) $(TCLR_SCN) $(TCLR_REG) $(TPLT_PXL) $(TPLT_HOR) $(TPLT_VRT) $(TPLT_LIN) $(TPLT_REC) $(TPLT_SQR) $(TPLT_TRI) $(TBMAP_8) $(TBMAP_16) $(TBMAP_32) $(TPLT_CHR) $(TPLT_STR) $(TBOUNDS) $(TPLT_CLIP)
+.PHONY: test $(TBLOCK) $(TGEO) $(TLAVA) $(TLEVEL) $(TSPIKE) $(TWORLD) $(TMODEL) $(TCAMERA) $(TASYNC) $(TCOND) $(TSYNC) $(TCLR_SCN) $(TCLR_REG) $(TPLT_PXL) $(TPLT_HOR) $(TPLT_VRT) $(TPLT_LIN) $(TPLT_REC) $(TPLT_SQR) $(TPLT_TRI) $(TBMAP_8) $(TBMAP_16) $(TBMAP_32) $(TPLT_CHR) $(TPLT_STR) $(TBOUNDS) $(TPLT_CLIP)

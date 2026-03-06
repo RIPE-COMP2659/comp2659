@@ -13,6 +13,8 @@ void test_rendering(UINT8 *base, Model *model)
 {
     World *world = &model->world;
     unsigned int w_iter;
+    int input;
+    signed int current_event;
 
     for (w_iter = 0; w_iter < 200; w_iter++) {
         /* 1. Update Model Logic */
