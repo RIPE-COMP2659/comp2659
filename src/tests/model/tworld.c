@@ -2,6 +2,7 @@
 #include "world.h"
 
 /* TODO: world_update_collisions tests missing */
+/* TODO: world_reset tests */
 
 Block block;
 Spike spike;
