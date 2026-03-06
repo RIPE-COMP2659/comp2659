@@ -1,9 +1,9 @@
 #ifndef SYNC_H
 #define SYNC_H
 
-#include "../entities/geo.h"
-#include "../entities/level.h"
-#include "../entities/world.h"
+#include "../model/geo.h"
+#include "../model/level.h"
+#include "../model/world.h"
 
 /*
  * on_clock_tick

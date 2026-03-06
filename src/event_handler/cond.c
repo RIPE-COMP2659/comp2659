@@ -7,7 +7,7 @@
  */
 
 #include "cond.h"
-#include "../entities/dtypes.h"
+#include "../model/dtypes.h"
 #include "events.h"
 
 /*

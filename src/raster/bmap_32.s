@@ -22,7 +22,7 @@
         xref    _check_bounds
         xref    _plot_clipped_bitmap
 
-SCREEN_HEIGHT equ       400                             ; Screen height in pixels
+SCREEN_HEIGHT equ 400                           ; Screen height in pixels
 
 base    equ     8             
 row     equ     12
@@ -43,38 +43,38 @@ _plot_bitmap_32:
 
                 ; Vertical clipping first - check if top edge is off screen
         move.w  row(a6),d0
-        bge.s   check_bottom                            ; If row >= 0, skip top clip
+        bge   check_bottom                    ; If row >= 0, skip top clip
 
                 ; Handle top clipping (row < 0)
         move.w  d0,d1
-        neg.w   d1                                      ; d1 = pixels off top (|row|)
-        cmp.w   height(a6),d1                           ; Is the whole bitmap off top?
-        bge     done                                    ; If so, entirely off screen, skip drawing
+        neg.w   d1                              ; d1 = pixels off top (|row|)
+        cmp.w   height(a6),d1                   ; Is the whole bitmap off top?
+        bge     done                            ; If so, entirely off screen, skip drawing
 
                 ; Partially off top
-        add.w   d0,height(a6)                           ; Decrease height by clipped rows
-        clr.w   row(a6)                                 ; Set row to 0 (top of screen)
+        add.w   d0,height(a6)                   ; Decrease height by clipped rows
+        clr.w   row(a6)                         ; Set row to 0 (top of screen)
 
                 ; Advance bitmap pointer (4 bytes per row for 32-bit)
         move.l  bitmap(a6),a0
-        ext.l   d1                                      ; Extend word to long for address math
-        lsl.l   #2,d1                                   ; Multiply by 4 (4 bytes per row)
-        adda.l  d1,a0                                   ; Advance pointer
-        move.l  a0,bitmap(a6)                           ; Save updated bitmap pointer
+        ext.l   d1                              ; Extend word to long for address math
+        lsl.l   #2,d1                           ; Multiply by 4 (4 bytes per row)
+        adda.l  d1,a0                           ; Advance pointer
+        move.l  a0,bitmap(a6)                   ; Save updated bitmap pointer
 
 check_bottom:
         move.w  row(a6),d0
         cmp.w   #SCREEN_HEIGHT,d0
-        bge     done                                    ; If row >= SCREEN_HEIGHT, entirely off bottom
+        bge     done                            ; If row >= SCREEN_HEIGHT, entirely off bottom
 
-        add.w   height(a6),d0                           ; d0 = row + height (bottom edge Y)
+        add.w   height(a6),d0                   ; d0 = row + height (bottom edge Y)
         cmp.w   #SCREEN_HEIGHT,d0
-        ble.s   v_clip_done                             ; If bottom edge <= SCREEN_HEIGHT, skip bottom clip
+        ble   v_clip_done                     ; If bottom edge <= SCREEN_HEIGHT, skip bottom clip
 
                 ; Partially off bottom
         move.w  #SCREEN_HEIGHT,d0
-        sub.w   row(a6),d0                              ; d0 = SCREEN_HEIGHT - row
-        move.w  d0,height(a6)                           ; Update height to fit exactly on screen
+        sub.w   row(a6),d0                      ; d0 = SCREEN_HEIGHT - row
+        move.w  d0,height(a6)                   ; Update height to fit exactly on screen
 
 v_clip_done:
 
@@ -297,21 +297,21 @@ shift_loop_32:
         lsr.l   #8,d3                           ; shift right 24 bits
         lsr.l   #8,d3
         lsr.l   #8,d3
-        or.b    d3,(a0)                         ; OR into screen byte 0
+        or.b    d3,(a0)                         ; OR into screen byte 0 (preserve masked bits)
                 
                 ; Byte 1
         move.l  d0,d3
         lsr.l   #8,d3                           ; shift right 16 bits
         lsr.l   #8,d3
-        or.b    d3,1(a0)                        ; OR into screen byte 1
+        move.b  d3,1(a0)                        ; write into screen byte 1
                 
                 ; Byte 2
         move.l  d0,d3
         lsr.l   #8,d3                           ; shift right 8 bits
-        or.b    d3,2(a0)                        ; OR into screen byte 2
+        move.b  d3,2(a0)                        ; write into screen byte 2
                 
                 ; Byte 3
-        or.b    d0,3(a0)                        ; OR into screen byte 3 (low byte of d0)
+        move.b  d0,3(a0)                        ; write into screen byte 3 (low byte of d0)
                 
                 ; Byte 4 (rightmost, overflow bits) - needs masking to preserve low bits
         move.l  #$ff,d4                         ; start with 0x0000FF

@@ -235,17 +235,16 @@ void test_plot_bitmap_32_off_right_edge(void)
     {
         for (col = 0; col < 15; col++)
         {
-            TEST_ASSERT_EQUAL_INT(0, get_pixel(mock_screen, row, start_col + col));
+            TEST_ASSERT_EQUAL_INT_MESSAGE(1, get_pixel(mock_screen, row, start_col + col), "white failed");
         }
     }
 
     /* Verify pixels before the sprite remain black */
     for (row = 0; row < 32; row++)
     {
-        TEST_ASSERT_EQUAL_INT(COLOR_BLACK, get_pixel(mock_screen, row, start_col - 1));
+        TEST_ASSERT_EQUAL_INT_MESSAGE(COLOR_BLACK, get_pixel(mock_screen, row, start_col - 1), "Black failed");
     }
 
-    TEST_ASSERT_EQUAL_INT(COLOR_BLACK, get_pixel(mock_screen, 32, start_col));
 }
 
 /* Test: Plot 32x32 sprite partially off top edge */

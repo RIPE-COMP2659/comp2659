@@ -1,10 +1,6 @@
-#ifndef BLOCK_H
-#define BLOCK_H
+#include "block.h"
 
-#include "dtypes.h"
-
-#define BLOCK_SIZE 32
-
+/* Global sprite, each Block will point here */
 static const unsigned int BLOCK_SPRITE[BLOCK_SIZE][BLOCK_SIZE / WORD] = {
     {0xFFFF, 0xFFFF},/* 1 */
     {0xFFFF, 0xFFFF},
@@ -40,13 +36,11 @@ static const unsigned int BLOCK_SPRITE[BLOCK_SIZE][BLOCK_SIZE / WORD] = {
     {0xFFFF, 0xFFFF} /* 32 */
 };
 
-typedef struct {
-  unsigned int x;
-  unsigned int y;
-  unsigned int size;
-  const unsigned int (*sprite)[BLOCK_SIZE / WORD];
-} Block;
-
-void block_placeholder(void);
-
-#endif /* BLOCK_H */
+Block create_block(unsigned int x, unsigned int y) {
+    Block block;
+    block.x = x;
+    block.y = y;
+    block.size = BLOCK_SIZE;
+    block.sprite = BLOCK_SPRITE;
+    return block;
+};

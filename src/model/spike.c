@@ -1,10 +1,6 @@
-#ifndef SPIKE_H
-#define SPIKE_H
+#include "spike.h"
 
-#include "dtypes.h"
-
-#define SPIKE_SIZE 32
-
+/* The global sprite for a spike, all spike sprites point here */
 static const unsigned int SPIKE_SPRITE[SPIKE_SIZE][SPIKE_SIZE / WORD] = {
   {0x0001, 0x8000},/* 1 */
   {0x0001, 0x8000},
@@ -40,13 +36,13 @@ static const unsigned int SPIKE_SPRITE[SPIKE_SIZE][SPIKE_SIZE / WORD] = {
   {0xC000, 0x0003} /* 32 */
 };
 
-typedef struct {
-  unsigned int x;
-  unsigned int y;
-  unsigned int size;
-  const unsigned int (*sprite)[SPIKE_SIZE / WORD];
-} Spike;
+Spike create_spike(unsigned int x, unsigned int y) {
+    Spike spike;
 
-void spike_placeholder(void);
+    spike.x = x;
+    spike.y = y;
+    spike.size = SPIKE_SIZE;
+    spike.sprite = SPIKE_SPRITE;
 
-#endif /* SPIKE_H */
+    return spike;
+}

@@ -1,19 +1,13 @@
-#ifndef LAVA_H
-#define LAVA_H
+#include "lava.h"
 
-#include "dtypes.h"
-
-#define LAVA_SIZE 32
-
+/* Global Lava sprite */
 static const unsigned int LAVA_SPRITE[LAVA_SIZE][LAVA_SIZE / WORD] = {
-    /* 1–2: full white */
-    {0x0000, 0x0000}, /* 1 */
+    {0x0000, 0x0000}, /* 1, white */
     {0x0000, 0x0000},
 
-    /* 3–12: chessboard */
+    {0xAAAA, 0xAAAA}, /* 3, checkerboard */
+    {0x5555, 0x5555},
     {0xAAAA, 0xAAAA},
-    {0x5555, 0x5555}, /* 4 */
-    {0xAAAA, 0xAAAA}, /* 5 */
     {0x5555, 0x5555},
     {0xAAAA, 0xAAAA},
     {0x5555, 0x5555},
@@ -22,8 +16,7 @@ static const unsigned int LAVA_SPRITE[LAVA_SIZE][LAVA_SIZE / WORD] = {
     {0xAAAA, 0xAAAA},
     {0x5555, 0x5555}, /* 12 */
 
-    /* 13–32: full black */
-    {0xFFFF, 0xFFFF}, /* 13 */
+    {0xFFFF, 0xFFFF}, /* 13, black */
     {0xFFFF, 0xFFFF},
     {0xFFFF, 0xFFFF},
     {0xFFFF, 0xFFFF},
@@ -45,13 +38,13 @@ static const unsigned int LAVA_SPRITE[LAVA_SIZE][LAVA_SIZE / WORD] = {
     {0xFFFF, 0xFFFF} /* 32 */
 };
 
-typedef struct {
-  unsigned int x;
-  unsigned int y;
-  unsigned int size;
-  const unsigned int (*sprite)[LAVA_SIZE / WORD];
-} Lava;
+Lava create_lava(unsigned int x, unsigned int y) {
+    Lava lava;
 
-void lava_placeholder(void);
+    lava.x = x;
+    lava.y = y;
+    lava.size = LAVA_SIZE;
+    lava.sprite = LAVA_SPRITE;
 
-#endif /* LAVA_H */
+    return lava;
+}

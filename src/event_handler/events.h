@@ -18,6 +18,7 @@
 #define EVENT_OFF_PLATFORM 4
 
 #include "async.h"
+#include "sync.h"
 #include "cond.h"
 #include "sync.h"
 

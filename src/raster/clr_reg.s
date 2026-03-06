@@ -16,7 +16,7 @@
 ; Falls back to generic byte-by-byte clearing for other widths or odd addresses.
 ;
 
-
+SCREEN_HEIGHT equ 400           
 
         xdef    _clear_region
 
@@ -27,9 +27,40 @@ length  equ     16
 width   equ     18
 
 
-_clear_region:  
+_clear_region: 
+
         link    a6,#0
-        movem.l d0-d7/a0-a6,-(sp)
+        movem.l d0-d7/a0-a5,-(sp)
+
+                ; Check vertical bounds
+
+                ; Vertical clipping first - check if top edge is off screen
+        move.w  row(a6),d0
+        bge     check_bottom
+
+                ; Handle top clipping (row < 0)
+        move.w  length(a6),d1
+        add.w   d0,d1                           ; d1 = length + row (row is negative)
+        ble     done                            ; If still <= 0, entirely off screen
+        move.w  d1,length(a6)                  ; Update length to clipped height
+        clr.w   row(a6)                         ; Set row to 0 (top of screen)
+        
+  
+check_bottom:
+        move.w  row(a6),d0
+        cmp.w   #SCREEN_HEIGHT,d0
+        bge     done                            ; If row >= SCREEN_HEIGHT, entirely off bottom
+
+        add.w   length(a6),d0                   ; d0 = row + height (bottom edge Y)
+        cmp.w   #SCREEN_HEIGHT,d0
+        ble   v_clip_done                     ; If bottom edge <= SCREEN_HEIGHT, skip bottom clip
+
+                ; Partially off bottom
+        move.w  #SCREEN_HEIGHT,d0
+        sub.w   row(a6),d0                      ; d0 = SCREEN_HEIGHT - row
+        move.w  d0,length(a6)                   ; Update height to fit exactly on screen
+
+v_clip_done:
 
         tst.w   length(a6)                      ; nothing to clear if length == 0
         beq     done
@@ -73,7 +104,7 @@ row_loop_32: move.l d1,(a0)                     ; write 1 long (4 bytes)
         adda.w  #80,a0                          ; move to next row (80 bytes per row)
         dbra    d7,row_loop_32
                 
-        movem.l (sp)+,d0-d7/a0-a6
+        movem.l (sp)+,d0-d7/a0-a5
         unlk    a6
         rts
 
@@ -177,6 +208,7 @@ next_row:
         dbra    d7,row_loop
 
 done:
-        movem.l (sp)+,d0-d7/a0-a6
+        movem.l (sp)+,d0-d7/a0-a5
         unlk    a6
         rts
+
