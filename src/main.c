@@ -3,6 +3,7 @@
 #include "model/model.h"
 #include "raster/raster.h"
 #include "render/render.h"
+#include "events/events.h"
 
 #define BYTES_PER_SCREEN 32000
 
@@ -16,21 +17,22 @@ void test_rendering(UINT8 *base, Model *model)
     int input;
     signed int current_event;
 
-    for (w_iter = 0; w_iter < 200; w_iter++) {
-        /* 1. Update Model Logic */
-        model_update(model);
+    for (w_iter = 0; w_iter < 400; w_iter++) {
+        /* Temporary input */
+        input = Cnecin();
+        printf("Input: %d\n", input);
+        if (input == 32) {
+            on_jump_request(model);
+        }
 
-        /* 2. Clear Buffer */
-        clear_screen((UINT32 *)base);
+        /* Cleans up once further along */
+        current_event = check_level_complete(model);
+        if (current_event == EVENT_LEVEL_DONE) {
+            printf("Level Complete!\n");
+        }
+        on_clock_tick(model);
 
-        /* 3. Render World State using the new renderer module */
         render(model, base);
-
-        /* Debug Info */
-        printf("Geo x: %d (Frame: %d)\n", world->geo.x, w_iter);
-        
-        /* Wait for input to step through frames (optional) */
-        /* Cnecin(); */
     }
 }
 

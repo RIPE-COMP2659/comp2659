@@ -18,6 +18,8 @@ void render(const Model *model, UINT8 *base) {
     unsigned int i;
     const Camera *cam = &model->world.camera;
 
+    clear_screen((UINT32 *)base);
+
     render_ground(model, base);
 
     for (i = model->cam_min_bi; i < model->cam_max_bi; i++) {
