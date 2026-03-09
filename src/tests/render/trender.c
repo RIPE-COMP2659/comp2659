@@ -90,7 +90,3 @@ int main(void) {
     RUN_TEST(test_render_culling_bounds);
     return UNITY_END();
 }
-
-#ifdef TESTING
-/* Add extra testing logic here if needed */
-#endif

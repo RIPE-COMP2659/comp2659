@@ -1,5 +1,6 @@
 #ifndef CAMERA_H
 #define CAMERA_H
+
 #include "dtypes.h"
 
 /* NOTE: Missing some documentation on the funny business with how these
@@ -84,4 +85,4 @@ signed int camera_get_relative_y(Camera *camera, unsigned int world_y);
  */
 void camera_update_coordinates(Camera *camera, unsigned int x, unsigned int y);
 
-#endif /* CAMERA_H */
+#endif
