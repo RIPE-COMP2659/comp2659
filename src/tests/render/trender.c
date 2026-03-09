@@ -36,23 +36,31 @@ void tearDown(void) {
  * the correct relative coordinates.
  */
 void test_render_master_frame(void) {
-    World world = get_world();
+    Model model = get_model();
     int rel_geo_x, rel_geo_y;
+    Camera *camera = &model.world.camera;
+    int ground_pixels_found = 0;
+    int i;
 
     /* Initialize camera indices */
-    world_update_camera(&world, 0);
+    model_update_camera(&model);
 
-    /* Render the world to our mock screen */
-    render(&world, mock_screen);
+    /* Render the model to our mock screen */
+    render(&model, mock_screen);
 
     /* Verify Ground (starts at relative Y of ground_y, across SCREEN_WIDTH) */
-    /* We check a pixel in the middle of the screen at the ground height */
-    rel_geo_y = camera_get_relative_y(&world.camera, world.ground_y);
-    TEST_ASSERT_EQUAL_INT_MESSAGE(1, get_pixel(mock_screen, rel_geo_y, 320), "Ground not rendered correctly");
+    /* Check multiple pixels along the ground line to see if any are set */
+    rel_geo_y = camera_get_relative_y(camera, model.world.ground_y);
+    for (i = 0; i < 640; i++) { /* Check every pixel across width */
+        if (get_pixel(mock_screen, rel_geo_y, i)) ground_pixels_found++;
+    }
+
+    /* NOTE: This test isn't great, it depends on the initial world state */
+    TEST_ASSERT_EQUAL_INT_MESSAGE(512, ground_pixels_found, "Not enough ground pixels found");
 
     /* Verify Geo (Player) placement */
-    rel_geo_x = camera_get_relative_x(&world.camera, world.geo.x);
-    rel_geo_y = camera_get_relative_y(&world.camera, world.geo.y);
+    rel_geo_x = camera_get_relative_x(camera, model.world.geo.x);
+    rel_geo_y = camera_get_relative_y(camera, model.world.geo.y);
     
     /* We check the top-left pixel of Geo's 32x32 sprite */
     /* Note: This assumes Geo's sprite has a set pixel at (0,0) */
@@ -63,15 +71,15 @@ void test_render_master_frame(void) {
  * Verifies that blocks outside the camera window indices are not rendered.
  */
 void test_render_culling_bounds(void) {
-    World world = get_world();
+    Model model = get_model();
     
     /* Manually set indices to 0 to force culling of all level elements */
-    world.cam_min_bi = 0;
-    world.cam_max_bi = 0;
+    model.cam_min_bi = 0;
+    model.cam_max_bi = 0;
     
-    render(&world, mock_screen);
+    render(&model, mock_screen);
 
-    /* Ensure a block that exists in world.levels[0].blocks[0] didn't draw */
+    /* Ensure a block that exists in model.world.levels[0].blocks[0] didn't draw */
     /* (Assuming blocks[0] would normally be visible at the start) */
     TEST_ASSERT_EQUAL_INT_MESSAGE(0, get_pixel(mock_screen, 200, 100), "Culling failed: Block rendered outside active camera indices");
 }

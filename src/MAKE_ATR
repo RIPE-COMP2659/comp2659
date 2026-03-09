@@ -167,7 +167,7 @@ $(COND).o: $(EVENTS_FOLDER)\$(COND).c $(EVENTS_FOLDER)\$(COND).h $(MODEL_FOLDER)
 $(SYNC).o: $(EVENTS_FOLDER)\$(SYNC).c $(EVENTS_FOLDER)\$(SYNC).h $(MODEL_FOLDER)\dtypes.h
 	$(ATARI_CC) $(TOS_FLAGS) $(EVENTS_FOLDER)\$(SYNC).c -o $(SYNC).o
 
-$(RENDER).o: $(RENDER_FOLDER)\$(RENDER).c $(RENDER_FOLDER)\$(RENDER).h $(MODEL_FOLDER)\dtypes.h
+$(RENDER).o: $(RENDER_FOLDER)\$(RENDER).c $(RENDER_FOLDER)\$(RENDER).h $(MODEL_FOLDER)\dtypes.h $(RASTER_FOLDER)\raster.h
 	$(ATARI_CC) $(TOS_FLAGS) $(RENDER_FOLDER)\$(RENDER).c -o $(RENDER).o
 
 
@@ -198,8 +198,8 @@ $(TCAMERA):
 
 
 # ----- Render Test Builds ---------------------------------------------------
-$(TRENDER):
-	$(ATARI_CC) $(RENDER_TEST_FLAGS) $(TESTS_RENDER_FOLDER)\$(TRENDER).c $(TEST_SRC) $(UNITY) -o $(TRENDER).ut
+$(TRENDER): $(PLT_REC).o $(BMAP_32).o $(BOUNDS).o $(PLT_CLIP).o
+	$(ATARI_CC) $(RENDER_TEST_FLAGS) $(TESTS_RENDER_FOLDER)\$(TRENDER).c $(TEST_SRC) $(PLT_REC).o $(BMAP_32).o $(BOUNDS).o $(PLT_CLIP).o $(UNITY) -o $(TRENDER).ut
 
 
 # ----- Events Test Builds ---------------------------------------------------

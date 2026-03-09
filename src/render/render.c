@@ -3,37 +3,37 @@
 /*
  * Function: render
  * ----------------
- * Renders the entire world state to the provided framebuffer.
+ * Renders the entire model state to the provided framebuffer.
  * Only renders objects within the camera's active indices.
  */
-void render(const World *world, UINT8 *base) {
+void render(const Model *model, UINT8 *base) {
     unsigned int i;
-    const Camera *cam = &world->camera;
+    const Camera *cam = &model->world.camera;
 
     /* 1. Render static ground */
-    render_ground(world, base);
+    render_ground(model, base);
 
     /* 2. Render blocks within current camera view */
-    for (i = world->cam_min_bi; i < world->cam_max_bi; i++) {
-        render_block(&world->levels[0].blocks[i], cam, base);
+    for (i = model->cam_min_bi; i < model->cam_max_bi; i++) {
+        render_block(&model->world.levels[0].blocks[i], cam, base);
     }
 
     /* 3. Render spikes within current camera view */
-    for (i = world->cam_min_si; i < world->cam_max_si; i++) {
-        render_spike(&world->levels[0].spikes[i], cam, base);
+    for (i = model->cam_min_si; i < model->cam_max_si; i++) {
+        render_spike(&model->world.levels[0].spikes[i], cam, base);
     }
 
     /* 4. Render lava within current camera view */
-    for (i = world->cam_min_li; i < world->cam_max_li; i++) {
-        render_lava(&world->levels[0].lava[i], cam, base);
+    for (i = model->cam_min_li; i < model->cam_max_li; i++) {
+        render_lava(&model->world.levels[0].lava[i], cam, base);
     }
 
     /* 5. Render Geo (Player) */
-    render_geo(&world->geo, cam, base);
+    render_geo(&model->world.geo, cam, base);
 }
 
-void render_ground(const World *world, UINT8 *base) {
-    int rel_y = camera_get_relative_y(&world->camera, world->ground_y);
+void render_ground(const Model *model, UINT8 *base) {
+    int rel_y = camera_get_relative_y(&model->world.camera, model->world.ground_y);
     /* Draw a 4-pixel tall rectangle across the screen width (640 px) */
     plot_rectangle((UINT32 *)base, rel_y, 0, 4, 640);
 }
