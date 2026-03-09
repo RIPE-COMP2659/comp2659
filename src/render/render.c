@@ -1,5 +1,4 @@
-#include "renderer.h"
-#include "model/camera.h"
+#include "render.h"
 
 /*
  * Function: render

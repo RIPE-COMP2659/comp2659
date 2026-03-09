@@ -1,8 +1,9 @@
-#ifndef RENDERER_H
-#define RENDERER_H
+#ifndef RENDER_H
+#define RENDER_H
 
-#include "../model/world.h"
+#include "../model/model.h"
 #include "../raster/raster.h"
+#include "../model/camera.h"
 
 /* * Master render function: Renders a single frame based on the world snapshot. */
 void render(const World *world, UINT8 *base);
@@ -13,4 +14,4 @@ void render_spike(const Spike *spike, const Camera *camera, UINT8 *base);
 void render_lava(const Lava *lava, const Camera *camera, UINT8 *base);
 void render_ground(const World *world, UINT8 *base);
 
-#endif /* RENDERER_H */
+#endif /* RENDER_H */

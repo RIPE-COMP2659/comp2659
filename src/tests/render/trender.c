@@ -1,6 +1,6 @@
 #include "unity.h"
-#include "renderer/renderer.h"
-#include "model/world.h"
+#include "render/render.h"
+#include "model/model.h"
 #include <string.h>
 
 /*
