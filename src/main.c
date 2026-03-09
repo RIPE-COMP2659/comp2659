@@ -2,6 +2,7 @@
 #include <osbind.h>
 #include "model/model.h"
 #include "raster/raster.h"
+#include "render/render.h"
 #include "events/events.h"
 
 #define BYTES_PER_SCREEN 32000
@@ -9,62 +10,29 @@
 /* Only works on Atari ST, comment out starting here */
 /* End commenting out here */
 
-void test_rendering(UINT32 *base, Model model)
+void test_rendering(UINT8 *base, Model *model)
 {
-    World *world = &model.world;
-    unsigned int i;
+    World *world = &model->world;
     unsigned int w_iter;
     int input;
     signed int current_event;
 
     for (w_iter = 0; w_iter < 400; w_iter++) {
-        on_clock_tick(&model);
-
-        clear_screen(base);
-
-        /* Test Plotting Ground */
-        /* TODO: These are getting incompatible pointer type warnings, left for another time, it works */
-        /* TODO: Without hardcoding 0, this causes a crash. */
-        plot_rectangle((UINT32 *)base, camera_get_relative_y(&world->camera, world->ground_y), 0, 4, SCREEN_WIDTH);
-
-        /* Test Blocks */
-        for (i = model.cam_min_bi; i < model.cam_max_bi; i++) {
-            Block block = world->levels[0].blocks[i];
-            plot_bitmap_32((UINT8 *)base, camera_get_relative_y(&world->camera, block.y), camera_get_relative_x(&world->camera, block.x), block.sprite, block.size);
+        /* Temporary input */
+        input = Cnecin();
+        printf("Input: %d\n", input);
+        if (input == 32) {
+            on_jump_request(model);
         }
 
-        /* Test Spikes */
-        for (i = model.cam_min_si; i < model.cam_max_si; i++) {
-            Spike spike = world->levels[0].spikes[i];
-            plot_bitmap_32((UINT8 *)base, camera_get_relative_y(&world->camera, spike.y), camera_get_relative_x(&world->camera, spike.x), spike.sprite, spike.size);
-        }
-
-        /* Test Lava */
-        for (i = model.cam_min_li; i < model.cam_max_li; i++) {
-            Lava lava = world->levels[0].lava[i];
-            plot_bitmap_32((UINT8 *)base, camera_get_relative_y(&world->camera, lava.y), camera_get_relative_x(&world->camera, lava.x), lava.sprite, lava.size);
-        }
-
-        /* Test Geo */
-        plot_bitmap_32((UINT8 *)base, camera_get_relative_y(&world->camera, world->geo.y), camera_get_relative_x(&world->camera, world->geo.x), world->geo.sprite, world->geo.size);
-
-        printf("Geo x: %d\n", world->geo.x);
-        printf("Geo is_landed: %d\n", world->geo.is_landed);
-        printf("Geo is_dead: %d\n", world->geo.is_dead);
-        printf("Geo ground_y: %d\n", world->geo.ground_y);
-
-        current_event = check_level_complete(&model);
+        /* Cleans up once further along */
+        current_event = check_level_complete(model);
         if (current_event == EVENT_LEVEL_DONE) {
             printf("Level Complete!\n");
         }
+        on_clock_tick(model);
 
-        /* Temporary */
-        input = Cnecin();
-        printf("Input: %d\n", input);
-        if (input == 32) { /* ESC key to exit */
-            on_jump_request(&model);
-        }
-        Cnecin();
+        render(model, base);
     }
 }
 
@@ -90,8 +58,6 @@ void test_clear_screen(UINT8 *base)
 
 void test_clear_region(UINT8 *base)
 {
-    int i;
-
     /* Fill screen with white first */
     fill_screen((UINT32 *)base, -1);
 
@@ -120,8 +86,9 @@ int main(void) {
     Model model = get_model();
     World *world = &model.world;
 
-    test_rendering((UINT32 *)base, model);
-
+    /* Run the rendering test loop (now properly encapsulated) */
+    test_rendering(base, &model);
+    
     disable_cursor();
 
     /* Test 1: Clear Screen */
