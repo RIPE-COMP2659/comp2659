@@ -24,7 +24,7 @@ void test_rendering(UINT8 *base, Model *model)
         clear_screen((UINT32 *)base);
 
         /* 3. Render World State using the new renderer module */
-        render(world, base);
+        render(model, base);
 
         /* Debug Info */
         printf("Geo x: %d (Frame: %d)\n", world->geo.x, w_iter);
