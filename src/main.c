@@ -2,7 +2,7 @@
 #include <osbind.h>
 #include "model/model.h"
 #include "raster/raster.h"
-#include "renderer/renderer.h"
+#include "render/render.h"
 
 #define BYTES_PER_SCREEN 32000
 
