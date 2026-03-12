@@ -22,15 +22,15 @@ void render(const Model *model, UINT8 *base) {
 
     render_ground(model, base);
 
-    for (i = model->cam_min_bi; i < model->cam_max_bi; i++) {
+    for (i = model->cam_min_bi; i <= model->cam_max_bi; i++) {
         render_block(&model->world.levels[0].blocks[i], cam, base);
     }
 
-    for (i = model->cam_min_si; i < model->cam_max_si; i++) {
+    for (i = model->cam_min_si; i <= model->cam_max_si; i++) {
         render_spike(&model->world.levels[0].spikes[i], cam, base);
     }
 
-    for (i = model->cam_min_li; i < model->cam_max_li; i++) {
+    for (i = model->cam_min_li; i <= model->cam_max_li; i++) {
         render_lava(&model->world.levels[0].lava[i], cam, base);
     }
 
