@@ -90,5 +90,7 @@ int main(void) {
     RUN_TEST(test_plot_triangle_basic);
     RUN_TEST(test_plot_triangle_all_directions);
     
+    test_plot_triangle_all_directions();
+
     return UNITY_END();
 }
