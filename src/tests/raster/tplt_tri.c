@@ -12,7 +12,10 @@ static UINT32 mock_screen[SCREEN_SIZE_BYTES / 4];
 /* Helper to check if a single pixel at (row, col) is black (0) or white (1) */
 static int get_pixel(UINT32 *base, INT16 row, INT16 col)
 {
-    UINT8 *byte_ptr = (UINT8 *)base + (row * SCREEN_WIDTH_BYTES) + (col / 8);
+    /* Cast to UINT32 to prevent 16-bit signed integer overflow during multiplication */
+    UINT32 offset = ((UINT32)row * SCREEN_WIDTH_BYTES) + (col / 8);
+    UINT8 *byte_ptr = (UINT8 *)base + offset;
+    
     int bit_pos = 7 - (col % 8);
     return (*byte_ptr >> bit_pos) & 1;
 }
@@ -90,7 +93,5 @@ int main(void) {
     RUN_TEST(test_plot_triangle_basic);
     RUN_TEST(test_plot_triangle_all_directions);
     
-    test_plot_triangle_all_directions();
-
     return UNITY_END();
 }
