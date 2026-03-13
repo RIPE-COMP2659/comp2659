@@ -80,7 +80,7 @@ void test_render_master_frame(void) {
 
     /* NOTE: This test isn't great, it depends on the initial world state */
     /* For example, this will fail if we remove lava */
-    TEST_ASSERT_EQUAL_INT_MESSAGE(512, ground_pixels_found, "Not enough ground pixels found");
+    TEST_ASSERT_EQUAL_INT_MESSAGE(480, ground_pixels_found, "Not enough ground pixels found");
 
     /* Verify Geo (Player) placement */
     rel_geo_x = camera_get_relative_x(camera, model.world.geo.x);

@@ -25,12 +25,13 @@ void test_rendering(UINT8 *base, Model *model)
             on_jump_request(model);
         }
 
+        on_clock_tick(model);
+
         /* Cleans up once further along */
         current_event = check_level_complete(model);
         if (current_event == EVENT_LEVEL_DONE) {
             printf("Level Complete!\n");
         }
-        on_clock_tick(model);
 
         render(model, base);
     }
