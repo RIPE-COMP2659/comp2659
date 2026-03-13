@@ -34,6 +34,7 @@ _clear_region:
 
                 ; Check vertical bounds
 
+check_top_clip:
                 ; Vertical clipping first - check if top edge is off screen
         move.w  row(a6),d0
         bge     check_bottom
@@ -53,7 +54,7 @@ check_bottom:
 
         add.w   length(a6),d0                   ; d0 = row + height (bottom edge Y)
         cmp.w   #SCREEN_HEIGHT,d0
-        ble   v_clip_done                     ; If bottom edge <= SCREEN_HEIGHT, skip bottom clip
+        ble     v_clip_done                     ; If bottom edge <= SCREEN_HEIGHT, skip bottom clip
 
                 ; Partially off bottom
         move.w  #SCREEN_HEIGHT,d0
@@ -67,6 +68,7 @@ v_clip_done:
         tst.w   width(a6)                       ; nothing to clear if width == 0
         beq     done
 
+calc_screen_offsets:
         movea.l base(a6),a0                     ; get base address
                 
                 ; Calculate and add row offset: row * 80 bytes
@@ -80,6 +82,7 @@ v_clip_done:
         ext.l   d0                              ; extend to long
         adda.l  d0,a0                           ; add col offset in bytes
 
+check_alignment:
                 ; Check if width == 32 pixels (4 bytes) for optimization
         move.w  width(a6),d0
         cmpi.w  #32,d0                          ; check if exactly 32 pixels
@@ -126,6 +129,7 @@ unoptimized:
         addq.w  #7,d6
         lsr.w   #3,d6                           ; d6 = number of bytes touched per row
 
+prep_unoptimized_loop:
         move.w  length(a6),d7
         subq.w  #1,d7                           ; adjust for dbra
 
@@ -212,3 +216,4 @@ done:
         unlk    a6
         rts
 
+        
