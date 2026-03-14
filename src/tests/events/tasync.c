@@ -13,10 +13,10 @@ void tearDown(void) {
 }
 
 void test_on_jump_request_calls_geo_jump(void) {
-    signed int expected_jump_dy = 10; /* Based on geo_jump implementation */
-    
+    signed int expected_jump_dy = GEO_JUMP_DY_SCALED;
+
     on_jump_request(&test_model);
-    
+
     TEST_ASSERT_EQUAL_INT(expected_jump_dy, test_model.world.geo.dy);
 }
 

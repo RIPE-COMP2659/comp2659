@@ -37,17 +37,19 @@ const unsigned int GEO_SPRITE[GEO_SIZE][GEO_SIZE / WORD] = {
     {0x800C, 0x3001} /* 32 */
 };
 
+/** See geo.h for documentation */
 Geo create_geo(unsigned int x, unsigned int y, unsigned int ground_y) {
     Geo geo;
 
-    geo.ddy = -1;
-    geo.dx = 1;
+    geo.ddy = GEO_DDY_SCALED;
+    geo.dx = 3;
     geo.dy = 0;
     geo.is_landed = FALSE;
     geo.is_dead = FALSE;
     geo.ground_y = ground_y;
     geo.x = x;
     geo.y = y;
+    geo.y_scaled = y << GEO_PHYSICS_SHIFT;
     geo.size = GEO_SIZE;
     geo.sprite = GEO_SPRITE;
 
@@ -56,6 +58,7 @@ Geo create_geo(unsigned int x, unsigned int y, unsigned int ground_y) {
 
 /* TODO: This will take some fine tuning on what feels right, but can't
    really be done until gameplay */
+/** See header file for documentation */
 signed int geo_check_square_collision(
     Geo *geo,
     unsigned int object_x,
@@ -115,23 +118,25 @@ signed int geo_check_square_collision(
     return collision_result;
 }
 
+/** See header file for documentation */
 void geo_jump(Geo *geo) {
     if (geo->is_landed == TRUE) {
-        geo->dy = 10;
+        geo->dy = GEO_JUMP_DY_SCALED;
     }
 }
 
+/** See header file for documentation */
 void geo_update(Geo *geo) {
     geo->x += geo->dx;
-
     geo->dy += geo->ddy;
-    geo->y += geo->dy;
-
+    geo->y_scaled += geo->dy;
+    geo->y = geo->y_scaled >> GEO_PHYSICS_SHIFT;
     geo_update_landed(geo);
 }
 
 /* TODO: This currently snaps geo up to the position of landed even if
    they're much lower, might be weird in practice. */
+/** See header file for documentation */
 void geo_update_landed(Geo *geo) {
     signed int geo_bottom = geo->y - geo->size;
     signed int ground_y = geo->ground_y;
@@ -139,10 +144,9 @@ void geo_update_landed(Geo *geo) {
     if (geo_bottom <= ground_y) {
         geo->is_landed = TRUE;
         geo->y = geo->ground_y + geo->size;
+        geo->y_scaled = geo->y << GEO_PHYSICS_SHIFT;
         geo->dy = 0;
     } else {
         geo->is_landed = FALSE;
     }
 }
-
-

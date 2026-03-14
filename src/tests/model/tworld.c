@@ -22,6 +22,7 @@ void tearDown(void) {
 void test_world_collision_geo_block_top(void) {
     block.y = world.geo.y;
     world.geo.y = block.y + block.size;
+    world.geo.y_scaled = world.geo.y << GEO_PHYSICS_SHIFT;
 
     /* Test that geo is landing on a block above and to the left */
     block.x = world.geo.x - block.size / 2;
@@ -45,6 +46,8 @@ void test_world_collision_geo_block_top(void) {
 void test_world_collision_geo_block_bottom(void) {
     block.y = world.geo.y + world.geo.size;
     world.geo.y = block.y - block.size;
+    world.geo.y_scaled = world.geo.y << GEO_PHYSICS_SHIFT;
+
     world.geo.dy = 1;
 
     /* Test that geo is colliding with a block above it and to the left */
@@ -140,6 +143,7 @@ void test_world_collision_geo_block_none(void) {
 void test_world_collision_geo_spike_top(void) {
     spike.y = world.geo.y;
     world.geo.y = spike.y + spike.size;
+    world.geo.y_scaled = world.geo.y << GEO_PHYSICS_SHIFT;
 
     /* Test that geo is landing on a spike above and to the left */
     spike.x = world.geo.x - spike.size / 2;
@@ -163,6 +167,7 @@ void test_world_collision_geo_spike_top(void) {
 void test_world_collision_geo_spike_bottom(void) {
     spike.y = world.geo.y + world.geo.size;
     world.geo.y = spike.y - spike.size;
+    world.geo.y_scaled = world.geo.y << GEO_PHYSICS_SHIFT;
 
     /* Test that geo is colliding with a spike above it and to the left */
     spike.x = world.geo.x - spike.size / 2;
@@ -264,6 +269,7 @@ void test_world_collision_geo_spike_none(void) {
 void test_world_collision_geo_lava_top(void) {
     lava.y = world.geo.y;
     world.geo.y = lava.y + lava.size;
+    world.geo.y_scaled = world.geo.y << GEO_PHYSICS_SHIFT;
 
     /* Test that geo is landing on lava above and to the left */
     lava.x = world.geo.x - lava.size / 2;
@@ -287,6 +293,7 @@ void test_world_collision_geo_lava_top(void) {
 void test_world_collision_geo_lava_bottom(void) {
     lava.y = world.geo.y + world.geo.size;
     world.geo.y = lava.y - lava.size;
+    world.geo.y_scaled = world.geo.y << GEO_PHYSICS_SHIFT;
 
     /* Test that geo is colliding with lava above it and to the left */
     lava.x = world.geo.x - lava.size / 2;
@@ -390,6 +397,7 @@ void test_world_collision_ground_resets_when_leaving_block(void) {
     /* Setup: geo lands on a block */
     block.x = world.geo.x;
     world.geo.y = block.y + world.geo.size;
+    world.geo.y_scaled = world.geo.y << GEO_PHYSICS_SHIFT;
 
     /* Geo collides with block and ground_y updates */
     world_collision_geo_block(&world, &block);
