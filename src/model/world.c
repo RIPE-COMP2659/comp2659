@@ -36,6 +36,7 @@ World get_world(void) {
 void world_reset_level(World *world) {
     world->geo.x = CAMERA_OFFSET;
     world->geo.y = world->ground_y + GEO_SIZE;
+    world->geo.y_scaled = world->geo.y << GEO_PHYSICS_SHIFT;
     world->geo.is_dead = FALSE;
 }
 

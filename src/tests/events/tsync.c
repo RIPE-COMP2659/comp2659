@@ -10,6 +10,7 @@ void setUp(void) {
     /* Set geo to a predictable state for testing model_update */
     test_model.world.geo.x = 100;
     test_model.world.geo.y = 100;
+    test_model.world.geo.y_scaled = test_model.world.geo.y << GEO_PHYSICS_SHIFT;
     test_model.world.geo.dy = -5; /* Give geo some upward velocity */
     test_model.world.geo.is_landed = FALSE;
     

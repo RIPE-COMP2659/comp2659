@@ -6,18 +6,31 @@
 /* The length and width of geo in pixels */
 #define GEO_SIZE 32
 
+/* The values used to scale the vertical movement of geo to have a roughly
+   2 block jump height and 1 second duration during a 70 FPS game. This is
+   because the original Impossible Game had roughly that exact design and it
+   would allow us to steal a large amount of their level design */
+#define GEO_PHYSICS_SHIFT 6 /* Bit shifting scaled values, / or * by 64 */
+#define GEO_JUMP_DY_SCALED 245 /* Necessary combo with DDY */
+#define GEO_DDY_SCALED -7 /* For height and time */
+
 /**
  * Represents the player character, Geo. Might have more than one if we do
- * two player
+ * two player. See the #defines for an explanation on some of the fields
+ * regarding the vertical position, some less intuitive math was done to
+ * avoid floating point numbers / non-integer division
  * 
  * signed int ddy:
- *     The change in vertical speed per update, effectively gravity
+ *     The change in dy per update. Note that this is not scaled relative
+ *     to vertical position, but instead it is scaled relative to a roughly
+ *     2 block jump height and 1 second duration during a 70 FPS game
  * signed int dx:
- *     The change in horizontal position per update, constant horiztonal
+ *     The change in horizontal position per update, constant horizontal
  *     scrolling
  * signed int dy:
- *     The change in vertical position per update, affected by jumping and
- *     landing. Set to their respective values on the given events
+ *     The change in y per update. It is not scalred relative to vertical
+ *     position, it is scaled for a 2 block jump height and 1 second duration
+ *     during a 70 FPS game
  * signed int is_landed:
  *     Whether geo is currently landed on the ground, which affects whether
  *     they can jump or is subject to gravity
@@ -31,6 +44,8 @@
  *     The world x value of the top left of Geo
  * unsigned int y:
  *     The world y value of the top of Geo
+ * signed int y_scaled:
+ *     The scaled y value of the top of Geo, see header defines for details
  * unsigned int size:
  *     The length and width of Geo in pixels
  * const unsigned int (*sprite)[GEO_SIZE / WORD]:
@@ -45,6 +60,7 @@ typedef struct {
     unsigned int ground_y;
     unsigned int x;
     unsigned int y;
+    unsigned int y_scaled;
     unsigned int size;
     const unsigned int (*sprite)[GEO_SIZE / WORD];
 } Geo;

@@ -17,21 +17,23 @@
 void render(const Model *model, UINT8 *base) {
     unsigned int i;
     const Camera *cam = &model->world.camera;
+    int level_i = model->world.level_index;
+    Level level = model->world.levels[level_i];
 
     clear_screen((UINT32 *)base);
 
     render_ground(model, base);
 
     for (i = model->cam_min_bi; i <= model->cam_max_bi; i++) {
-        render_block(&model->world.levels[0].blocks[i], cam, base);
+        render_block(&level.blocks[i], cam, base);
     }
 
     for (i = model->cam_min_si; i <= model->cam_max_si; i++) {
-        render_spike(&model->world.levels[0].spikes[i], cam, base);
+        render_spike(&level.spikes[i], cam, base);
     }
 
     for (i = model->cam_min_li; i <= model->cam_max_li; i++) {
-        render_lava(&model->world.levels[0].lava[i], cam, base);
+        render_lava(&level.lava[i], cam, base);
     }
 
     render_geo(&model->world.geo, cam, base);

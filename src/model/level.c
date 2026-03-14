@@ -10,7 +10,7 @@
 
 /* Level two */
 #define L2_BLOCKS_SIZE 2
-#define L2_SPIKES_SIZE 1
+#define L2_SPIKES_SIZE 3
 #define L2_LAVA_SIZE 1
 
 Level create_level(
@@ -89,7 +89,9 @@ Level get_level2(void) {
     level_lava[0] = create_lava(500, 600);
 
     /* Spike initialization */
-    level_spikes[0] = create_spike(300, 400);
+    level_spikes[0] = create_spike(356, 64);
+    level_spikes[1] = create_spike(388, 64);
+    level_spikes[2] = create_spike(420, 64);
 
     return create_level(
         level_blocks,
