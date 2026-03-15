@@ -37,6 +37,7 @@ _plot_bitmap_8:
 ;                       This will avoid read/writes to memory, which costs us clock cycles
 ;--------------------------------------------------------------------------------------------
 
+check_top_clip:
                 ; Check bounds using the _check_bounds routine.
 
                 ; Vertical clipping first - check if top edge is off screen
@@ -74,7 +75,6 @@ check_bottom:
         move.w  d0,height(a6)                   ; Update height to fit exactly on screen
 
 v_clip_done:
-
         move.w  #8,-(sp)                        ; push width (8 pixels)
         move.w  height(a6),-(sp)                ; push height
         move.w  col(a6),-(sp)                   ; push col
@@ -82,6 +82,7 @@ v_clip_done:
         jsr     _check_bounds
         adda.l  #8,sp                           ; clean parameters from  stack
 
+evaluate_bounds:
                 ; Check return status
         cmpi.b  #3,d0                           ; check if entirely out of bounds (nothing to draw)
         beq     done                            ; if so, return immediately
@@ -89,6 +90,7 @@ v_clip_done:
         tst.b   d0                              ; check if any clipping needed
         bne     use_clipped                     ; if status != 0 (but not 3), use clipped version
                 
+calc_screen_offsets:
                 ; No clipping needed, continue with normal routine
         movea.l base(a6),a0                     ; get base address (screen starting pointer)
         movea.l bitmap(a6),a1                   ; get bitmap start address
@@ -109,6 +111,7 @@ v_clip_done:
                                                 ; Don't really understand it, but its from the labs. 
         beq     aligned_copy                    ; if 0, no shifting needed ( happy )
                 
+prep_unaligned_copy:
                 ; Unaligned copy - need to shift bits ( not happy )
         move.w  height(a6),d7                   ; get height
         subq.w  #1,d7                           ; adjust for dbra
@@ -117,7 +120,8 @@ v_clip_done:
         moveq   #8,d6
         sub.w   d5,d6                           ; d6 = 8 - bit_offset
                 
-shift_loop: moveq #0,d0                         ; clear d0
+shift_loop: 
+        moveq   #0,d0                           ; clear d0
         move.b  (a1)+,d0                        ; get bitmap byte into low byte
         lsl.w   #8,d0                           ; shift to high byte: 0x00FF --> 0xFF00
         lsr.w   d5,d0                           ; shift right by bit offset
@@ -151,7 +155,8 @@ aligned_copy:
         move.w  height(a6),d7                   ; get height (number of rows)
         subq.w  #1,d7                           ; adjust for dbra
                 
-row_loop: move.b (a1)+,(a0)                     ; copy one byte of bitmap to screen
+row_loop: 
+        move.b  (a1)+,(a0)                      ; copy one byte of bitmap to screen
         adda.w  #80,a0                          ; move to next row (80 bytes per row)
         dbra    d7,row_loop
                 
@@ -173,6 +178,7 @@ use_clipped:
 ;                       This will avoid read/writes to memory, which costs us clock cycles
 ;--------------------------------------------------------------------------------------------
 
+prep_clipped_call:
                 ; Now push parameters for _plot_clipped_bitmap
         move.w  d6,-(sp)                        ; push new_width
         move.w  d7,-(sp)                        ; push status
@@ -187,3 +193,5 @@ use_clipped:
         movem.l (sp)+,d0-d7/a0-a5               ; restore saved registers
         unlk    a6
         rts
+
+        

@@ -26,6 +26,7 @@ _plot_clipped_bitmap:
         link    a6,#0
         movem.l d0-d7/a0-a5,-(sp)
 
+evaluate_clip_status:
                 ; Get status and new_width from parameters (already computed by caller)
         move.w  status(a6),d7                   ; get status in d7
         move.w  new_width(a6),d6                ; get new_width in d6
@@ -97,6 +98,7 @@ do_plot:
         ext.l   d0
         adda.l  d0,a0                           ; add col offset
                 
+calc_plot_bytes:
                 ; Calculate bytes per row of bitmap (original width)
         move.w  d4,d5                           ; original width in pixels
         addq.w  #7,d5                           ; round up
@@ -149,6 +151,7 @@ do_plot_left_clip:
         ext.l   d0
         adda.l  d0,a0                           ; add row offset
                 
+calc_lclip_bytes:
                 ; Calculate original bitmap width in bytes
         move.w  d4,d6                           ; original width in pixels
         addq.w  #7,d6
@@ -187,3 +190,5 @@ plot_lclip_entry:
         dbra    d2,plot_lclip_row
                 
         rts
+
+        

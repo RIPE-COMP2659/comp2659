@@ -18,7 +18,7 @@
 ;              as implemented in the Linux kernel (drivers/video/console/font_8x16.c).
 ;              Reference: Linux kernel source tree, lib/fonts/font_8x16.c
 ;
-;           Fid it here: https://github.com/torvalds/linux/blob/master/lib/fonts/font_8x16.c
+;          Fid it here: https://github.com/torvalds/linux/blob/master/lib/fonts/font_8x16.c
 ; ------------------------------------------------------------------------------------------------------
         xdef    _plot_character
         xref    _plot_bitmap_8
@@ -36,6 +36,7 @@ _plot_character:
         link    a6,#0
         movem.l d0-d3/a0-a1,-(sp)
 
+check_char_bounds:
                 ; Get character code and calculate font offset
         move.w  ch(a6),d0                       ; get character code
                 
@@ -45,6 +46,7 @@ _plot_character:
         cmpi.w  #127,d0
         bhi     done                            ; if > 127, skip (extended ASCII)
                 
+calculate_font_offset:
                 ; Subtract offset since font table starts at ASCII 32
         subi.w  #32,d0                          ; d0 = character - 32
         ext.l   d0
@@ -54,6 +56,7 @@ _plot_character:
         lea     font_data,a1                    ; a1 = base of font table
         adda.l  d0,a1                           ; a1 = pointer to character bitmap
                 
+draw_character:
                 ; Call plot_bitmap_8(base, row, col, character_bitmap, 16)
         move.w  #FONT_HEIGHT,-(sp)              ; push height (16)
         move.l  a1,-(sp)                        ; push font character address

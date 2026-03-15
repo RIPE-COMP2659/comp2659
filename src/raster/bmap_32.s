@@ -1,4 +1,3 @@
-
 ;
 ; PURPOSE: Plots a bitmap to the screen given by the top left pixel of the bitmap and the height of bitmap.
 ;
@@ -41,9 +40,10 @@ _plot_bitmap_32:
 
                 ; Check bounds first
 
+check_top_clip:
                 ; Vertical clipping first - check if top edge is off screen
         move.w  row(a6),d0
-        bge   check_bottom                    ; If row >= 0, skip top clip
+        bge     check_bottom                    ; If row >= 0, skip top clip
 
                 ; Handle top clipping (row < 0)
         move.w  d0,d1
@@ -69,7 +69,7 @@ check_bottom:
 
         add.w   height(a6),d0                   ; d0 = row + height (bottom edge Y)
         cmp.w   #SCREEN_HEIGHT,d0
-        ble   v_clip_done                     ; If bottom edge <= SCREEN_HEIGHT, skip bottom clip
+        ble     v_clip_done                     ; If bottom edge <= SCREEN_HEIGHT, skip bottom clip
 
                 ; Partially off bottom
         move.w  #SCREEN_HEIGHT,d0
@@ -85,6 +85,7 @@ v_clip_done:
         jsr     _check_bounds
         adda.l  #8,sp                           ; clean up stack
                 
+evaluate_bounds:
                 ; Check return status
         cmpi.b  #3,d0                           ; check if entirely out of bounds
         beq     done                            ; if so, return immediately
@@ -92,6 +93,7 @@ v_clip_done:
         tst.b   d0                              ; check if any clipping needed
         bne     use_clipped                     ; if status != 0 (but not 3), use clipped version
                 
+calc_screen_offsets:
                 ; No clipping needed, continue
         movea.l base(a6),a0                     ; get base address (screen)
         movea.l bitmap(a6),a1                   ; get bitmap data address
@@ -111,6 +113,7 @@ v_clip_done:
         andi.w  #7,d5                           ; d5 = col % 8 (bit shift amount)
         bne     unaligned_copy                  ; if not 0, need bit shifting
                 
+check_alignment:
                 ; BYTE-ALIGNED PATH (col % 8 == 0)
                 ; Check long word alignment for optimization
         move.l  a0,d1
@@ -158,6 +161,7 @@ shifted_copy:
 shift_row_loop:
         movea.l a0,a2                           ; row destination pointer
 
+extract_b0_b1:
         moveq   #0,d0
         moveq   #0,d1
         moveq   #0,d2
@@ -182,6 +186,7 @@ shift_row_loop:
         or.b    d3,d4
         move.b  d4,(a2)+
 
+extract_b2_b3:
         move.b  (a1)+,d2                        ; b2
 
                 ; out2 = (b1 << (8-shift)) | (b2 >> shift)
@@ -202,6 +207,7 @@ shift_row_loop:
         or.b    d0,d4
         move.b  d4,(a2)+
 
+shift_finish_row:
                 ; out4 = b3 << (8-shift), merge with last destination byte
         moveq   #-1,d0
         lsr.w   d5,d0                           ; keep mask for low bits after sprite end
@@ -277,6 +283,7 @@ shift_loop_32:
                 ; We need to shift d0 right by d5 bits, but this will lose bits
                 ; So we use two registers to catch the overflow
                                 
+extract_32_overflow:
                 ; First, extract the bits that will overflow into the 5th byte
         move.l  d0,d1                           ; copy bitmap to d1
         moveq   #8,d2                           ; d2 = 8
@@ -289,6 +296,8 @@ shift_loop_32:
                 ; d0 now has the 32 bits positioned correctly, but in 24+shift bits
                 
                 ; Extract individual bytes and write them using OR
+                
+write_32_b0_b1:
                 ; Byte 0 (leftmost) - needs masking to preserve high bits
         moveq   #-1,d4                          ; start with all 1s
         lsl.w   d2,d4                           ; shift left by (8-d5) to create mask for high bits
@@ -305,6 +314,7 @@ shift_loop_32:
         lsr.l   #8,d3
         move.b  d3,1(a0)                        ; write into screen byte 1
                 
+write_32_b2_b4:
                 ; Byte 2
         move.l  d0,d3
         lsr.l   #8,d3                           ; shift right 8 bits
@@ -341,6 +351,7 @@ use_clipped:
 ;                       This will avoid read/writes to memory, which costs us clock cycles
 ;--------------------------------------------------------------------------------------------
 
+prep_clipped_call:
                 ; Now push parameters for _plot_clipped_bitmap
         move.w  d6,-(sp)                        ; push new_width
         move.w  d7,-(sp)                        ; push status
@@ -357,3 +368,4 @@ use_clipped:
         unlk    a6
         rts
 
+        
