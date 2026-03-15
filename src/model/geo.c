@@ -42,14 +42,15 @@ Geo create_geo(unsigned int x, unsigned int y, unsigned int ground_y) {
     Geo geo;
 
     geo.ddy = GEO_DDY_SCALED;
-    geo.dx = 3;
+    geo.dx = GEO_DX_SCALED;
     geo.dy = 0;
     geo.is_landed = FALSE;
     geo.is_dead = FALSE;
     geo.ground_y = ground_y;
     geo.x = x;
+    geo.x_scaled = (signed long)x << GEO_PHYSICS_SHIFT;
     geo.y = y;
-    geo.y_scaled = y << GEO_PHYSICS_SHIFT;
+    geo.y_scaled = (signed long)y << GEO_PHYSICS_SHIFT;
     geo.size = GEO_SIZE;
     geo.sprite = GEO_SPRITE;
 
@@ -119,6 +120,45 @@ signed int geo_check_square_collision(
 }
 
 /** See header file for documentation */
+signed int geo_check_spike_collision(
+    Geo *geo,
+    unsigned int spike_x,
+    unsigned int spike_y,
+    unsigned int spike_size
+) {
+    signed int gx_left = geo->x;
+    signed int gx_right = geo->x + geo->size;
+    signed int gy_top = geo->y;
+    signed int gy_bottom = geo->y - geo->size;
+
+    /* Check 4 points of the spike against Geo's bounding box:
+       middle 2 at the top, and bottom left/right.
+       Since sy is the top, py is sy at the top and sy - 31 at the bottom. */
+
+    /* Top peaks (checking both pixels for the apex) */
+    unsigned int py = spike_y;
+    unsigned int px1 = spike_x + 15;
+    unsigned int px2 = spike_x + 16;
+
+    if ((px1 >= gx_left && px1 <= gx_right && py <= gy_top && py >= gy_bottom) ||
+        (px2 >= gx_left && px2 <= gx_right && py <= gy_top && py >= gy_bottom)) {
+        return COLLISION_BOTTOM;
+    }
+
+    /* Bottom corners */
+    py = spike_y - spike_size + 1;
+    px1 = spike_x;
+    px2 = spike_x + spike_size - 1;
+
+    if ((px1 >= gx_left && px1 <= gx_right && py <= gy_top && py >= gy_bottom) ||
+        (px2 >= gx_left && px2 <= gx_right && py <= gy_top && py >= gy_bottom)) {
+        return COLLISION_BOTTOM;
+    }
+
+    return COLLISION_NONE;
+}
+
+/** See header file for documentation */
 void geo_jump(Geo *geo) {
     if (geo->is_landed == TRUE) {
         geo->dy = GEO_JUMP_DY_SCALED;
@@ -127,7 +167,8 @@ void geo_jump(Geo *geo) {
 
 /** See header file for documentation */
 void geo_update(Geo *geo) {
-    geo->x += geo->dx;
+    geo->x_scaled += geo->dx;
+    geo->x = geo->x_scaled >> GEO_PHYSICS_SHIFT;
     geo->dy += geo->ddy;
     geo->y_scaled += geo->dy;
     geo->y = geo->y_scaled >> GEO_PHYSICS_SHIFT;

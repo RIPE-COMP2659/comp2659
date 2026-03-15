@@ -1,17 +1,12 @@
 #include "level.h"
 
 /* Constants for level sizes */
-#define NUM_LEVELS 2
+#define NUM_LEVELS 1
 
-/* Level one */
-#define L1_BLOCKS_SIZE 12
-#define L1_SPIKES_SIZE 2
+/* Level one (consistently using L2 sizes for current draft) */
+#define L1_BLOCKS_SIZE 25
+#define L1_SPIKES_SIZE 15
 #define L1_LAVA_SIZE 5
-
-/* Level two */
-#define L2_BLOCKS_SIZE 2
-#define L2_SPIKES_SIZE 3
-#define L2_LAVA_SIZE 1
 
 Level create_level(
     Block* blocks,
@@ -37,70 +32,64 @@ Level create_level(
 
 Level get_level1(void) {
     static Block level_blocks[L1_BLOCKS_SIZE];
-    static Lava level_lava[L1_LAVA_SIZE];
     static Spike level_spikes[L1_SPIKES_SIZE];
+    static Lava level_lava[L1_LAVA_SIZE];
+    int i;
 
-    /* Block initialization */
-    level_blocks[0] = create_block(288, 64);
-    level_blocks[1] = create_block(352, 96);
-    level_blocks[2] = create_block(416, 96);
-    level_blocks[3] = create_block(480, 64);
-    level_blocks[4] = create_block(608, 96);
-    level_blocks[5] = create_block(640, 96);
-    level_blocks[6] = create_block(672, 96);
-    level_blocks[7] = create_block(704, 96);
-    level_blocks[8] = create_block(736, 96);
-    level_blocks[9] = create_block(768, 96);
-    level_blocks[10] = create_block(800, 96);
-    level_blocks[11] = create_block(832, 96);
+    /* Test 1: 4-block lava jump from 1-high to 2-high (Shifted +64px) */
+    /* 1-high starting block */
+    level_blocks[0] = create_block(464, 64);
 
-    /* Lava initialization */
-    level_lava[0] = create_lava(320, 32);
-    level_lava[1] = create_lava(352, 32);
-    level_lava[2] = create_lava(384, 32);
-    level_lava[3] = create_lava(416, 32);
-    level_lava[4] = create_lava(448, 32);
+    /* 4-block wide lava pit */
+    level_lava[0] = create_lava(496, 32);
+    level_lava[1] = create_lava(528, 32);
+    level_lava[2] = create_lava(560, 32);
+    level_lava[3] = create_lava(592, 32);
 
-    /* Spike initialization */
-    level_spikes[0] = create_spike(256, 64);
-    level_spikes[1] = create_spike(512, 64);
+    /* 2-high landing block */
+    level_blocks[1] = create_block(624, 64);
+    level_blocks[2] = create_block(624, 96);
 
+    /* Test 2: Ascending stair ladder (5 steps, 4-block gap, Shifted +160px) */
+    /* Step 1: 800 + 160 = 960 */
+    level_blocks[3] = create_block(960, 64);
+    /* Step 2: 960 + 160 = 1120 */
+    level_blocks[4] = create_block(1120, 96);
+    /* Step 3: 1120 + 160 = 1280 */
+    level_blocks[5] = create_block(1280, 128);
+    /* Step 4: 1280 + 160 = 1440 */
+    level_blocks[6] = create_block(1440, 160);
+    /* Step 5: 1440 + 160 = 1600 */
+    level_blocks[7] = create_block(1600, 192);
+
+    /* Test 3: Descending stairway (5 steps, 5-block spacing, Shifted +160px) */
+    /* First block down: 1600 + 160 = 1760 */
+    level_blocks[8] = create_block(1760, 160);
+    level_blocks[9] = create_block(1920, 128);
+    level_blocks[10] = create_block(2080, 96);
+    level_blocks[11] = create_block(2240, 64);
+    level_blocks[12] = create_block(2400, 64);
+
+    /* Fill remainder with dummy values to avoid garbage rendering */
+    for(i = 13; i < L1_BLOCKS_SIZE; i++) {
+        level_blocks[i] = create_block(0, 0); 
+    }
+    for(i = 0; i < L1_SPIKES_SIZE; i++) {
+        level_spikes[i] = create_spike(0, 0);
+    }
+    for(i = 4; i < L1_LAVA_SIZE; i++) {
+        level_lava[i] = create_lava(0, 0);
+    }
+
+    /* Set actual sizes to matching indices to avoid dummy rendering overhead */
     return create_level(
         level_blocks,
         level_spikes,
         level_lava,
-        L1_BLOCKS_SIZE,
-        L1_SPIKES_SIZE,
-        L1_LAVA_SIZE,
-        1000
-    );
-}
-
-Level get_level2(void) {
-    static Block level_blocks[L2_BLOCKS_SIZE];
-    static Spike level_spikes[L2_SPIKES_SIZE];
-    static Lava level_lava[L2_LAVA_SIZE];
-
-    /* Block initialization */
-    level_blocks[0] = create_block(100, 100);
-    level_blocks[1] = create_block(200, 200);
-
-    /* Lava initialization */
-    level_lava[0] = create_lava(500, 600);
-
-    /* Spike initialization */
-    level_spikes[0] = create_spike(356, 64);
-    level_spikes[1] = create_spike(388, 64);
-    level_spikes[2] = create_spike(420, 64);
-
-    return create_level(
-        level_blocks,
-        level_spikes,
-        level_lava,
-        L2_BLOCKS_SIZE,
-        L2_SPIKES_SIZE,
-        L2_LAVA_SIZE,
-        1000
+        13,
+        0,
+        4,
+        19000
     );
 }
 
@@ -108,7 +97,6 @@ Level* get_levels(void) {
     static Level levels[NUM_LEVELS];
 
     levels[0] = get_level1();
-    levels[1] = get_level2();
 
     return levels;
 }

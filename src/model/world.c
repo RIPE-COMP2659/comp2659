@@ -35,8 +35,10 @@ World get_world(void) {
 
 void world_reset_level(World *world) {
     world->geo.x = CAMERA_OFFSET;
+    world->geo.x_scaled = (signed long)world->geo.x << GEO_PHYSICS_SHIFT;
     world->geo.y = world->ground_y + GEO_SIZE;
-    world->geo.y_scaled = world->geo.y << GEO_PHYSICS_SHIFT;
+    world->geo.y_scaled = (signed long)world->geo.y << GEO_PHYSICS_SHIFT;
+    world->camera.x = 0;
     world->geo.is_dead = FALSE;
 }
 
@@ -127,9 +129,8 @@ void world_collision_geo_block(World *world, Block *block) {
     }
 }
 
-/* TODO: Implement proper spike collision detection */
 void world_collision_geo_spike(World *world, Spike *spike) {
-    signed int collision = geo_check_square_collision(
+    signed int collision = geo_check_spike_collision(
         &world->geo,
         spike->x,
         spike->y,

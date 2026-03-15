@@ -1,50 +1,66 @@
-#include <stdio.h> /* Temporary printf import */
-#include <osbind.h>
+#include "events/events.h"
+#include "input.h"
 #include "model/model.h"
 #include "raster/raster.h"
 #include "render/render.h"
-#include "events/events.h"
+#include <osbind.h>
+#include <stdio.h> /* Temporary printf import */
+
 
 #define BYTES_PER_SCREEN 32000
 
 /* Only works on Atari ST, comment out starting here */
 /* End commenting out here */
 
-void test_rendering(UINT8 *base, Model *model)
-{
+void test_rendering(UINT8 *base, Model *model) {
     World *world = &model->world;
-    unsigned int w_iter;
-    int input;
+    char input_char;
     signed int current_event;
+    int is_running = TRUE;
 
-    for (w_iter = 0; w_iter < 400; w_iter++) {
-        /* Temporary input */
-        input = Cnecin();
-        printf("Input: %d\n", input);
-        if (input == 32) {
-            on_jump_request(model);
+    /* Start on Level 1 */
+    world->level_index = 0;
+
+    /* Run continuously until 'q' or 'Q' is pressed */
+    while (is_running == TRUE) {
+        /* Vsync first to align with screen refresh and stabilize frame time */
+        Vsync();
+
+        if (has_input() == TRUE) {
+            input_char = get_input();
+            if (input_char == 'q' || input_char == 'Q') {
+                is_running = FALSE;
+            } else if (input_char == ' ') {
+                on_jump_request(model);
+            }
         }
 
-        on_clock_tick(model);
+        if (is_running == TRUE) {
+            on_clock_tick(model);
 
-        /* Cleans up once further along */
-        current_event = check_level_complete(model);
-        if (current_event == EVENT_LEVEL_DONE) {
-            printf("Level Complete!\n");
+            /* Handle game state based on events */
+            current_event = check_level_complete(model);
+            if (current_event == EVENT_LEVEL_DONE) {
+                /* Level Complete! Exit or go to next level */
+                is_running = FALSE;
+            }
+
+            if (world->geo.is_dead == TRUE) {
+                /* Restart on death */
+                world_reset_level(world);
+            }
+
+            render(model, base);
         }
-
-        render(model, base);
     }
 }
 
-void disable_cursor()
-{
+void disable_cursor() {
     printf("\033f");
     fflush(stdout);
 }
 
-void fill_screen(UINT32 *base, char pattern)
-{
+void fill_screen(UINT32 *base, char pattern) {
     register int i = 0;
     register UINT32 *loc = base;
 
@@ -52,13 +68,9 @@ void fill_screen(UINT32 *base, char pattern)
         *(loc++) = pattern;
 }
 
-void test_clear_screen(UINT8 *base)
-{
-    clear_screen((UINT32 *)base);
-}
+void test_clear_screen(UINT8 *base) { clear_screen((UINT32 *)base); }
 
-void test_clear_region(UINT8 *base)
-{
+void test_clear_region(UINT8 *base) {
     /* Fill screen with white first */
     fill_screen((UINT32 *)base, -1);
 
@@ -82,70 +94,10 @@ void test_clear_region(UINT8 *base)
 }
 
 int main(void) {
-    /* For now, just a placeholder */
     UINT8 *base = (UINT8 *)Physbase();
     Model model = get_model();
-    World *world = &model.world;
 
-    /* Run the rendering test loop (now properly encapsulated) */
     test_rendering(base, &model);
-    
-    disable_cursor();
-
-    /* Test 1: Clear Screen */
-    fill_screen((UINT32 *)base, -1); /* fill with white */
-    Cnecin();
-    test_clear_screen(base);
-    Cnecin();
-
-    /* Test 2: Clear Region - various sizes and positions */
-    test_clear_region(base);
-    Cnecin();
-
-    printf("Running main!\n");
-
-    printf("Level has %u block size \n", 
-        world->levels[0].blocks[0].size
-    );
-
-    printf("Geo x: %d\n", world->geo.x);
-    printf("Geo y: %d\n", world->geo.y);
-    printf("Geo dx: %d\n", world->geo.dx);
-    printf("Geo dy: %d\n", world->geo.dy);
-    printf("Geo ddy: %d\n", world->geo.ddy);
-    printf("Geo is_landed: %d\n", world->geo.is_landed);
-
-    geo_update(&world->geo);
-    printf("Geo is_landed: %d\n", world->geo.is_landed);
-    geo_update(&world->geo);
-    printf("Geo is_landed: %d\n", world->geo.is_landed);
-    geo_update(&world->geo);
-
-    printf("Geo x: %d\n", world->geo.x);
-    printf("Geo y: %d\n", world->geo.y);
-    printf("Geo dx: %d\n", world->geo.dx);
-    printf("Geo dy: %d\n", world->geo.dy);
-    printf("Geo ddy: %d\n", world->geo.ddy);
-    printf("Geo is_landed: %d\n", world->geo.is_landed);
-
-    geo_jump(&world->geo);
-    geo_update(&world->geo);
-
-    printf("Geo x after jump and move: %d\n", world->geo.x);
-    printf("Geo y after jump and move: %d\n", world->geo.y);
-    printf("Geo dx: %d\n", world->geo.dx);
-    printf("Geo dy: %d\n", world->geo.dy);
-    printf("Geo ddy: %d\n", world->geo.ddy);
-    printf("Geo is_landed: %d\n", world->geo.is_landed);
-
-    geo_jump(&world->geo);
-    geo_jump(&world->geo);
-    geo_jump(&world->geo);
-    geo_update(&world->geo);
-
-    printf("Geo x after move: %d\n", world->geo.x);
-    printf("Geo y after move: %d\n", world->geo.y);
-    printf("Geo is_landed: %d\n", world->geo.is_landed);
 
     return 0;
 }

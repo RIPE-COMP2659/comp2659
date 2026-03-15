@@ -37,6 +37,12 @@ void model_update(Model *model) {
 void model_check_death(Model *model) {
     if (model->world.geo.is_dead == TRUE) {
         world_reset_level(&model->world);
+        model->cam_min_bi = 0; model->cam_max_bi = 0;
+        model->cam_min_si = 0; model->cam_max_si = 0;
+        model->cam_min_li = 0; model->cam_max_li = 0;
+        model->col_min_bi = 0; model->col_max_bi = 0;
+        model->col_min_si = 0; model->col_max_si = 0;
+        model->col_min_li = 0; model->col_max_li = 0;
     }
 }
 
