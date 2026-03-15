@@ -87,7 +87,12 @@ check_alignment:
         move.w  width(a6),d0
         cmpi.w  #32,d0                          ; check if exactly 32 pixels
         bne     unoptimized
-                
+
+                ; 32-pixel fast path only valid when col is byte-aligned
+        move.w  col(a6),d0
+        andi.w  #7,d0                           ; d0 = col % 8
+        bne     unoptimized
+
                 ; Ensure word alignment for move.l (address must be even)
         move.l  a0,d1
         btst    #0,d1                           ; test if address is odd
