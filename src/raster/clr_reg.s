@@ -87,7 +87,7 @@ check_alignment:
         move.w  width(a6),d0
         cmpi.w  #32,d0                          ; check if exactly 32 pixels
         bne     unoptimized
-                
+
                 ; Ensure word alignment for move.l (address must be even)
         move.l  a0,d1
         btst    #0,d1                           ; test if address is odd
