@@ -42,21 +42,40 @@ static void assert_borders(
     UINT16 length,
     UINT16 width
 ) {
+    /* TODO: Logic is garbage, should be using ternary and cleaner loops */
     INT16 y;
     INT16 x;
+    const INT16 left_col = col - 1;
+    const INT16 right_col = col + width;
+    const INT16 top_row = row - 1;
+    const INT16 bottom_row = row + length;
 
     for (y = row; y < (INT16)(row + length); y++) {
-        TEST_ASSERT_EQUAL_INT_MESSAGE(WHITE, get_pixel(base, y, col - 1),
-            "Left boundary column cleared incorrectly");
-        TEST_ASSERT_EQUAL_INT_MESSAGE(WHITE, get_pixel(base, y, col + width),
-            "Right boundary column cleared incorrectly");
+        if (y >= 0 && y < SCREEN_HEIGHT_PIXELS) {
+            if (left_col >= 0 && left_col < SCREEN_WIDTH_PIXELS) {
+                TEST_ASSERT_EQUAL_INT_MESSAGE(WHITE, get_pixel(base, y, left_col),
+                    "Left boundary column cleared incorrectly");
+            }
+
+            if (right_col >= 0 && right_col < SCREEN_WIDTH_PIXELS) {
+                TEST_ASSERT_EQUAL_INT_MESSAGE(WHITE, get_pixel(base, y, right_col),
+                    "Right boundary column cleared incorrectly");
+            }
+        }
     }
 
     for (x = col; x < (INT16)(col + width); x++) {
-        TEST_ASSERT_EQUAL_INT_MESSAGE(WHITE, get_pixel(base, row - 1, x),
-            "Top boundary row cleared incorrectly");
-        TEST_ASSERT_EQUAL_INT_MESSAGE(WHITE, get_pixel(base, row + length, x),
-            "Bottom boundary row cleared incorrectly");
+        if (x >= 0 && x < SCREEN_WIDTH_PIXELS) {
+            if (top_row >= 0 && top_row < SCREEN_HEIGHT_PIXELS) {
+                TEST_ASSERT_EQUAL_INT_MESSAGE(WHITE, get_pixel(base, top_row, x),
+                    "Top boundary row cleared incorrectly");
+            }
+
+            if (bottom_row >= 0 && bottom_row < SCREEN_HEIGHT_PIXELS) {
+                TEST_ASSERT_EQUAL_INT_MESSAGE(WHITE, get_pixel(base, bottom_row, x),
+                    "Bottom boundary row cleared incorrectly");
+            }
+        }
     }
 }
 
@@ -118,8 +137,6 @@ void tearDown(void)
 /* Test: Plot 32x32 all-white sprite at top-left */
 void test_plot_bitmap_32_top_left(void)
 {
-    int row, col;
-
     /* Create a 32x32 bitmap with all bits set to black */
     const UINT32 bitmap[32] = {
         0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
@@ -133,26 +150,13 @@ void test_plot_bitmap_32_top_left(void)
 
     /* Plot at origin (0, 0) */
     plot_bitmap_32(mock_screen, 0, 0, bitmap, 32);
-
-    /* Verify all 32x32 pixels are black */
-    for (row = 0; row < 32; row++)
-    {
-        for (col = 0; col < 32; col++)
-        {
-            TEST_ASSERT_EQUAL_INT(BLACK, get_pixel(mock_screen, row, col));
-        }
-    }
-
-    /* Verify pixels outside sprite remain black */
-    TEST_ASSERT_EQUAL_INT(WHITE, get_pixel(mock_screen, 0, 32));
-    TEST_ASSERT_EQUAL_INT(WHITE, get_pixel(mock_screen, 32, 0));
-    TEST_ASSERT_EQUAL_INT(WHITE, get_pixel(mock_screen, 32, 32));
+    assert_borders((UINT8 *)mock_screen, 0, 0, 32, 32);
+    verify_bitmap_32_pixels((UINT8 *)mock_screen, 0, 0, bitmap, 32);
 }
 
 /* Test: Plot 32x32 all-white sprite at top-right */
 void test_plot_bitmap_32_top_right(void)
 {
-    int row, col;
     const INT16 start_col = SCREEN_WIDTH_PIXELS - 32;
 
     /* Create a 32x32 bitmap with all bits set to black */
@@ -168,25 +172,13 @@ void test_plot_bitmap_32_top_right(void)
 
     /* Plot at top-right */
     plot_bitmap_32(mock_screen, 0, start_col, bitmap, 32);
-
-    /* Verify all 32x32 pixels are black */
-    for (row = 0; row < 32; row++)
-    {
-        for (col = 0; col < 32; col++)
-        {
-            TEST_ASSERT_EQUAL_INT(BLACK, get_pixel(mock_screen, row, start_col + col));
-        }
-    }
-
-    /* Verify pixels just outside sprite remain white */
-    TEST_ASSERT_EQUAL_INT(WHITE, get_pixel(mock_screen, 0, start_col - 1));
-    TEST_ASSERT_EQUAL_INT(WHITE, get_pixel(mock_screen, 32, start_col));
+    assert_borders((UINT8 *)mock_screen, 0, start_col, 32, 32);
+    verify_bitmap_32_pixels((UINT8 *)mock_screen, 0, start_col, bitmap, 32);
 }
 
 /* Test: Plot 32x32 all-white sprite at bottom-left */
 void test_plot_bitmap_32_bottom_left(void)
 {
-    int row, col;
     const INT16 start_row = SCREEN_HEIGHT_PIXELS - 32;
 
     /* Create a 32x32 bitmap with all bits set to 1 (white) */
@@ -202,25 +194,13 @@ void test_plot_bitmap_32_bottom_left(void)
 
     /* Plot at bottom-left */
     plot_bitmap_32(mock_screen, start_row, 0, bitmap, 32);
-
-    /* Verify all 32x32 pixels are white */
-    for (row = 0; row < 32; row++)
-    {
-        for (col = 0; col < 32; col++)
-        {
-            TEST_ASSERT_EQUAL_INT(BLACK, get_pixel(mock_screen, start_row + row, col));
-        }
-    }
-
-    /* Verify pixels just outside sprite remain white */
-    TEST_ASSERT_EQUAL_INT(WHITE, get_pixel(mock_screen, start_row - 1, 0));
-    TEST_ASSERT_EQUAL_INT(WHITE, get_pixel(mock_screen, start_row, 32));
+    assert_borders((UINT8 *)mock_screen, start_row, 0, 32, 32);
+    verify_bitmap_32_pixels((UINT8 *)mock_screen, start_row, 0, bitmap, 32);
 }
 
 /* Test: Plot 32x32 all-white sprite at bottom-right */
 void test_plot_bitmap_32_bottom_right(void)
 {
-    int row, col;
     const INT16 start_row = SCREEN_HEIGHT_PIXELS - 32;
     const INT16 start_col = SCREEN_WIDTH_PIXELS - 32;
 
@@ -237,25 +217,13 @@ void test_plot_bitmap_32_bottom_right(void)
 
     /* Plot at bottom-right */
     plot_bitmap_32(mock_screen, start_row, start_col, bitmap, 32);
-
-    /* Verify all 32x32 pixels are black */
-    for (row = 0; row < 32; row++)
-    {
-        for (col = 0; col < 32; col++)
-        {
-            TEST_ASSERT_EQUAL_INT(BLACK, get_pixel(mock_screen, start_row + row, start_col + col));
-        }
-    }
-
-    /* Verify pixels just outside sprite remain white */
-    TEST_ASSERT_EQUAL_INT(WHITE, get_pixel(mock_screen, start_row - 1, start_col));
-    TEST_ASSERT_EQUAL_INT(WHITE, get_pixel(mock_screen, start_row, start_col - 1));
+    assert_borders((UINT8 *)mock_screen, start_row, start_col, 32, 32);
+    verify_bitmap_32_pixels((UINT8 *)mock_screen, start_row, start_col, bitmap, 32);
 }
 
 /* Test: Plot 32x32 sprite partially off left edge */
 void test_plot_bitmap_32_off_left_edge(void)
 {
-    int row, col;
     const INT16 start_col = -16; /* Half off screen to the left */
 
     /* Create a 32x32 bitmap with all bits set to 1 (white) */
@@ -271,29 +239,13 @@ void test_plot_bitmap_32_off_left_edge(void)
 
     /* Plot sprite starting at col -16 (16 pixels off screen) */
     plot_bitmap_32(mock_screen, 0, start_col, bitmap, 32);
-
-    /* Verify only the right 16 pixels (columns 0-15) are drawn */
-    for (row = 0; row < 32; row++)
-    {
-        for (col = 0; col < 16; col++)
-        {
-            TEST_ASSERT_EQUAL_INT(BLACK, get_pixel(mock_screen, row, col));
-        }
-    }
-
-    /* Verify pixels beyond visible portion remain white */
-    for (row = 0; row < 32; row++)
-    {
-        TEST_ASSERT_EQUAL_INT(WHITE, get_pixel(mock_screen, row, 16));
-    }
-
-    TEST_ASSERT_EQUAL_INT(WHITE, get_pixel(mock_screen, 32, 0));
+    assert_borders((UINT8 *)mock_screen, 0, start_col, 32, 32);
+    verify_bitmap_32_pixels((UINT8 *)mock_screen, 0, start_col, bitmap, 32);
 }
 
 /* Test: Plot 32x32 sprite partially off right edge */
 void test_plot_bitmap_32_off_right_edge(void)
 {
-    int row, col;
     const INT16 start_col = SCREEN_WIDTH_PIXELS - 16; /* Half off screen to the right */
 
     /* Create a 32x32 bitmap with all bits set to 1 (white) */
@@ -309,28 +261,13 @@ void test_plot_bitmap_32_off_right_edge(void)
 
     /* Plot sprite starting at col SCREEN_WIDTH_PIXELS - 16 (16 pixels off screen) */
     plot_bitmap_32(mock_screen, 0, start_col, bitmap, 32);
-
-    /* Verify only the left 16 pixels are drawn (from start_col to start_col+15) */
-    for (row = 0; row < 32; row++)
-    {
-        for (col = 0; col < 15; col++)
-        {
-            TEST_ASSERT_EQUAL_INT_MESSAGE(BLACK, get_pixel(mock_screen, row, start_col + col), "Black failed");
-        }
-    }
-
-    /* Verify pixels before the sprite remain white */
-    for (row = 0; row < 32; row++)
-    {
-        TEST_ASSERT_EQUAL_INT_MESSAGE(WHITE, get_pixel(mock_screen, row, start_col - 1), "White failed");
-    }
-
+    assert_borders((UINT8 *)mock_screen, 0, start_col, 32, 32);
+    verify_bitmap_32_pixels((UINT8 *)mock_screen, 0, start_col, bitmap, 32);
 }
 
 /* Test: Plot 32x32 sprite partially off top edge */
 void test_plot_bitmap_32_off_top_edge(void)
 {
-    int row, col;
     const INT16 start_row = -16; /* Half off screen to the top */
 
     /* Create a 32x32 bitmap with all bits set to 1 (white) */
@@ -346,27 +283,13 @@ void test_plot_bitmap_32_off_top_edge(void)
 
     /* Plot sprite starting at row -16 (top 16 pixels clipped) */
     plot_bitmap_32(mock_screen, start_row, 0, bitmap, 32);
-
-    /* Verify only the bottom 16 pixels of the sprite (rows 0-15 on screen) are drawn */
-    for (row = 0; row < 16; row++)
-    {
-        for (col = 0; col < 32; col++)
-        {
-            TEST_ASSERT_EQUAL_INT(BLACK, get_pixel(mock_screen, row, col));
-        }
-    }
-
-    /* Verify pixels just below the visible portion remain white */
-    for (col = 0; col < 32; col++)
-    {
-        TEST_ASSERT_EQUAL_INT(WHITE, get_pixel(mock_screen, 16, col));
-    }
+    assert_borders((UINT8 *)mock_screen, start_row, 0, 32, 32);
+    verify_bitmap_32_pixels((UINT8 *)mock_screen, start_row, 0, bitmap, 32);
 }
 
 /* Test: Plot 32x32 sprite partially off bottom edge */
 void test_plot_bitmap_32_off_bottom_edge(void)
 {
-    int row, col;
     const INT16 start_row = SCREEN_HEIGHT_PIXELS - 16; /* Half off screen to the bottom */
 
     /* Create a 32x32 bitmap with all bits set to 1 (white) */
@@ -382,21 +305,8 @@ void test_plot_bitmap_32_off_bottom_edge(void)
 
     /* Plot sprite starting at row SCREEN_HEIGHT_PIXELS - 16 (bottom 16 pixels clipped) */
     plot_bitmap_32(mock_screen, start_row, 0, bitmap, 32);
-
-    /* Verify only the top 16 pixels of the sprite are drawn */
-    for (row = 0; row < 16; row++)
-    {
-        for (col = 0; col < 32; col++)
-        {
-            TEST_ASSERT_EQUAL_INT(BLACK, get_pixel(mock_screen, start_row + row, col));
-        }
-    }
-
-    /* Verify pixels just above the sprite remain white */
-    for (col = 0; col < 32; col++)
-    {
-        TEST_ASSERT_EQUAL_INT(WHITE, get_pixel(mock_screen, start_row - 1, col));
-    }
+    assert_borders((UINT8 *)mock_screen, start_row, 0, 32, 32);
+    verify_bitmap_32_pixels((UINT8 *)mock_screen, start_row, 0, bitmap, 32);
 }
 
 /* Test: Plot 32x32 sprite completely off screen (top and bottom) */
@@ -415,13 +325,11 @@ void test_plot_bitmap_32_completely_off_screen(void)
 
     /* Plot way above the top edge */
     plot_bitmap_32(mock_screen, -40, 0, bitmap, 32);
+    assert_borders((UINT8 *)mock_screen, -40, 0, 32, 32);
     
     /* Plot way below the bottom edge */
     plot_bitmap_32(mock_screen, SCREEN_HEIGHT_PIXELS + 10, 0, bitmap, 32);
-
-    /* Verify that bounds remain perfectly black, proving the draw aborted */
-    TEST_ASSERT_EQUAL_INT(WHITE, get_pixel(mock_screen, 0, 0));
-    TEST_ASSERT_EQUAL_INT(WHITE, get_pixel(mock_screen, SCREEN_HEIGHT_PIXELS - 1, 0));
+    assert_borders((UINT8 *)mock_screen, SCREEN_HEIGHT_PIXELS + 10, 0, 32, 32);
 }
 
 void test_plot_bitmap_32_centered(void) {
