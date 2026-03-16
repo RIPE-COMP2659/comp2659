@@ -92,12 +92,19 @@ do_plot:
         mulu.w  #80,d0                          ; row * 80 bytes
         ext.l   d0
         adda.l  d0,a0                           ; add row offset
-                
+
+                ; Extract sub-byte bit shift before computing byte offset
+        move.w  d1,d5
+        andi.w  #7,d5                           ; d5 = col % 8 (bit shift)
+
         move.w  d1,d0
         lsr.w   #3,d0                           ; col / 8
         ext.l   d0
-        adda.l  d0,a0                           ; add col offset
-                
+        adda.l  d0,a0                           ; add col byte offset
+
+        tst.w   d5
+        bne     do_plot_shifted                 ; non-byte-aligned: use shifted path
+
 calc_plot_bytes:
                 ; Calculate bytes per row of bitmap (original width)
         move.w  d4,d5                           ; original width in pixels
@@ -191,4 +198,79 @@ plot_lclip_entry:
                 
         rts
 
-        
+;----------------------------------------------------------------
+; Internal subroutine: do_plot_shifted
+; Plots a right-clipped bitmap with a non-byte-aligned column.
+; Branches here from do_plot when col % 8 != 0.
+; Input:
+;   a0 = screen base + row*80 + col/8  (byte-aligned start address)
+;   a1 = bitmap data
+;   d2 = height
+;   d3 = clipped width (in pixels)
+;   d4 = original bitmap width (in pixels)
+;   d5 = bit shift (col % 8, range 1-7)
+;----------------------------------------------------------------
+do_plot_shifted:
+        moveq   #8,d6
+        sub.w   d5,d6                           ; d6 = 8 - shift (complement)
+
+                ; Calculate orig bytes per row
+        move.w  d4,d0
+        addq.w  #7,d0
+        lsr.w   #3,d0                           ; d0 = orig bytes per row
+
+                ; Calculate clipped bytes per row
+        move.w  d3,d1
+        addq.w  #7,d1
+        lsr.w   #3,d1                           ; d1 = clipped bytes per row
+
+                ; Compute skip = orig - clipped (for bitmap row advance)
+        sub.w   d1,d0
+        ext.l   d0
+        move.l  d0,d7                           ; d7 = bytes to skip after each row
+        move.w  d1,d4                           ; d4 = clipped bytes per row
+
+        subq.w  #1,d2                           ; height - 1 for dbra
+
+shifted_do_plot_row:
+        movea.l a0,a2                           ; a2 = dest ptr for this row
+
+                ; Mask first dest byte: preserve top `shift` bits, clear sprite bits
+        moveq   #-1,d0
+        lsl.w   d6,d0                           ; d0 low byte = 0xFF << (8-shift)
+        and.b   d0,(a2)
+
+                ; First source byte: shift and OR into first dest byte, compute carry
+        moveq   #0,d0
+        move.b  (a1)+,d0                        ; d0 = first source byte (zero-extended)
+        move.w  d0,d1                           ; d1 = source copy for carry
+        lsr.w   d5,d0                           ; d0 low byte = source >> shift
+        or.b    d0,(a2)+                        ; OR into first dest byte, advance ptr
+        lsl.w   d6,d1                           ; d1 low byte = carry = source << (8-shift)
+        move.w  d1,d3                           ; d3 = carry for next dest byte
+
+                ; Process remaining source bytes
+        move.w  d4,d1                           ; d1 = total clipped bytes
+        subq.w  #2,d1                           ; dbra is inclusive; remaining count is (d4 - 1)
+        blt.s   shifted_do_plot_advance         ; if no remaining bytes, skip inner loop
+
+shifted_do_plot_byte_loop:
+        move.w  d1,-(sp)                        ; save loop counter
+        moveq   #0,d0
+        move.b  (a1)+,d0                        ; d0 = next source byte (zero-extended)
+        move.w  d0,d1                           ; d1 = source copy for new carry
+        lsr.w   d5,d0                           ; d0 = source >> shift
+        or.b    d3,d0                           ; combine: old carry | shifted source
+        move.b  d0,(a2)+                        ; write dest byte
+        lsl.w   d6,d1                           ; d1 = new carry in low byte
+        move.w  d1,d3                           ; d3 = new carry
+        move.w  (sp)+,d1                        ; restore loop counter
+        dbra    d1,shifted_do_plot_byte_loop
+
+shifted_do_plot_advance:
+        adda.l  d7,a1                           ; skip remaining bitmap bytes this row
+        adda.w  #80,a0                          ; advance screen to next row
+        dbra    d2,shifted_do_plot_row
+
+        rts
+
