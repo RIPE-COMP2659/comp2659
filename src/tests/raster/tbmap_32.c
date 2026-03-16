@@ -137,16 +137,16 @@ void tearDown(void)
 /* Test: Plot 32x32 all-white sprite at top-left */
 void test_plot_bitmap_32_top_left(void)
 {
-    /* Create a 32x32 bitmap with all bits set to black */
     const UINT32 bitmap[32] = {
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF};
+        0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA,
+        0x55555555, 0x55555555, 0x55555555, 0x55555555,
+        0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA,
+        0x55555555, 0x55555555, 0x55555555, 0x55555555,
+        0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA,
+        0x55555555, 0x55555555, 0x55555555, 0x55555555,
+        0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA,
+        0x55555555, 0x55555555, 0x55555555, 0x55555555
+    };
 
     /* Plot at origin (0, 0) */
     plot_bitmap_32(mock_screen, 0, 0, bitmap, 32);
@@ -159,16 +159,16 @@ void test_plot_bitmap_32_top_right(void)
 {
     const INT16 start_col = SCREEN_WIDTH_PIXELS - 32;
 
-    /* Create a 32x32 bitmap with all bits set to black */
     const UINT32 bitmap[32] = {
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF};
+        0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA,
+        0x55555555, 0x55555555, 0x55555555, 0x55555555,
+        0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA,
+        0x55555555, 0x55555555, 0x55555555, 0x55555555,
+        0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA,
+        0x55555555, 0x55555555, 0x55555555, 0x55555555,
+        0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA,
+        0x55555555, 0x55555555, 0x55555555, 0x55555555
+    };
 
     /* Plot at top-right */
     plot_bitmap_32(mock_screen, 0, start_col, bitmap, 32);
@@ -181,16 +181,16 @@ void test_plot_bitmap_32_bottom_left(void)
 {
     const INT16 start_row = SCREEN_HEIGHT_PIXELS - 32;
 
-    /* Create a 32x32 bitmap with all bits set to 1 (white) */
     const UINT32 bitmap[32] = {
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF};
+        0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA,
+        0x55555555, 0x55555555, 0x55555555, 0x55555555,
+        0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA,
+        0x55555555, 0x55555555, 0x55555555, 0x55555555,
+        0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA,
+        0x55555555, 0x55555555, 0x55555555, 0x55555555,
+        0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA,
+        0x55555555, 0x55555555, 0x55555555, 0x55555555
+    };
 
     /* Plot at bottom-left */
     plot_bitmap_32(mock_screen, start_row, 0, bitmap, 32);
@@ -204,16 +204,16 @@ void test_plot_bitmap_32_bottom_right(void)
     const INT16 start_row = SCREEN_HEIGHT_PIXELS - 32;
     const INT16 start_col = SCREEN_WIDTH_PIXELS - 32;
 
-    /* Create a 32x32 bitmap with all bits set to 1 (white) */
     const UINT32 bitmap[32] = {
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF};
+        0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA,
+        0x55555555, 0x55555555, 0x55555555, 0x55555555,
+        0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA,
+        0x55555555, 0x55555555, 0x55555555, 0x55555555,
+        0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA,
+        0x55555555, 0x55555555, 0x55555555, 0x55555555,
+        0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA,
+        0x55555555, 0x55555555, 0x55555555, 0x55555555
+    };
 
     /* Plot at bottom-right */
     plot_bitmap_32(mock_screen, start_row, start_col, bitmap, 32);
@@ -226,16 +226,16 @@ void test_plot_bitmap_32_off_left_edge(void)
 {
     const INT16 start_col = -16; /* Half off screen to the left */
 
-    /* Create a 32x32 bitmap with all bits set to 1 (white) */
     const UINT32 bitmap[32] = {
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF};
+        0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA,
+        0x55555555, 0x55555555, 0x55555555, 0x55555555,
+        0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA,
+        0x55555555, 0x55555555, 0x55555555, 0x55555555,
+        0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA,
+        0x55555555, 0x55555555, 0x55555555, 0x55555555,
+        0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA,
+        0x55555555, 0x55555555, 0x55555555, 0x55555555
+    };
 
     /* Plot sprite starting at col -16 (16 pixels off screen) */
     plot_bitmap_32(mock_screen, 0, start_col, bitmap, 32);
@@ -243,23 +243,45 @@ void test_plot_bitmap_32_off_left_edge(void)
     verify_bitmap_32_pixels((UINT8 *)mock_screen, 0, start_col, bitmap, 32);
 }
 
-/* Test: Plot 32x32 sprite partially off right edge */
-void test_plot_bitmap_32_off_right_edge(void)
+/* Test: Plot 32x32 sprite partially off right edge byte aligned */
+void test_plot_bitmap_32_off_right_edge_byte_aligned(void)
 {
     const INT16 start_col = SCREEN_WIDTH_PIXELS - 16; /* Half off screen to the right */
 
-    /* Create a 32x32 bitmap with all bits set to 1 (white) */
     const UINT32 bitmap[32] = {
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF};
+        0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA,
+        0x55555555, 0x55555555, 0x55555555, 0x55555555,
+        0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA,
+        0x55555555, 0x55555555, 0x55555555, 0x55555555,
+        0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA,
+        0x55555555, 0x55555555, 0x55555555, 0x55555555,
+        0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA,
+        0x55555555, 0x55555555, 0x55555555, 0x55555555
+    };
 
     /* Plot sprite starting at col SCREEN_WIDTH_PIXELS - 16 (16 pixels off screen) */
+    plot_bitmap_32(mock_screen, 0, start_col, bitmap, 32);
+    assert_borders((UINT8 *)mock_screen, 0, start_col, 32, 32);
+    verify_bitmap_32_pixels((UINT8 *)mock_screen, 0, start_col, bitmap, 32);
+}
+
+/* Test: Plot 32x32 sprite partially off right edge not byte aligned */
+void test_plot_bitmap_32_off_right_edge_non_byte_aligned(void)
+{
+    const INT16 start_col = SCREEN_WIDTH_PIXELS - 7; /* Half off screen to the right */
+
+    const UINT32 bitmap[32] = {
+        0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA,
+        0x55555555, 0x55555555, 0x55555555, 0x55555555,
+        0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA,
+        0x55555555, 0x55555555, 0x55555555, 0x55555555,
+        0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA,
+        0x55555555, 0x55555555, 0x55555555, 0x55555555,
+        0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA,
+        0x55555555, 0x55555555, 0x55555555, 0x55555555
+    };
+
+    /* Plot sprite starting at col SCREEN_WIDTH_PIXELS - 7 (7 pixels off screen) */
     plot_bitmap_32(mock_screen, 0, start_col, bitmap, 32);
     assert_borders((UINT8 *)mock_screen, 0, start_col, 32, 32);
     verify_bitmap_32_pixels((UINT8 *)mock_screen, 0, start_col, bitmap, 32);
@@ -270,16 +292,16 @@ void test_plot_bitmap_32_off_top_edge(void)
 {
     const INT16 start_row = -16; /* Half off screen to the top */
 
-    /* Create a 32x32 bitmap with all bits set to 1 (white) */
     const UINT32 bitmap[32] = {
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF};
+        0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA,
+        0x55555555, 0x55555555, 0x55555555, 0x55555555,
+        0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA,
+        0x55555555, 0x55555555, 0x55555555, 0x55555555,
+        0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA,
+        0x55555555, 0x55555555, 0x55555555, 0x55555555,
+        0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA,
+        0x55555555, 0x55555555, 0x55555555, 0x55555555
+    };;
 
     /* Plot sprite starting at row -16 (top 16 pixels clipped) */
     plot_bitmap_32(mock_screen, start_row, 0, bitmap, 32);
@@ -292,16 +314,16 @@ void test_plot_bitmap_32_off_bottom_edge(void)
 {
     const INT16 start_row = SCREEN_HEIGHT_PIXELS - 16; /* Half off screen to the bottom */
 
-    /* Create a 32x32 bitmap with all bits set to 1 (white) */
     const UINT32 bitmap[32] = {
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF};
+        0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA,
+        0x55555555, 0x55555555, 0x55555555, 0x55555555,
+        0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA,
+        0x55555555, 0x55555555, 0x55555555, 0x55555555,
+        0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA,
+        0x55555555, 0x55555555, 0x55555555, 0x55555555,
+        0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA,
+        0x55555555, 0x55555555, 0x55555555, 0x55555555
+    };
 
     /* Plot sprite starting at row SCREEN_HEIGHT_PIXELS - 16 (bottom 16 pixels clipped) */
     plot_bitmap_32(mock_screen, start_row, 0, bitmap, 32);
@@ -312,16 +334,16 @@ void test_plot_bitmap_32_off_bottom_edge(void)
 /* Test: Plot 32x32 sprite completely off screen (top and bottom) */
 void test_plot_bitmap_32_completely_off_screen(void)
 {
-    /* Create a 32x32 bitmap with all bits set to 1 (white) */
     const UINT32 bitmap[32] = {
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-        0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF};
+        0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA,
+        0x55555555, 0x55555555, 0x55555555, 0x55555555,
+        0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA,
+        0x55555555, 0x55555555, 0x55555555, 0x55555555,
+        0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA,
+        0x55555555, 0x55555555, 0x55555555, 0x55555555,
+        0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA,
+        0x55555555, 0x55555555, 0x55555555, 0x55555555
+    };
 
     /* Plot way above the top edge */
     plot_bitmap_32(mock_screen, -40, 0, bitmap, 32);
@@ -363,7 +385,8 @@ int main(void)
     RUN_TEST(test_plot_bitmap_32_bottom_left);
     RUN_TEST(test_plot_bitmap_32_bottom_right);
     RUN_TEST(test_plot_bitmap_32_off_left_edge);
-    RUN_TEST(test_plot_bitmap_32_off_right_edge);
+    RUN_TEST(test_plot_bitmap_32_off_right_edge_byte_aligned);
+    RUN_TEST(test_plot_bitmap_32_off_right_edge_non_byte_aligned);
     RUN_TEST(test_plot_bitmap_32_off_top_edge);
     RUN_TEST(test_plot_bitmap_32_off_bottom_edge);
     RUN_TEST(test_plot_bitmap_32_completely_off_screen);
