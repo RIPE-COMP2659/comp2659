@@ -28,6 +28,8 @@
 ;
 ; PURPOSE: Plot a hoizontal line on the screen. The vertical line is specified by the topmost pixel of the line and the length of the line.
 ;
+	xdef    _plot_vertical_line
+
 _plot_vertical_line:	
 		link	a6,#0
 		movem.l	d0-d3/a0,-(sp)

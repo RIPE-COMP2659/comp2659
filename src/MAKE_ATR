@@ -211,8 +211,9 @@ $(TCAMERA):
 
 
 # ----- Render Test Builds ---------------------------------------------------
-$(TRENDER): $(PLT_REC).o $(BMAP_32).o $(BOUNDS).o $(PLT_CLIP).o $(CLR_REG).o
-	$(ATARI_CC) $(RENDER_TEST_FLAGS) $(TESTS_RENDER_FOLDER)\$(TRENDER).c $(RENDER_TEST_SRC) $(PLT_REC).o $(BMAP_32).o $(BOUNDS).o $(PLT_CLIP).o $(CLR_REG).o $(UNITY) -o $(TRENDER).ut
+# Include clear-screen object so render.o's reference to _clear_screen is satisfied
+$(TRENDER): $(PLT_REC).o $(BMAP_32).o $(BOUNDS).o $(PLT_CLIP).o $(CLR_REG).o $(CLR_SCN).o
+	$(ATARI_CC) $(RENDER_TEST_FLAGS) $(TESTS_RENDER_FOLDER)\$(TRENDER).c $(RENDER_TEST_SRC) $(PLT_REC).o $(BMAP_32).o $(BOUNDS).o $(PLT_CLIP).o $(CLR_REG).o $(CLR_SCN).o $(UNITY) -o $(TRENDER).ut
 
 
 # ----- Events Test Builds ---------------------------------------------------

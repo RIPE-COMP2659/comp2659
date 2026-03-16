@@ -29,6 +29,7 @@
 ;
 ; PURPOSE: Plots a triangle on the screen given by the coordinate of the 90° angle, the length of the base, the length of the height, and the direction of the triangle.
 ;
+        xdef    _plot_triangle
 
 base    equ     8                               ; UINT32* (4 bytes)
 row     equ     12                              ; UINT16 (2 bytes)
