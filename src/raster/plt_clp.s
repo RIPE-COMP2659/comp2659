@@ -127,7 +127,6 @@ plot_byte_loop:
         or.b    d1,(a2)+                        ; OR onto screen
 plot_byte_entry:
         dbra    d7,plot_byte_loop               ; decrement and branch if not -1
-                
                 ; Advance bitmap pointer to next row (skip remaining bytes)
         move.w  d5,d1                           ; original bytes per row
         sub.w   d6,d1                           ; bytes not copied
@@ -172,6 +171,11 @@ calc_lclip_bytes:
         move.w  d3,d4                           ; clipped width in pixels
         addq.w  #7,d4
         lsr.w   #3,d4                           ; bytes to copy
+
+                ; If skipped pixels are not byte-aligned, use shifted left-clip path
+        move.w  d5,d0
+        andi.w  #7,d0                           ; abs(col) % 8
+        bne     do_plot_left_clip_shifted
                 
                 ; Plot bitmap row by row
         subq.w  #1,d2                           ; height - 1 for dbra
@@ -185,7 +189,6 @@ plot_lclip_byte:
         or.b    d0,(a2)+                        ; OR onto screen
 plot_lclip_entry:
         dbra    d1,plot_lclip_byte              ; decrement and branch if not -1
-                
                 ; Move to next row in original bitmap (skip remaining bytes)
         move.w  d6,d1                           ; original bytes per row
         sub.w   d4,d1                           ; bytes already copied
@@ -196,6 +199,96 @@ plot_lclip_entry:
         adda.w  #80,a0                          ; next screen row
         dbra    d2,plot_lclip_row
                 
+        rts
+
+;----------------------------------------------------------------
+; Internal subroutine: do_plot_left_clip_shifted
+; Plots a left-clipped bitmap when abs(col) is not byte-aligned.
+; Input:
+;   a0 = screen base + row*80 (col is already clipped to 0)
+;   a1 = bitmap row start
+;   d2 = height
+;   d4 = clipped bytes per row
+;   d5 = pixels to skip from left
+;   d6 = original bytes per row
+;   d7 = bytes to skip from left
+;----------------------------------------------------------------
+do_plot_left_clip_shifted:
+        move.w  d3,d0
+        andi.w  #7,d0                           ; trailing visible bits in last byte (0..7)
+        movea.w d0,a3                           ; keep for per-row tail-byte masking
+
+        move.w  d5,d0
+        andi.w  #7,d0                           ; d0 = bit shift (1..7)
+        move.w  d0,d5                           ; d5 = shift
+        moveq   #8,d3
+        sub.w   d5,d3                           ; d3 = 8 - shift
+
+        subq.w  #1,d2                           ; height - 1 for dbra
+
+plot_lclip_shift_row:
+        movea.l a0,a2                           ; destination row pointer
+        movea.l a1,a4                           ; source row base
+        adda.w  d7,a4                           ; source row after byte skip
+        movea.l a1,a5                           ; source row base copy
+        adda.w  d6,a5                           ; source row end (one-past-last byte)
+
+                ; Save original last destination byte if partial tail exists
+        move.w  a3,d0
+        beq.s   plot_lclip_no_tail_save
+        move.w  d4,d1
+        subq.w  #1,d1
+        move.b  0(a2,d1.w),d0
+        move.b  d0,-(sp)
+plot_lclip_no_tail_save:
+
+        move.w  d4,d0                           ; bytes to output this row
+        subq.w  #1,d0                           ; dbra counter (inclusive)
+        blt.s   plot_lclip_shift_advance
+
+plot_lclip_shift_byte:
+        move.w  d0,-(sp)                        ; save byte-loop counter
+
+                ; curr byte (or 0 if out of source bytes)
+        moveq   #0,d1
+        cmpa.l  a5,a4
+        bge.s   plot_lclip_curr_done
+        move.b  (a4)+,d1
+plot_lclip_curr_done:
+
+                ; next byte (or 0), then combine
+        lsl.w   d5,d1                           ; curr << shift
+        moveq   #0,d0
+        cmpa.l  a5,a4
+        bge.s   plot_lclip_next_done
+        move.b  (a4),d0
+        lsr.w   d3,d0                           ; next >> (8 - shift)
+plot_lclip_next_done:
+        or.b    d0,d1
+        move.b  d1,(a2)+                        ; write composed destination byte
+
+        move.w  (sp)+,d0                        ; restore byte-loop counter
+        dbra    d0,plot_lclip_shift_byte
+
+plot_lclip_shift_advance:
+                ; Restore non-sprite low bits in last destination byte for partial tails
+        move.w  a3,d0
+        beq.s   plot_lclip_tail_done
+        move.l  #$ff,d1
+        lsr.w   d0,d1                           ; d1 low byte = preserve mask
+        move.w  d1,d0
+        not.w   d0                              ; d0 low byte = sprite-bit mask
+        and.b   d0,-1(a2)                       ; keep only sprite bits in written byte
+        moveq   #0,d0
+        move.b  (sp)+,d0                        ; original destination byte
+        and.b   d1,d0                           ; keep only preserved low bits
+        or.b    d0,-1(a2)                       ; merge original tail bits back
+plot_lclip_tail_done:
+
+        adda.w  d6,a1                           ; next source row (original stride)
+        adda.w  #80,a0                          ; next destination row
+        dbra    d2,plot_lclip_shift_row
+
         rts
 
 ;----------------------------------------------------------------
