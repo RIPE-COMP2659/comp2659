@@ -1,5 +1,5 @@
 #include "events/events.h"
-#include "input.h"
+#include "input/input.h"
 #include "model/model.h"
 #include "raster/raster.h"
 #include "render/render.h"
@@ -26,7 +26,9 @@ void test_rendering(UINT8 *base, Model *model) {
         /* Vsync first to align with screen refresh and stabilize frame time */
         Vsync();
 
-        if (has_input() == TRUE) {
+        /* Process ALL pending input to reduce latency and clear buffer, 
+           in geometry dash thats the way it works and otherwise there is some delay between jumps even if space is held down */
+        while (has_input() == TRUE) {
             input_char = get_input();
             if (input_char == 'q' || input_char == 'Q') {
                 is_running = FALSE;

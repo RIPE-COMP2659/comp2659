@@ -1,6 +1,7 @@
 #include "world.h"
 
-#define CAMERA_OFFSET 160
+#define CAMERA_X_OFFSET 160
+#define CAMERA_Y_OFFSET 260
 
 /* TODO: Level index management, currently never updated */
 /* TODO: Levels must be in ascending x value order or logic will break */
@@ -25,7 +26,7 @@ World get_world(void) {
     /* TODO: Should probably not be hard coded for starting x */
     /* TODO: Added some additional height to test the start, can be removed */
     Geo geo = create_geo(
-        CAMERA_OFFSET,
+        CAMERA_X_OFFSET,
         ground_y + GEO_SIZE + GEO_SIZE,
         ground_y
     );
@@ -34,10 +35,9 @@ World get_world(void) {
 }
 
 void world_reset_level(World *world) {
-    world->geo.x = CAMERA_OFFSET;
-    world->geo.x_scaled = (signed long)world->geo.x << GEO_PHYSICS_SHIFT;
+    world->geo.x = CAMERA_X_OFFSET;
     world->geo.y = world->ground_y + GEO_SIZE;
-    world->geo.y_scaled = (signed long)world->geo.y << GEO_PHYSICS_SHIFT;
+    world->geo.y_scaled = (unsigned int)world->geo.y << GEO_PHYSICS_SHIFT;
     world->camera.x = 0;
     world->geo.is_dead = FALSE;
 }
@@ -46,7 +46,8 @@ void world_update(World *world) {
     geo_update(&world->geo);
     camera_update_coordinates(
         &world->camera,
-        world->geo.x - CAMERA_OFFSET, SCREEN_HEIGHT
+        world->geo.x - CAMERA_X_OFFSET, 
+        world->geo.y + CAMERA_Y_OFFSET
     );
 }
 
@@ -123,9 +124,6 @@ void world_collision_geo_block(World *world, Block *block) {
         world->geo.is_landed = TRUE;
     } else if (collision == COLLISION_BOTTOM || collision == COLLISION_LEFT) {
         world->geo.is_dead = TRUE;
-    } else if (collision == COLLISION_NONE) {
-        /* No collision with this block, geo is not supported */
-        world->geo.is_landed = FALSE;
     }
 }
 

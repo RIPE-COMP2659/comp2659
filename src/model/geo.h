@@ -10,41 +10,39 @@
    2 block jump height and 1 second duration during a 70 FPS game. This is
    because the original Impossible Game had roughly that exact design and it
    would allow us to steal a large amount of their level design */
-#define GEO_DX_SCALED 192      /* 3 pixels * 64 */
-#define GEO_JUMP_DY_SCALED 280 /* Necessary combo with DDY */
-#define GEO_DDY_SCALED -9      /* For height and time */
+#define GEO_DX 5u               /*pixels per frame (unscaled) */
+#define GEO_JUMP_DY_SCALED 610 /* Necessary combo with DDY */
+#define GEO_DDY_SCALED -42     /* For height and time */
+#define GEO_TERMINAL_DY_SCALED -666 /* -13 pixels * 64 */
 #define GEO_PHYSICS_SHIFT 6    /* Bit shifting scaled values, / or * by 64 */
-
 /**
  * Represents the player character, Geo. Might have more than one if we do
  * two player. See the #defines for an explanation on some of the fields
  * regarding the vertical position, some less intuitive math was done to
  * avoid floating point numbers / non-integer division
  *
- * signed long ddy:
+ * signed int ddy:
  *     The change in dy per update. Note that this is not scaled relative
  *     to vertical position, but instead it is scaled relative to a roughly
  *     2 block jump height and 1 second duration during a 70 FPS game
- * signed long dx:
+ * signed int dx:
  *     The change in horizontal position per update, constant horizontal
- *     scrolling. Scaled by 64 (bit shift 6).
- * signed long dy:
+ *     scrolling.
+ * signed int dy:
  *     The change in y per update. It is not scalred relative to vertical
  *     position, it is scaled for a 2 block jump height and 1 second duration
  *     during a 70 FPS game
- * signed int is_landed:
+ * unsigned int is_landed:
  *     Whether geo is currently landed on the ground, which affects whether
  *     they can jump or is subject to gravity
- * signed int is_dead:
+ * unsigned int is_dead:
  *     Whether geo is currently dead, will display a game over or another
  *     attempt will be given in the future
- * unsigned int ground_y
+ * unsigned int ground_y:
  *     The y value of the ground, either a block or the ground of the level,
  *     determines if geo has landed
  * unsigned int x:
  *     The world x value of the top left of Geo
- * signed int x_scaled:
- *     The scaled x value of the top left of Geo, see header defines for details
  * unsigned int y:
  *     The world y value of the top of Geo
  * signed int y_scaled:
@@ -55,17 +53,17 @@
  *     The pointer to the sprite of Geo, a 32x32 pixel image
  */
 typedef struct {
-  signed long ddy;
-  signed long dx;
-  signed long dy;
-  signed int is_landed;
-  signed int is_dead;
+  signed int ddy;
+  unsigned int dx;
+  signed int dy;
+  unsigned int is_landed;
+  unsigned int is_dead;
   unsigned int ground_y;
   unsigned int x;
-  signed long x_scaled;
   unsigned int y;
-  signed long y_scaled;
+  unsigned int y_scaled;
   unsigned int size;
+  unsigned int jump_buffer;
   const unsigned int (*sprite)[GEO_SIZE / WORD];
 } Geo;
 

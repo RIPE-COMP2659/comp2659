@@ -4,7 +4,7 @@
 #define NUM_LEVELS 1
 
 /* Level one (consistently using L2 sizes for current draft) */
-#define L1_BLOCKS_SIZE 25
+#define L1_BLOCKS_SIZE 200
 #define L1_SPIKES_SIZE 15
 #define L1_LAVA_SIZE 5
 
@@ -35,49 +35,53 @@ Level get_level1(void) {
     static Spike level_spikes[L1_SPIKES_SIZE];
     static Lava level_lava[L1_LAVA_SIZE];
     int i;
+    int current_block;
+    unsigned int last_x;
+    unsigned int last_y;
+    unsigned int next_y;
 
-    /* Test 1: 4-block lava jump from 1-high to 2-high (Shifted +64px) */
-    /* 1-high starting block */
+    /* Test 1: 3-block right jump over lava (x_diff = 96px) */
+    /* Starting block */
     level_blocks[0] = create_block(464, 64);
-
-    /* 4-block wide lava pit */
+    level_blocks[1] = create_block(464, 96);
+    /* 2-block wide lava pit (for a 3-right jump) */
     level_lava[0] = create_lava(496, 32);
     level_lava[1] = create_lava(528, 32);
-    level_lava[2] = create_lava(560, 32);
-    level_lava[3] = create_lava(592, 32);
 
-    /* 2-high landing block */
-    level_blocks[1] = create_block(624, 64);
-    level_blocks[2] = create_block(624, 96);
+    /* 2-high landing block (strictly 3 blocks right: 464 + 96 = 560) */
+    
+    level_blocks[2] = create_block(560, 64);
 
-    /* Test 2: Ascending stair ladder (5 steps, 4-block gap, Shifted +160px) */
-    /* Step 1: 800 + 160 = 960 */
-    level_blocks[3] = create_block(960, 64);
-    /* Step 2: 960 + 160 = 1120 */
-    level_blocks[4] = create_block(1120, 96);
-    /* Step 3: 1120 + 160 = 1280 */
-    level_blocks[5] = create_block(1280, 128);
-    /* Step 4: 1280 + 160 = 1440 */
-    level_blocks[6] = create_block(1440, 160);
-    /* Step 5: 1440 + 160 = 1600 */
-    level_blocks[7] = create_block(1600, 192);
+#define NUM_STAIR_STEPS 15
 
-    /* Test 3: Descending stairway (5 steps, 5-block spacing, Shifted +160px) */
-    /* First block down: 1600 + 160 = 1760 */
-    level_blocks[8] = create_block(1760, 160);
-    level_blocks[9] = create_block(1920, 128);
-    level_blocks[10] = create_block(2080, 96);
-    level_blocks[11] = create_block(2240, 64);
-    level_blocks[12] = create_block(2400, 64);
+    /* Test 2: Ascending stair ladder (NUM_STAIR_STEPS steps, 4-right jumps = 128px) */
+    current_block = 3;
+    last_x = 928;
+    last_y = 64;
+    for(i = 0; i < NUM_STAIR_STEPS; i++) {
+        level_blocks[current_block++] = create_block(last_x + (i * 128), last_y + (i * 32));
+    }
+
+    /* Test 3: Descending stairway (NUM_STAIR_STEPS steps, 5-right spacing = 160px) */
+    /* Start descent from the final peak of Test 2 plus a 5-block gap */
+    last_x = last_x + ((NUM_STAIR_STEPS - 1) * 128) + 160;
+    last_y = last_y + ((NUM_STAIR_STEPS - 1) * 32);
+    for(i = 0; i < NUM_STAIR_STEPS; i++) {
+        /* Each step down is 1 block lower than the previous peak/step */
+        next_y = last_y - ((i + 1) * 32);
+        /* If we go below ground level (64), stop decreasing height */
+        if (next_y < 64) next_y = 64; 
+        level_blocks[current_block++] = create_block(last_x + (i * 160), next_y);
+    }
 
     /* Fill remainder with dummy values to avoid garbage rendering */
-    for(i = 13; i < L1_BLOCKS_SIZE; i++) {
+    for(i = current_block; i < L1_BLOCKS_SIZE; i++) {
         level_blocks[i] = create_block(0, 0); 
     }
     for(i = 0; i < L1_SPIKES_SIZE; i++) {
         level_spikes[i] = create_spike(0, 0);
     }
-    for(i = 4; i < L1_LAVA_SIZE; i++) {
+    for(i = 2; i < L1_LAVA_SIZE; i++) {
         level_lava[i] = create_lava(0, 0);
     }
 
@@ -86,10 +90,10 @@ Level get_level1(void) {
         level_blocks,
         level_spikes,
         level_lava,
-        13,
+        current_block,
         0,
-        4,
-        19000
+        2,
+        30000
     );
 }
 
