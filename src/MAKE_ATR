@@ -173,11 +173,11 @@ $(SYNC).o: $(EVENTS_FOLDER)\$(SYNC).c $(EVENTS_FOLDER)\$(SYNC).h $(MODEL_FOLDER)
 $(RENDER).o: $(RENDER_FOLDER)\$(RENDER).c $(RENDER_FOLDER)\$(RENDER).h $(MODEL_FOLDER)\dtypes.h $(RASTER_FOLDER)\raster.h
 	$(ATARI_CC) $(TOS_FLAGS) $(RENDER_FOLDER)\$(RENDER).c -o $(RENDER).o
 
-$(OSWRAP).o: oswrap.c oswrap.h
-	$(ATARI_CC) $(TOS_FLAGS) oswrap.c -o $(OSWRAP).o
+$(OSWRAP).o: $(OSWRAP).c $(OSWRAP).h
+	$(ATARI_CC) $(TOS_FLAGS) $(OSWRAP).c -o $(OSWRAP).o
 
-$(CLOCK).o: clock.c clock.h
-	$(ATARI_CC) $(TOS_FLAGS) clock.c -o $(CLOCK).o
+$(CLOCK).o: $(CLOCK).c $(CLOCK).h
+	$(ATARI_CC) $(TOS_FLAGS) $(CLOCK).c -o $(CLOCK).o
 
 
 $(CLR_SCN).o: $(RASTER_FOLDER)\$(CLR_SCN).s
@@ -292,7 +292,7 @@ test: $(TBLOCK) $(TGEO) $(TLAVA) $(TLEVEL) $(TSPIKE) $(TWORLD) $(TMODEL) $(TCAME
 	$(TASYNC).ut
 	$(TCOND).ut
 	$(TSYNC).ut
-    
+
 	$(TCLR_REG).ut
 	$(TPLT_PXL).ut
 	$(TPLT_HOR).ut
