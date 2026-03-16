@@ -20,7 +20,7 @@ void test_rendering(UINT8 *base, Model *model)
     for (w_iter = 0; w_iter < 400; w_iter++) {
         /* Temporary input */
         input = Cnecin();
-        printf("Input: %d\n", input);
+
         if (input == 32) {
             on_jump_request(model);
         }
