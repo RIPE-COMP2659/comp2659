@@ -103,48 +103,69 @@ signed int geo_check_square_collision(
     unsigned int object_y,
     unsigned int object_size
 ) {
-    signed int geo_left = geo->x;
-    signed int geo_right = geo->x + geo->size;
-    signed int geo_bottom = geo->y - geo->size;
-    signed int geo_top = geo->y;
+    signed int gx_left = geo->x;
+    signed int gx_right = geo->x + geo->size - 1;
+    signed int gy_top = geo->y;
+    signed int gy_bot = geo->y - geo->size + 1;
 
-    signed int object_left = object_x;
-    signed int object_right = object_x + object_size;
-    signed int object_top = object_y;
-    signed int object_bottom = object_y - object_size;
+    signed int ox_left = object_x;
+    signed int ox_right = object_x + object_size - 1;
+    signed int oy_top = object_y;
+    signed int oy_bot = object_y - object_size + 1;
 
-    signed int collision_result = COLLISION_ERROR;
+    /* AABB Quick Check */
+    if (gx_right < ox_left || gx_left > ox_right ||
+        gy_bot > oy_top || gy_top < oy_bot) {
+        return COLLISION_NONE;
+    }
 
-    /* TODO: Optimize logic after determining desired behaviour based on
-       gameplay */
-    if (geo_right < object_left || geo_left > object_right ||
-        geo_top < object_bottom || geo_bottom > object_top) {
-        collision_result = COLLISION_NONE;
-    } else {
-        /* penetration_depth: how many pixels Geo is 'sunken' into the block vertically.
-           We use the 'Half-Block Rule' (16px) to decide between landing and crashing. */
-        unsigned int penetration_depth = (unsigned int)(object_top - geo_bottom);
-
-        if (geo->dy <= 0) {
-            /* FALLING or STANDING: If we are in the top half of the block, prioritize landing.
-               This allows sliding off edges safely and 'soft' corner landings. */
-            if (penetration_depth <= 16) {
-                collision_result = COLLISION_TOP;
-            } else {
-                collision_result = COLLISION_LEFT;
-            }
+    /* POINT-BASED PRIORITY: Check Geo's corners against the block */
+    if (geo->dy <= 0) {
+        /* Moving Down/Still: Check bottom corners for landing */
+        /* Use 16px threshold (Half-Block) for landing vs crashing into sides */
+        if (gy_bot >= oy_top - 16) {
+            return COLLISION_TOP;
         } else {
-            /* JUMPING: Only trigger a death (BOTTOM collision) if our feet are physically 
-               below the block's bottom. This prevents 'phantom ceiling' deaths. */
-            if (geo_bottom < object_bottom) {
-                collision_result = COLLISION_BOTTOM;
-            } else {
-                collision_result = COLLISION_NONE;
-            }
+            return COLLISION_LEFT;
+        }
+    } else {
+        /* Moving Up: Check top corners for head-strike */
+        /* Only die if we are physically hitting the bottom of the block from underneath */
+        if (gy_bot < oy_bot) {
+            return COLLISION_BOTTOM;
+        } else {
+            return COLLISION_NONE;
+        }
+    }
+}
+
+/** See header file for documentation */
+signed int geo_check_lava_collision(
+    Geo *geo,
+    unsigned int lava_x,
+    unsigned int lava_y,
+    unsigned int lava_size
+) {
+    signed int gx_left = geo->x + 2;   /* Inset feet slightly */
+    signed int gx_right = geo->x + 29;
+    signed int gx_mid = geo->x + 16;
+    signed int gy_bot = geo->y - geo->size + 1;
+
+    signed int lx_left = lava_x;
+    signed int lx_right = lava_x + lava_size - 1;
+    signed int ly_top = lava_y;
+
+    /* Optimization: Only check 3 points on the bottom surface against the top of lava */
+    /* Add a 2-pixel 'surface' threshold so standing ON lava kills you */
+    if (gy_bot <= ly_top + 2) {
+        if ((gx_left >= lx_left && gx_left <= lx_right) ||
+            (gx_mid >= lx_left && gx_mid <= lx_right) ||
+            (gx_right >= lx_left && gx_right <= lx_right)) {
+            return COLLISION_BOTTOM; /* Death */
         }
     }
 
-    return collision_result;
+    return COLLISION_NONE;
 }
 
 /** See header file for documentation */
@@ -163,23 +184,23 @@ signed int geo_check_spike_collision(
        middle 2 at the top, and bottom left/right.
        Since sy is the top, py is sy at the top and sy - 31 at the bottom. */
 
-    /* Top peaks (checking both pixels for the apex) */
-    unsigned int py = spike_y;
-    unsigned int px1 = spike_x + 15;
-    unsigned int px2 = spike_x + 16;
+    /* Points to check: Apex (tip) and the two bottom corners */
+    unsigned int py_top = spike_y;
+    unsigned int py_bot = spike_y - (spike_size - 1);
+    unsigned int px_apex1 = spike_x + 15;
+    unsigned int px_apex2 = spike_x + 16;
+    unsigned int px_left = spike_x;
+    unsigned int px_right = spike_x + (spike_size - 1);
 
-    if ((px1 >= gx_left && px1 <= gx_right && py <= gy_top && py >= gy_bottom) ||
-        (px2 >= gx_left && px2 <= gx_right && py <= gy_top && py >= gy_bottom)) {
+    /* Check Tip */
+    if ((px_apex1 >= gx_left && px_apex1 <= gx_right && py_top <= gy_top && py_top >= gy_bottom) ||
+        (px_apex2 >= gx_left && px_apex2 <= gx_right && py_top <= gy_top && py_top >= gy_bottom)) {
         return COLLISION_BOTTOM;
     }
 
-    /* Bottom corners */
-    py = spike_y - spike_size + 1;
-    px1 = spike_x;
-    px2 = spike_x + spike_size - 1;
-
-    if ((px1 >= gx_left && px1 <= gx_right && py <= gy_top && py >= gy_bottom) ||
-        (px2 >= gx_left && px2 <= gx_right && py <= gy_top && py >= gy_bottom)) {
+    /* Check Bottom Corners (to catch the sides/base) */
+    if ((px_left >= gx_left && px_left <= gx_right && py_bot <= gy_top && py_bot >= gy_bottom) ||
+        (px_right >= gx_left && px_right <= gx_right && py_bot <= gy_top && py_bot >= gy_bottom)) {
         return COLLISION_BOTTOM;
     }
 

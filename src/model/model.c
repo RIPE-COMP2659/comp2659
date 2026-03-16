@@ -71,6 +71,12 @@ static void update_entity_indices(
 ) {
     unsigned int i;
 
+    if (entity_count == 0) {
+        *min = 0;
+        *max = 0;
+        return;
+    }
+
     /* Find max first: iterate from current max to find last entity with left edge within range */
     i = *max;
     while (i < entity_count && get_x(entities, i) < range_right) {

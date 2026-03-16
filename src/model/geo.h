@@ -11,7 +11,7 @@
    because the original Impossible Game had roughly that exact design and it
    would allow us to steal a large amount of their level design */
 #define GEO_DX 5u               /*pixels per frame (unscaled) */
-#define GEO_JUMP_DY_SCALED 610 /* Necessary combo with DDY */
+#define GEO_JUMP_DY_SCALED 640 /* Necessary combo with DDY */
 #define GEO_DDY_SCALED -42     /* For height and time */
 #define GEO_TERMINAL_DY_SCALED -666 /* -13 pixels * 64 */
 #define GEO_PHYSICS_SHIFT 6    /* Bit shifting scaled values, / or * by 64 */
@@ -123,6 +123,13 @@ signed int geo_check_square_collision(Geo *geo, unsigned int object_x,
  *     signed int:
  *       COLLISION_NONE or COLLISION_BOTTOM (representing death)
  */
+signed int geo_check_lava_collision(
+    Geo *geo,
+    unsigned int lava_x,
+    unsigned int lava_y,
+    unsigned int lava_size
+);
+
 signed int geo_check_spike_collision(Geo *geo, unsigned int spike_x,
                                      unsigned int spike_y,
                                      unsigned int spike_size);

@@ -43,12 +43,19 @@ void world_reset_level(World *world) {
 }
 
 void world_update(World *world) {
+    unsigned int cam_x, cam_y;
     geo_update(&world->geo);
-    camera_update_coordinates(
-        &world->camera,
-        world->geo.x - CAMERA_X_OFFSET, 
-        world->geo.y + CAMERA_Y_OFFSET
-    );
+    
+    /* Calculate and clamp camera X */
+    if (world->geo.x > CAMERA_X_OFFSET)
+        cam_x = world->geo.x - CAMERA_X_OFFSET;
+    else
+        cam_x = 0;
+
+    /* Camera Y follows Geo */
+    cam_y = world->geo.y + CAMERA_Y_OFFSET;
+
+    camera_update_coordinates(&world->camera, cam_x, cam_y);
 }
 
 void world_update_collisions(
@@ -143,7 +150,7 @@ void world_collision_geo_spike(World *world, Spike *spike) {
 /* TODO: Implement proper lava collision detection once we refactor to better
    lava objects */
 void world_collision_geo_lava(World *world, Lava *lava) {
-    signed int collision = geo_check_square_collision(
+    signed int collision = geo_check_lava_collision(
         &world->geo,
         lava->x,
         lava->y,
