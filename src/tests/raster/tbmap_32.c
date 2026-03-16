@@ -6,8 +6,8 @@
 #define SCREEN_WIDTH_BYTES 80
 #define SCREEN_WIDTH_PIXELS 640
 #define SCREEN_HEIGHT_PIXELS 400
-#define COLOR_WHITE 1
-#define COLOR_BLACK 0
+#define WHITE 0
+#define BLACK 1
 
 /* Mock screen buffer for testing */
 static UINT8 mock_screen[SCREEN_SIZE_BYTES];
@@ -22,10 +22,90 @@ static int get_pixel(UINT8 *base, INT16 row, INT16 col)
     return (*byte_ptr >> bit_pos) & 1;
 }
 
+/* Helper to set a pixel at (row, col) to 0 or 1 */
+static void set_pixel(UINT8 *base, INT16 row, INT16 col, int value) {
+    UINT8 *byte_ptr = base + (row * SCREEN_WIDTH_BYTES) + (col / 8);
+    UINT8 bit_mask = (UINT8)(1u << (7 - (col % 8)));
+
+    if (value) {
+        *byte_ptr |= bit_mask;
+    } else {
+        *byte_ptr &= (UINT8)(~bit_mask);
+    }
+}
+
+/* Seed border, clear region, and verify clear/boundary behavior. */
+static void assert_borders(
+    UINT8 *base,
+    INT16 row,
+    INT16 col,
+    UINT16 length,
+    UINT16 width
+) {
+    INT16 y;
+    INT16 x;
+
+    for (y = row; y < (INT16)(row + length); y++) {
+        TEST_ASSERT_EQUAL_INT_MESSAGE(WHITE, get_pixel(base, y, col - 1),
+            "Left boundary column cleared incorrectly");
+        TEST_ASSERT_EQUAL_INT_MESSAGE(WHITE, get_pixel(base, y, col + width),
+            "Right boundary column cleared incorrectly");
+    }
+
+    for (x = col; x < (INT16)(col + width); x++) {
+        TEST_ASSERT_EQUAL_INT_MESSAGE(WHITE, get_pixel(base, row - 1, x),
+            "Top boundary row cleared incorrectly");
+        TEST_ASSERT_EQUAL_INT_MESSAGE(WHITE, get_pixel(base, row + length, x),
+            "Bottom boundary row cleared incorrectly");
+    }
+}
+
+/* Read one pixel from a 32-bit bitmap row using only division/modulo math. */
+static int get_bitmap_32_pixel(const UINT32 *bitmap, INT16 row, INT16 col)
+{
+    UINT32 value = bitmap[row];
+    INT16 step;
+
+    for (step = 0; step < (INT16)(31 - col); step++) {
+        /* 2u is an unsigned int 2, avoids conversion warnings */
+        value /= 2u;
+    }
+
+    return (value % 2u) ? BLACK : WHITE;
+}
+
+/* Verify bitmap pixels exactly match expected data, with screen bounds clipping. */
+static void verify_bitmap_32_pixels(
+    UINT8 *base,
+    INT16 row,
+    INT16 col,
+    const UINT32 *bitmap,
+    UINT16 height
+) {
+    INT16 src_row;
+    INT16 src_col;
+
+    for (src_row = 0; src_row < (INT16)height; src_row++) {
+        const INT16 dst_row = row + src_row;
+
+        if (dst_row >= 0 && dst_row < SCREEN_HEIGHT_PIXELS) {
+            for (src_col = 0; src_col < 32; src_col++) {
+                const INT16 dst_col = col + src_col;
+                const int expected = get_bitmap_32_pixel(bitmap, src_row, src_col);
+
+                if (dst_col >= 0 && dst_col < SCREEN_WIDTH_PIXELS) {
+                    TEST_ASSERT_EQUAL_INT_MESSAGE(expected, get_pixel(base, dst_row, dst_col),
+                        "Bitmap pixel mismatch");
+                }
+            }
+        }
+    }
+}
+
 /* Setup - runs before each test */
 void setUp(void)
 {
-    /* Initialize screen with all zeros (black) */
+    /* Initialize screen with all white */
     memset(mock_screen, 0x00, SCREEN_SIZE_BYTES);
 }
 
@@ -40,7 +120,7 @@ void test_plot_bitmap_32_top_left(void)
 {
     int row, col;
 
-    /* Create a 32x32 bitmap with all bits set to 1 (white) */
+    /* Create a 32x32 bitmap with all bits set to black */
     const UINT32 bitmap[32] = {
         0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
         0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
@@ -54,19 +134,19 @@ void test_plot_bitmap_32_top_left(void)
     /* Plot at origin (0, 0) */
     plot_bitmap_32(mock_screen, 0, 0, bitmap, 32);
 
-    /* Verify all 32x32 pixels are white */
+    /* Verify all 32x32 pixels are black */
     for (row = 0; row < 32; row++)
     {
         for (col = 0; col < 32; col++)
         {
-            TEST_ASSERT_EQUAL_INT(COLOR_WHITE, get_pixel(mock_screen, row, col));
+            TEST_ASSERT_EQUAL_INT(BLACK, get_pixel(mock_screen, row, col));
         }
     }
 
     /* Verify pixels outside sprite remain black */
-    TEST_ASSERT_EQUAL_INT(COLOR_BLACK, get_pixel(mock_screen, 0, 32));
-    TEST_ASSERT_EQUAL_INT(COLOR_BLACK, get_pixel(mock_screen, 32, 0));
-    TEST_ASSERT_EQUAL_INT(COLOR_BLACK, get_pixel(mock_screen, 32, 32));
+    TEST_ASSERT_EQUAL_INT(WHITE, get_pixel(mock_screen, 0, 32));
+    TEST_ASSERT_EQUAL_INT(WHITE, get_pixel(mock_screen, 32, 0));
+    TEST_ASSERT_EQUAL_INT(WHITE, get_pixel(mock_screen, 32, 32));
 }
 
 /* Test: Plot 32x32 all-white sprite at top-right */
@@ -75,7 +155,7 @@ void test_plot_bitmap_32_top_right(void)
     int row, col;
     const INT16 start_col = SCREEN_WIDTH_PIXELS - 32;
 
-    /* Create a 32x32 bitmap with all bits set to 1 (white) */
+    /* Create a 32x32 bitmap with all bits set to black */
     const UINT32 bitmap[32] = {
         0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
         0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
@@ -89,18 +169,18 @@ void test_plot_bitmap_32_top_right(void)
     /* Plot at top-right */
     plot_bitmap_32(mock_screen, 0, start_col, bitmap, 32);
 
-    /* Verify all 32x32 pixels are white */
+    /* Verify all 32x32 pixels are black */
     for (row = 0; row < 32; row++)
     {
         for (col = 0; col < 32; col++)
         {
-            TEST_ASSERT_EQUAL_INT(COLOR_WHITE, get_pixel(mock_screen, row, start_col + col));
+            TEST_ASSERT_EQUAL_INT(BLACK, get_pixel(mock_screen, row, start_col + col));
         }
     }
 
-    /* Verify pixels just outside sprite remain black */
-    TEST_ASSERT_EQUAL_INT(COLOR_BLACK, get_pixel(mock_screen, 0, start_col - 1));
-    TEST_ASSERT_EQUAL_INT(COLOR_BLACK, get_pixel(mock_screen, 32, start_col));
+    /* Verify pixels just outside sprite remain white */
+    TEST_ASSERT_EQUAL_INT(WHITE, get_pixel(mock_screen, 0, start_col - 1));
+    TEST_ASSERT_EQUAL_INT(WHITE, get_pixel(mock_screen, 32, start_col));
 }
 
 /* Test: Plot 32x32 all-white sprite at bottom-left */
@@ -128,13 +208,13 @@ void test_plot_bitmap_32_bottom_left(void)
     {
         for (col = 0; col < 32; col++)
         {
-            TEST_ASSERT_EQUAL_INT(COLOR_WHITE, get_pixel(mock_screen, start_row + row, col));
+            TEST_ASSERT_EQUAL_INT(BLACK, get_pixel(mock_screen, start_row + row, col));
         }
     }
 
-    /* Verify pixels just outside sprite remain black */
-    TEST_ASSERT_EQUAL_INT(COLOR_BLACK, get_pixel(mock_screen, start_row - 1, 0));
-    TEST_ASSERT_EQUAL_INT(COLOR_BLACK, get_pixel(mock_screen, start_row, 32));
+    /* Verify pixels just outside sprite remain white */
+    TEST_ASSERT_EQUAL_INT(WHITE, get_pixel(mock_screen, start_row - 1, 0));
+    TEST_ASSERT_EQUAL_INT(WHITE, get_pixel(mock_screen, start_row, 32));
 }
 
 /* Test: Plot 32x32 all-white sprite at bottom-right */
@@ -158,18 +238,18 @@ void test_plot_bitmap_32_bottom_right(void)
     /* Plot at bottom-right */
     plot_bitmap_32(mock_screen, start_row, start_col, bitmap, 32);
 
-    /* Verify all 32x32 pixels are white */
+    /* Verify all 32x32 pixels are black */
     for (row = 0; row < 32; row++)
     {
         for (col = 0; col < 32; col++)
         {
-            TEST_ASSERT_EQUAL_INT(COLOR_WHITE, get_pixel(mock_screen, start_row + row, start_col + col));
+            TEST_ASSERT_EQUAL_INT(BLACK, get_pixel(mock_screen, start_row + row, start_col + col));
         }
     }
 
-    /* Verify pixels just outside sprite remain black */
-    TEST_ASSERT_EQUAL_INT(COLOR_BLACK, get_pixel(mock_screen, start_row - 1, start_col));
-    TEST_ASSERT_EQUAL_INT(COLOR_BLACK, get_pixel(mock_screen, start_row, start_col - 1));
+    /* Verify pixels just outside sprite remain white */
+    TEST_ASSERT_EQUAL_INT(WHITE, get_pixel(mock_screen, start_row - 1, start_col));
+    TEST_ASSERT_EQUAL_INT(WHITE, get_pixel(mock_screen, start_row, start_col - 1));
 }
 
 /* Test: Plot 32x32 sprite partially off left edge */
@@ -197,17 +277,17 @@ void test_plot_bitmap_32_off_left_edge(void)
     {
         for (col = 0; col < 16; col++)
         {
-            TEST_ASSERT_EQUAL_INT(COLOR_WHITE, get_pixel(mock_screen, row, col));
+            TEST_ASSERT_EQUAL_INT(BLACK, get_pixel(mock_screen, row, col));
         }
     }
 
-    /* Verify pixels beyond visible portion remain black */
+    /* Verify pixels beyond visible portion remain white */
     for (row = 0; row < 32; row++)
     {
-        TEST_ASSERT_EQUAL_INT(COLOR_BLACK, get_pixel(mock_screen, row, 16));
+        TEST_ASSERT_EQUAL_INT(WHITE, get_pixel(mock_screen, row, 16));
     }
 
-    TEST_ASSERT_EQUAL_INT(COLOR_BLACK, get_pixel(mock_screen, 32, 0));
+    TEST_ASSERT_EQUAL_INT(WHITE, get_pixel(mock_screen, 32, 0));
 }
 
 /* Test: Plot 32x32 sprite partially off right edge */
@@ -235,14 +315,14 @@ void test_plot_bitmap_32_off_right_edge(void)
     {
         for (col = 0; col < 15; col++)
         {
-            TEST_ASSERT_EQUAL_INT_MESSAGE(1, get_pixel(mock_screen, row, start_col + col), "white failed");
+            TEST_ASSERT_EQUAL_INT_MESSAGE(BLACK, get_pixel(mock_screen, row, start_col + col), "Black failed");
         }
     }
 
-    /* Verify pixels before the sprite remain black */
+    /* Verify pixels before the sprite remain white */
     for (row = 0; row < 32; row++)
     {
-        TEST_ASSERT_EQUAL_INT_MESSAGE(COLOR_BLACK, get_pixel(mock_screen, row, start_col - 1), "Black failed");
+        TEST_ASSERT_EQUAL_INT_MESSAGE(WHITE, get_pixel(mock_screen, row, start_col - 1), "White failed");
     }
 
 }
@@ -272,14 +352,14 @@ void test_plot_bitmap_32_off_top_edge(void)
     {
         for (col = 0; col < 32; col++)
         {
-            TEST_ASSERT_EQUAL_INT(COLOR_WHITE, get_pixel(mock_screen, row, col));
+            TEST_ASSERT_EQUAL_INT(BLACK, get_pixel(mock_screen, row, col));
         }
     }
 
-    /* Verify pixels just below the visible portion remain black */
+    /* Verify pixels just below the visible portion remain white */
     for (col = 0; col < 32; col++)
     {
-        TEST_ASSERT_EQUAL_INT(COLOR_BLACK, get_pixel(mock_screen, 16, col));
+        TEST_ASSERT_EQUAL_INT(WHITE, get_pixel(mock_screen, 16, col));
     }
 }
 
@@ -308,14 +388,14 @@ void test_plot_bitmap_32_off_bottom_edge(void)
     {
         for (col = 0; col < 32; col++)
         {
-            TEST_ASSERT_EQUAL_INT(COLOR_WHITE, get_pixel(mock_screen, start_row + row, col));
+            TEST_ASSERT_EQUAL_INT(BLACK, get_pixel(mock_screen, start_row + row, col));
         }
     }
 
-    /* Verify pixels just above the sprite remain black */
+    /* Verify pixels just above the sprite remain white */
     for (col = 0; col < 32; col++)
     {
-        TEST_ASSERT_EQUAL_INT(COLOR_BLACK, get_pixel(mock_screen, start_row - 1, col));
+        TEST_ASSERT_EQUAL_INT(WHITE, get_pixel(mock_screen, start_row - 1, col));
     }
 }
 
@@ -340,8 +420,29 @@ void test_plot_bitmap_32_completely_off_screen(void)
     plot_bitmap_32(mock_screen, SCREEN_HEIGHT_PIXELS + 10, 0, bitmap, 32);
 
     /* Verify that bounds remain perfectly black, proving the draw aborted */
-    TEST_ASSERT_EQUAL_INT(COLOR_BLACK, get_pixel(mock_screen, 0, 0));
-    TEST_ASSERT_EQUAL_INT(COLOR_BLACK, get_pixel(mock_screen, SCREEN_HEIGHT_PIXELS - 1, 0));
+    TEST_ASSERT_EQUAL_INT(WHITE, get_pixel(mock_screen, 0, 0));
+    TEST_ASSERT_EQUAL_INT(WHITE, get_pixel(mock_screen, SCREEN_HEIGHT_PIXELS - 1, 0));
+}
+
+void test_plot_bitmap_32_centered(void) {
+    const UINT32 bitmap[32] = {
+        0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA,
+        0x55555555, 0x55555555, 0x55555555, 0x55555555,
+        0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA,
+        0x55555555, 0x55555555, 0x55555555, 0x55555555,
+        0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA,
+        0x55555555, 0x55555555, 0x55555555, 0x55555555,
+        0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA,
+        0x55555555, 0x55555555, 0x55555555, 0x55555555
+    };
+    int row = ((SCREEN_HEIGHT_PIXELS - 32) / 2) + 1;
+    int col = ((SCREEN_WIDTH_PIXELS - 32) / 2) + 1;
+
+    /* Plot sprite centered on the screen, but shouldn't be byte aligned */
+    plot_bitmap_32(mock_screen, row, col, bitmap, 32);
+
+    verify_bitmap_32_pixels((UINT8 *)mock_screen, row, col, bitmap, 32);
+    assert_borders((UINT8 *)mock_screen, row, col, 32, 32);
 }
 
 /* Main function to run all tests */
@@ -358,6 +459,7 @@ int main(void)
     RUN_TEST(test_plot_bitmap_32_off_top_edge);
     RUN_TEST(test_plot_bitmap_32_off_bottom_edge);
     RUN_TEST(test_plot_bitmap_32_completely_off_screen);
+    RUN_TEST(test_plot_bitmap_32_centered);
 
     return UNITY_END();
 }
