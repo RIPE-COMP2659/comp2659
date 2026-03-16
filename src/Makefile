@@ -33,7 +33,7 @@ INCLUDES = -I. -Itests/unity -Imodel -Ievents
 SRC = $(filter-out tests/%, $(wildcard *.c model/*.c events/*.c))
 SRC_BASENAMES = $(basename $(SRC))
 UNITY_FILES = tests/unity/unity.c
-TEST_SUPPORT_SRC = $(filter-out main.c,$(SRC))
+TEST_SUPPORT_SRC = $(filter-out dash.c,$(SRC))
 
 # Dynamically discover test files (all .c files in tests/model/ and tests/events/)
 TEST_MODEL_FILES = $(wildcard tests/model/*.c)
@@ -43,8 +43,8 @@ TEST_EVENTS_EXECS = $(TEST_EVENTS_FILES:tests/events/%.c=%$(EXE_EXT))
 TEST_EXECS = $(TEST_MODEL_EXECS) $(TEST_EVENTS_EXECS)
 
 # Main program sources
-MAIN_EXE = main$(EXE_EXT)
-MAIN_SRC = main.c model/model.c model/block.c model/spike.c model/lava.c model/geo.c model/level.c model/world.c events/async.c events/cond.c events/sync.c
+MAIN_EXE = dash$(EXE_EXT)
+MAIN_SRC = dash.c model/model.c model/block.c model/spike.c model/lava.c model/geo.c model/level.c model/world.c events/async.c events/cond.c events/sync.c
 
 # Default target
 all: main

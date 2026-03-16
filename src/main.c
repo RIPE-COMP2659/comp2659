@@ -17,11 +17,13 @@ void test_rendering(UINT8 *base, Model *model)
     int input;
     signed int current_event;
 
-    for (w_iter = 0; w_iter < 400; w_iter++) {
+    for (w_iter = 0; w_iter < 400; w_iter++)
+    {
         /* Temporary input */
         input = Cnecin();
         printf("Input: %d\n", input);
-        if (input == 32) {
+        if (input == 32)
+        {
             on_jump_request(model);
         }
 
@@ -29,7 +31,8 @@ void test_rendering(UINT8 *base, Model *model)
 
         /* Cleans up once further along */
         current_event = check_level_complete(model);
-        if (current_event == EVENT_LEVEL_DONE) {
+        if (current_event == EVENT_LEVEL_DONE)
+        {
             printf("Level Complete!\n");
         }
 
@@ -81,71 +84,5 @@ void test_clear_region(UINT8 *base)
     clear_region((UINT32 *)base, 200, 5, 15, 4);
 }
 
-int main(void) {
-    /* For now, just a placeholder */
-    UINT8 *base = (UINT8 *)Physbase();
-    Model model = get_model();
-    World *world = &model.world;
-
-    /* Run the rendering test loop (now properly encapsulated) */
-    test_rendering(base, &model);
-    
-    disable_cursor();
-
-    /* Test 1: Clear Screen */
-    fill_screen((UINT32 *)base, -1); /* fill with white */
-    Cnecin();
-    test_clear_screen(base);
-    Cnecin();
-
-    /* Test 2: Clear Region - various sizes and positions */
-    test_clear_region(base);
-    Cnecin();
-
-    printf("Running main!\n");
-
-    printf("Level has %u block size \n", 
-        world->levels[0].blocks[0].size
-    );
-
-    printf("Geo x: %d\n", world->geo.x);
-    printf("Geo y: %d\n", world->geo.y);
-    printf("Geo dx: %d\n", world->geo.dx);
-    printf("Geo dy: %d\n", world->geo.dy);
-    printf("Geo ddy: %d\n", world->geo.ddy);
-    printf("Geo is_landed: %d\n", world->geo.is_landed);
-
-    geo_update(&world->geo);
-    printf("Geo is_landed: %d\n", world->geo.is_landed);
-    geo_update(&world->geo);
-    printf("Geo is_landed: %d\n", world->geo.is_landed);
-    geo_update(&world->geo);
-
-    printf("Geo x: %d\n", world->geo.x);
-    printf("Geo y: %d\n", world->geo.y);
-    printf("Geo dx: %d\n", world->geo.dx);
-    printf("Geo dy: %d\n", world->geo.dy);
-    printf("Geo ddy: %d\n", world->geo.ddy);
-    printf("Geo is_landed: %d\n", world->geo.is_landed);
-
-    geo_jump(&world->geo);
-    geo_update(&world->geo);
-
-    printf("Geo x after jump and move: %d\n", world->geo.x);
-    printf("Geo y after jump and move: %d\n", world->geo.y);
-    printf("Geo dx: %d\n", world->geo.dx);
-    printf("Geo dy: %d\n", world->geo.dy);
-    printf("Geo ddy: %d\n", world->geo.ddy);
-    printf("Geo is_landed: %d\n", world->geo.is_landed);
-
-    geo_jump(&world->geo);
-    geo_jump(&world->geo);
-    geo_jump(&world->geo);
-    geo_update(&world->geo);
-
-    printf("Geo x after move: %d\n", world->geo.x);
-    printf("Geo y after move: %d\n", world->geo.y);
-    printf("Geo is_landed: %d\n", world->geo.is_landed);
-
-    return 0;
-}
+/* main is intentionally left minimal; the game entrypoint is dash.c */
+int main(void) { return 0; }
