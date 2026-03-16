@@ -221,10 +221,32 @@ void test_plot_bitmap_32_bottom_right(void)
     verify_bitmap_32_pixels((UINT8 *)mock_screen, start_row, start_col, bitmap, 32);
 }
 
-/* Test: Plot 32x32 sprite partially off left edge */
-void test_plot_bitmap_32_off_left_edge(void)
+/* Test: Plot 32x32 sprite partially off left edge, byte aligned */
+void test_plot_bitmap_32_off_left_edge_byte_aligned(void)
 {
     const INT16 start_col = -16; /* Half off screen to the left */
+
+    const UINT32 bitmap[32] = {
+        0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA,
+        0x55555555, 0x55555555, 0x55555555, 0x55555555,
+        0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA,
+        0x55555555, 0x55555555, 0x55555555, 0x55555555,
+        0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA,
+        0x55555555, 0x55555555, 0x55555555, 0x55555555,
+        0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA,
+        0x55555555, 0x55555555, 0x55555555, 0x55555555
+    };
+
+    /* Plot sprite starting at col -16 (16 pixels off screen) */
+    plot_bitmap_32(mock_screen, 0, start_col, bitmap, 32);
+    assert_borders((UINT8 *)mock_screen, 0, start_col, 32, 32);
+    verify_bitmap_32_pixels((UINT8 *)mock_screen, 0, start_col, bitmap, 32);
+}
+
+/* Test: Plot 32x32 sprite partially off left edge, non byte aligned */
+void test_plot_bitmap_32_off_left_edge_non_byte_aligned(void)
+{
+    const INT16 start_col = -15; /* Half off screen to the left, non byte aligned */
 
     const UINT32 bitmap[32] = {
         0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA, 0xAAAAAAAA,
@@ -384,7 +406,8 @@ int main(void)
     RUN_TEST(test_plot_bitmap_32_top_right);
     RUN_TEST(test_plot_bitmap_32_bottom_left);
     RUN_TEST(test_plot_bitmap_32_bottom_right);
-    RUN_TEST(test_plot_bitmap_32_off_left_edge);
+    RUN_TEST(test_plot_bitmap_32_off_left_edge_byte_aligned);
+    RUN_TEST(test_plot_bitmap_32_off_left_edge_non_byte_aligned);
     RUN_TEST(test_plot_bitmap_32_off_right_edge_byte_aligned);
     RUN_TEST(test_plot_bitmap_32_off_right_edge_non_byte_aligned);
     RUN_TEST(test_plot_bitmap_32_off_top_edge);
