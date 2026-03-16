@@ -1,6 +1,21 @@
+/**
+ * model.c
+ * Authors:
+ *     Riley Gramlich, rgram060@mtroyal.ca, 201762060
+ *     Robert Parker Hutcheson, rhutc335@mtroyal.ca, 201762335
+ *     Isaac Klein, iklei977@mtroyal.ca, 201763977
+ *     Eduard Mykhailets, emykh268@mtroyal.ca, 201750268
+ * Course: COMP 2659-001, Computing Machinery II, Winter 2026
+ * Instructor: Nolan Shaw
+ *
+ * PURPOSE: Top-level model operations which coordinate camera updates,
+ *          world updates and collision indexing. Exposes `get_model`
+ *          and `model_update` used by the synchronous event handlers.
+ */
 #include "model.h"
 
-Model get_model(void) {
+Model get_model(void)
+{
     Model model;
     model.cam_min_bi = 0; /* block index, camera */
     model.cam_max_bi = 0; /* block index, camera */
@@ -18,7 +33,8 @@ Model get_model(void) {
     return model;
 }
 
-void model_update(Model *model) {
+void model_update(Model *model)
+{
     model_update_camera(model);
     world_update(&model->world);
     model_update_collision(model);
@@ -29,24 +45,27 @@ void model_update(Model *model) {
         model->col_min_si,
         model->col_max_si,
         model->col_min_li,
-        model->col_max_li
-    );
+        model->col_max_li);
     model_check_death(model);
 }
 
-void model_check_death(Model *model) {
-    if (model->world.geo.is_dead == TRUE) {
+void model_check_death(Model *model)
+{
+    if (model->world.geo.is_dead == TRUE)
+    {
         world_reset_level(&model->world);
     }
 }
 
-void model_update_collision(Model *model) {
+void model_update_collision(Model *model)
+{
     model_update_collision_bi(model);
     model_update_collision_si(model);
     model_update_collision_li(model);
 }
 
-void model_update_camera(Model *model) {
+void model_update_camera(Model *model)
+{
     model_update_camera_bi(model);
     model_update_camera_si(model);
     model_update_camera_li(model);
@@ -59,15 +78,16 @@ static void update_entity_indices(
     unsigned int range_left,
     unsigned int range_right,
     unsigned int entity_count,
-    unsigned int (*get_x)(void*, unsigned int),
-    unsigned int (*get_size)(void*, unsigned int),
-    void *entities
-) {
+    unsigned int (*get_x)(void *, unsigned int),
+    unsigned int (*get_size)(void *, unsigned int),
+    void *entities)
+{
     unsigned int i;
 
     /* Find max first: iterate from current max to find last entity with left edge within range */
     i = *max;
-    while (i < entity_count && get_x(entities, i) < range_right) {
+    while (i < entity_count && get_x(entities, i) < range_right)
+    {
         i++;
     }
 
@@ -76,7 +96,8 @@ static void update_entity_indices(
 
     /* Find min: iterate from current min (up to new max) to find first entity with right edge within range */
     i = *min;
-    while (i <= *max && get_x(entities, i) + get_size(entities, i) <= range_left) {
+    while (i <= *max && get_x(entities, i) + get_size(entities, i) <= range_left)
+    {
         i++;
     }
 
@@ -84,33 +105,40 @@ static void update_entity_indices(
 }
 
 /* Helper functions for blocks */
-static unsigned int get_block_x(void *blocks, unsigned int index) {
-    return ((Block*)blocks)[index].x;
+static unsigned int get_block_x(void *blocks, unsigned int index)
+{
+    return ((Block *)blocks)[index].x;
 }
 
-static unsigned int get_block_size(void *blocks, unsigned int index) {
-    return ((Block*)blocks)[index].size;
+static unsigned int get_block_size(void *blocks, unsigned int index)
+{
+    return ((Block *)blocks)[index].size;
 }
 
 /* Helper functions for spikes */
-static unsigned int get_spike_x(void *spikes, unsigned int index) {
-    return ((Spike*)spikes)[index].x;
+static unsigned int get_spike_x(void *spikes, unsigned int index)
+{
+    return ((Spike *)spikes)[index].x;
 }
 
-static unsigned int get_spike_size(void *spikes, unsigned int index) {
-    return ((Spike*)spikes)[index].size;
+static unsigned int get_spike_size(void *spikes, unsigned int index)
+{
+    return ((Spike *)spikes)[index].size;
 }
 
 /* Helper functions for lava */
-static unsigned int get_lava_x(void *lava, unsigned int index) {
-    return ((Lava*)lava)[index].x;
+static unsigned int get_lava_x(void *lava, unsigned int index)
+{
+    return ((Lava *)lava)[index].x;
 }
 
-static unsigned int get_lava_size(void *lava, unsigned int index) {
-    return ((Lava*)lava)[index].size;
+static unsigned int get_lava_size(void *lava, unsigned int index)
+{
+    return ((Lava *)lava)[index].size;
 }
 
-void model_update_camera_bi(Model *model) {
+void model_update_camera_bi(Model *model)
+{
     Level *level = &model->world.levels[model->world.level_index];
     unsigned int camera_left = model->world.camera.x;
     unsigned int camera_right = model->world.camera.x + model->world.camera.width;
@@ -123,11 +151,11 @@ void model_update_camera_bi(Model *model) {
         level->blocks_size,
         get_block_x,
         get_block_size,
-        level->blocks
-    );
+        level->blocks);
 }
 
-void model_update_camera_si(Model *model) {
+void model_update_camera_si(Model *model)
+{
     Level *level = &model->world.levels[model->world.level_index];
     unsigned int camera_left = model->world.camera.x;
     unsigned int camera_right = model->world.camera.x + model->world.camera.width;
@@ -140,11 +168,11 @@ void model_update_camera_si(Model *model) {
         level->spikes_size,
         get_spike_x,
         get_spike_size,
-        level->spikes
-    );
+        level->spikes);
 }
 
-void model_update_camera_li(Model *model) {
+void model_update_camera_li(Model *model)
+{
     Level *level = &model->world.levels[model->world.level_index];
     unsigned int camera_left = model->world.camera.x;
     unsigned int camera_right = model->world.camera.x + model->world.camera.width;
@@ -157,11 +185,11 @@ void model_update_camera_li(Model *model) {
         level->lava_size,
         get_lava_x,
         get_lava_size,
-        level->lava
-    );
+        level->lava);
 }
 
-void model_update_collision_bi(Model *model) {
+void model_update_collision_bi(Model *model)
+{
     Level *level = &model->world.levels[model->world.level_index];
     unsigned int collision_left = model->world.geo.x;
     unsigned int collision_right = model->world.geo.x + model->world.geo.size;
@@ -174,11 +202,11 @@ void model_update_collision_bi(Model *model) {
         level->blocks_size,
         get_block_x,
         get_block_size,
-        level->blocks
-    );
+        level->blocks);
 }
 
-void model_update_collision_si(Model *model) {
+void model_update_collision_si(Model *model)
+{
     Level *level = &model->world.levels[model->world.level_index];
     unsigned int collision_left = model->world.geo.x;
     unsigned int collision_right = model->world.geo.x + model->world.geo.size;
@@ -191,11 +219,11 @@ void model_update_collision_si(Model *model) {
         level->spikes_size,
         get_spike_x,
         get_spike_size,
-        level->spikes
-    );
+        level->spikes);
 }
 
-void model_update_collision_li(Model *model) {
+void model_update_collision_li(Model *model)
+{
     Level *level = &model->world.levels[model->world.level_index];
     unsigned int collision_left = model->world.geo.x;
     unsigned int collision_right = model->world.geo.x + model->world.geo.size;
@@ -208,6 +236,5 @@ void model_update_collision_li(Model *model) {
         level->lava_size,
         get_lava_x,
         get_lava_size,
-        level->lava
-    );
+        level->lava);
 }
