@@ -24,6 +24,7 @@ typedef struct {
     unsigned int col_max_si; /* spike index, collision */
     unsigned int col_min_li; /* lava index, collision */
     unsigned int col_max_li; /* lava index, collision */
+    Camera old_cam; /* previous frame's camera, used for computing camera deltas */
 } Model;
 
 /**
