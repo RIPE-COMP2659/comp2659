@@ -34,13 +34,23 @@ static int floor_div8(int x) {
 static void clear_sprite_region(UINT8 *base, int rel_y, int rel_x, unsigned int size) {
     int clear_x;
     int clear_right;
+    int clipped_left;
+    int clipped_right;
     int clear_width;
 
     clear_x = floor_div8(rel_x) << 3;
     clear_right = (floor_div8(rel_x + (int)size - 1) << 3) + 7;
-    clear_width = clear_right - clear_x + 1;
 
-    clear_region((UINT32 *)base, rel_y, clear_x, size, clear_width);
+    /* Keep the clippings in bounds */
+    clipped_left = (clear_x < 0) ? 0 : clear_x;
+    clipped_right = (clear_right >= SCREEN_WIDTH) ? (SCREEN_WIDTH - 1) : clear_right;
+
+    /* Keep horizontal clear bounds on-screen to avoid invalid writes */
+    /* TODO: There's bad logic in here, this shouldn't need to happen, but it can crash */
+    if (clipped_right >= clipped_left) {
+        clear_width = clipped_right - clipped_left + 1;
+        clear_region((UINT32 *)base, rel_y, clipped_left, size, clear_width);
+    }
 }
 
 /* See render.h for documentation */
@@ -73,8 +83,6 @@ void render(const Model *model, UINT8 *base) {
     }
 
     render_geo(&model->world.geo, cam, base);
-
-    input = Cnecin();
 }
 
 void clear_geo(UINT8 *base, const Camera *camera, const Geo *geo) {
