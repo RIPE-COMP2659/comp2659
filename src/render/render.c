@@ -14,86 +14,75 @@
 #include "render.h"
 #include <osbind.h>
 
+/* Screen size: 640x400 at 8-bit = 32000 bytes */
+/* Extra space for 256-byte alignment */
 #define SCREEN_SIZE 32000
-#define BUFFER_SIZE (SCREEN_SIZE + 512)
+#define BUFFER_SIZE (SCREEN_SIZE + 256)
 #define NUM_BUFFERS 2
 
-/* Off-screen buffers - oversized for 256-byte alignment */
+/* Two off-screen buffers - oversized for alignment */
 static UINT8 buffer_0[BUFFER_SIZE];
 static UINT8 buffer_1[BUFFER_SIZE];
 
-/* Buffer pointers - initialized at compile time to avoid NULL */
-static UINT8 *buffers[NUM_BUFFERS] = {buffer_0, buffer_1};
+/* Aligned buffer pointers - set at runtime */
+static UINT8 *buffers[NUM_BUFFERS];
 
-/* Index of buffer currently being rendered to */
-static int render_index = 0;
-
-/* Index of buffer currently displayed on screen */
-static int display_index = 0;
-
-/* Flag: true when render is complete and ready for buffer swap */
-static int render_complete = FALSE;
-
-/* Flag: true after init_render_buffers() has been called */
-static int buffers_initialized = FALSE;
+/* Current buffer index (the one we're rendering to) */
+static int current_buffer = 0;
 
 /**
- * Initialize buffers with proper alignment.
- * Must be called once before rendering.
+ * Initialize buffers and set up double buffering.
+ * Must be called once at program start.
  */
 void init_render_buffers(void) {
-  /* Align buffer pointers to 256-byte boundaries */
-  buffers[0] = (UINT8 *)(((UINT32)buffer_0 + 255) & 0xFFFFFF00);
-  buffers[1] = (UINT8 *)(((UINT32)buffer_1 + 255) & 0xFFFFFF00);
+  UINT32 addr;
 
-  /* Screen shows buffer 0 */
-  display_index = 0;
-  /* We render to buffer 1 */
-  render_index = 1;
+  /* Align buffer 0 to 256-byte boundary */
+  addr = (UINT32)buffer_0;
+  buffers[0] = (UINT8 *)((addr + 255) & 0xFFFFFF00UL);
 
-  /* Point hardware to show buffer 0 */
-  Setscreen(buffers[display_index], buffers[display_index], -1);
+  /* Align buffer 1 to 256-byte boundary */
+  addr = (UINT32)buffer_1;
+  buffers[1] = (UINT8 *)((addr + 255) & 0xFFFFFF00UL);
 
-  /* Mark as initialized */
-  buffers_initialized = TRUE;
+  /* Clear both buffers */
+  clear_screen((UINT32 *)buffers[0]);
+  clear_screen((UINT32 *)buffers[1]);
+
+  /* Set screen to show first buffer */
+  Setscreen(buffers[0], buffers[0], -1);
+
+  /* Start rendering to the other buffer */
+  current_buffer = 1;
 }
 
 /**
- * Get the buffer currently being rendered to.
+ * Get pointer to the buffer currently being rendered to.
  */
-UINT8 *get_render_buffer(void) { return buffers[render_index]; }
+UINT8 *get_render_buffer(void) { return buffers[current_buffer]; }
 
 /**
- * Get the buffer currently displayed on screen.
+ * Get pointer to the buffer currently displayed on screen.
  */
-UINT8 *get_display_buffer(void) { return buffers[display_index]; }
+UINT8 *get_display_buffer(void) { return buffers[1 - current_buffer]; }
 
 /**
- * Mark rendering as complete.
+ * Mark rendering as complete and ready for display.
  */
-void mark_render_complete(void) { render_complete = TRUE; }
+void mark_render_complete(void) {
+  /* Nothing to do - swap happens in swap_buffers */
+}
 
 /**
- * Swap buffers - call after Vsync.
- * Swaps render_index and display_index, then updates video base.
+ * Swap buffers - call this AFTER Vsync().
+ * Switches the display to the newly rendered buffer.
  */
 void swap_buffers(void) {
-  int temp;
+  /* Switch to the other buffer (the one we just rendered to) */
+  current_buffer = 1 - current_buffer;
 
-  if (!render_complete) {
-    return;
-  }
-
-  /* Swap indices */
-  temp = render_index;
-  render_index = display_index;
-  display_index = temp;
-
-  /* Update video base to point to new display buffer */
-  Setscreen(buffers[display_index], buffers[display_index], -1);
-
-  /* Reset flag */
-  render_complete = FALSE;
+  /* Update hardware to show the new buffer */
+  Setscreen(buffers[current_buffer], buffers[current_buffer], -1);
 }
 
 /* See render.h for documentation */
@@ -106,8 +95,8 @@ void render(const Model *model, UINT8 *base) {
 
   (void)base;
 
-  /* For now, always render directly to screen using Physbase */
-  render_buf = (UINT8 *)Physbase();
+  /* Get the back buffer to render to */
+  render_buf = buffers[current_buffer];
 
   clear_screen((UINT32 *)render_buf);
 
@@ -126,11 +115,6 @@ void render(const Model *model, UINT8 *base) {
   }
 
   render_geo(&model->world.geo, cam, render_buf);
-
-  /* Mark render complete - swap happens after Vsync */
-  if (buffers_initialized) {
-    mark_render_complete();
-  }
 }
 
 /* See render.h for documentation */
