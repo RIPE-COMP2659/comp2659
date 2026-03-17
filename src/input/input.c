@@ -1,5 +1,6 @@
 /**
  * input.c
+ *
  * Authors:
  *     Riley Gramlich, rgram060@mtroyal.ca, 201762060
  *     Robert Parker Hutcheson, rhutc335@mtroyal.ca, 201762335
@@ -12,7 +13,6 @@
  * injection or wrapping of OS-specific keyboard routines like Cconis and
  * Cnecin.
  */
-
 #include "input.h"
 
 int has_input() {

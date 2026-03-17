@@ -20,6 +20,7 @@ TESTS_MODEL_FOLDER = $(TESTS_FOLDER)\$(MODEL_FOLDER)
 TESTS_RASTER_FOLDER = $(TESTS_FOLDER)\$(RASTER_FOLDER)
 TESTS_RENDER_FOLDER = $(TESTS_FOLDER)\$(RENDER_FOLDER)
 TESTS_EVENTS_FOLDER = $(TESTS_FOLDER)\$(EVENTS_FOLDER)
+TESTS_INPUT_FOLDER = $(TESTS_FOLDER)\$(INPUT_FOLDER)
 UNITY_FOLDER = $(TESTS_FOLDER)\unity
 
 # File Names, Base - Events
@@ -100,6 +101,9 @@ RENDER_TEST_SRC = $(TEST_SRC) $(RENDER_FOLDER)\$(RENDER).c
 TASYNC = t${ASYNC}
 TCOND = t${COND}
 TSYNC = t${SYNC}
+
+# File Names, Tests - Input
+TINPUT = t${INPUT}
 
 # File Names, Tests - Model
 TBLOCK = t${BLOCK}
@@ -221,6 +225,10 @@ $(TCOND):
 $(TSYNC):
 	$(ATARI_CC) $(EVENTS_TEST_FLAGS) $(TESTS_EVENTS_FOLDER)\$(TSYNC).c $(EVENTS_TEST_SRC) $(UNITY) -o $(TSYNC).ut
 
+# ----- Input Test Builds ----------------------------------------------------
+$(TINPUT): $(INPUT).o
+	$(ATARI_CC) $(MAIN_FLAGS) $(TESTS_INPUT_FOLDER)\$(TINPUT).c $(INPUT).o -o $(TINPUT).tos
+
 
 # TODO: For some of these, there is cascading dependencies on objects, eg chr
 # ----- Raster Test Builds ---------------------------------------------------
@@ -274,7 +282,7 @@ $(TPLT_CLIP): $(PLT_CLIP).o
 
 
 # ----- Test Execution -------------------------------------------------------
-test: $(TBLOCK) $(TGEO) $(TLAVA) $(TLEVEL) $(TSPIKE) $(TWORLD) $(TMODEL) $(TCAMERA) $(TRENDER) $(TASYNC) $(TCOND) $(TSYNC) $(TCLR_SCN) $(TCLR_REG) $(TPLT_PXL) $(TPLT_HOR) $(TPLT_VRT) $(TPLT_LIN) $(TPLT_REC) $(TPLT_SQR) $(TPLT_TRI) $(TBMAP_8) $(TBMAP_16) $(TBMAP_32) $(TPLT_CHR) $(TPLT_STR) $(TBOUNDS) $(TPLT_CLIP)
+test: $(TINPUT) $(TBLOCK) $(TGEO) $(TLAVA) $(TLEVEL) $(TSPIKE) $(TWORLD) $(TMODEL) $(TCAMERA) $(TRENDER) $(TASYNC) $(TCOND) $(TSYNC) $(TCLR_SCN) $(TCLR_REG) $(TPLT_PXL) $(TPLT_HOR) $(TPLT_VRT) $(TPLT_LIN) $(TPLT_REC) $(TPLT_SQR) $(TPLT_TRI) $(TBMAP_8) $(TBMAP_16) $(TBMAP_32) $(TPLT_CHR) $(TPLT_STR) $(TBOUNDS) $(TPLT_CLIP)
 	$(TBLOCK).ut
 	$(TGEO).ut
 	$(TLAVA).ut
@@ -356,4 +364,4 @@ $(PLT_CLIP).o: $(RASTER_FOLDER)\$(PLT_CLIP).s
 
 # ----- Output ---------------------------------------------------------------
 # Otherwise the Make can think that the commands are files.
-.PHONY: test $(TBLOCK) $(TGEO) $(TLAVA) $(TLEVEL) $(TSPIKE) $(TWORLD) $(TMODEL) $(TCAMERA) $(TRENDER) $(TASYNC) $(TCOND) $(TSYNC) $(TCLR_SCN) $(TCLR_REG) $(TPLT_PXL) $(TPLT_HOR) $(TPLT_VRT) $(TPLT_LIN) $(TPLT_REC) $(TPLT_SQR) $(TPLT_TRI) $(TBMAP_8) $(TBMAP_16) $(TBMAP_32) $(TPLT_CHR) $(TPLT_STR) $(TBOUNDS) $(TPLT_CLIP)
+.PHONY: test $(TINPUT) $(TBLOCK) $(TGEO) $(TLAVA) $(TLEVEL) $(TSPIKE) $(TWORLD) $(TMODEL) $(TCAMERA) $(TRENDER) $(TASYNC) $(TCOND) $(TSYNC) $(TCLR_SCN) $(TCLR_REG) $(TPLT_PXL) $(TPLT_HOR) $(TPLT_VRT) $(TPLT_LIN) $(TPLT_REC) $(TPLT_SQR) $(TPLT_TRI) $(TBMAP_8) $(TBMAP_16) $(TBMAP_32) $(TPLT_CHR) $(TPLT_STR) $(TBOUNDS) $(TPLT_CLIP)
