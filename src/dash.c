@@ -3,24 +3,22 @@
 #include "model/model.h"
 #include "oswrap.h"
 #include "render/render.h"
+#include <osbind.h>
 
 #define JUMP 32
 #define QUIT 113
 
 int main_game(void) {
 
-  /* Initialize the game models and variables */
   Model model = get_model();
   UINT8 quit = FALSE;
   UINT8 game_won = FALSE;
-  unsigned int input; /* this maybe larger than it needs to be- I was just being
-  careful so that nothing breaks */
+  unsigned int input;
 
   unsigned long timeThen, timeNow, timeElapsed;
-  unsigned char *base = os_framebuffer_base();
 
   /* Initial render */
-  render(&model, base);
+  render(&model, 0);
 
   timeThen = get_time();
   while (quit != TRUE && game_won != TRUE) {
@@ -41,10 +39,13 @@ int main_game(void) {
     timeNow = get_time();
     timeElapsed = timeNow - timeThen;
 
-    on_clock_tick(&model); /* Update the game model state */
-    /* event-driven checks */
-    /* rendering triggered on clock tick */
-    render(&model, base);
+    on_clock_tick(&model);
+    render(&model, 0);
+
+    /* Wait for VBL, then swap buffers */
+    Vsync();
+    swap_buffers();
+
     timeThen = timeNow;
 
     os_yield();
@@ -53,5 +54,4 @@ int main_game(void) {
   return 0;
 }
 
-/* Expose C main entrypoint expected by build */
 int main(void) { return main_game(); }
