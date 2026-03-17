@@ -49,10 +49,8 @@ void init_render_buffers(void) {
   clear_screen((UINT32 *)buffers[0]);
   clear_screen((UINT32 *)buffers[1]);
 
-  /* Set screen to show first buffer */
+  /* Set screen to show first buffer, start rendering to second */
   Setscreen(buffers[0], buffers[0], -1);
-
-  /* Start rendering to the other buffer */
   current_buffer = 1;
 }
 
@@ -78,11 +76,11 @@ void mark_render_complete(void) {
  * Switches the display to the newly rendered buffer.
  */
 void swap_buffers(void) {
-  /* Switch to the other buffer (the one we just rendered to) */
+  /* Toggle to the other buffer for next frame */
   current_buffer = 1 - current_buffer;
 
-  /* Update hardware to show the new buffer */
-  Setscreen(buffers[current_buffer], buffers[current_buffer], -1);
+  /* Show the newly rendered buffer (the one we just switched away from) */
+  Setscreen(buffers[1 - current_buffer], buffers[1 - current_buffer], -1);
 }
 
 /* See render.h for documentation */
