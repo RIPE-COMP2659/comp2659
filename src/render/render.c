@@ -41,8 +41,12 @@ static int render_complete = FALSE;
  * Must be called once before rendering.
  */
 void init_render_buffers(void) {
+  /* Align buffer pointers to 256-byte boundaries */
   buffers[0] = (UINT8 *)(((UINT32)buffer_0 + ALIGN_MASK) & ~ALIGN_MASK);
   buffers[1] = (UINT8 *)(((UINT32)buffer_1 + ALIGN_MASK) & ~ALIGN_MASK);
+
+  /* Point hardware to our first buffer so we see something on screen */
+  Setscreen(buffers[0], buffers[0], -1);
 }
 
 /**
