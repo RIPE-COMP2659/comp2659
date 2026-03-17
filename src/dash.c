@@ -46,8 +46,9 @@ int main_game(void) {
     render(&model, 0);
 
     /* Wait for VBL, then swap buffers */
-    Vsync();
+
     swap_buffers();
+    Vsync();
 
     timeThen = timeNow;
 
