@@ -28,10 +28,10 @@ static UINT8 buffer_1[BUFFER_SIZE];
 static UINT8 *buffers[NUM_BUFFERS];
 
 /* Index of buffer currently being rendered to */
-static int render_index = 0;
+static int render_index = 1;
 
 /* Index of buffer currently displayed on screen */
-static int display_index = 1;
+static int display_index = 0;
 
 /* Flag: true when render is complete and ready for buffer swap */
 static int render_complete = FALSE;
