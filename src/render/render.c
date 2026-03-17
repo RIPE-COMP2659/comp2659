@@ -78,10 +78,10 @@ void swap_buffers(void) {
     return;
   }
 
-  /* Swap indices */
-  temp_index = display_index;
-  display_index = render_index;
-  render_index = temp_index;
+  /* Swap render and display indices */
+  temp_index = render_index;
+  render_index = display_index;
+  display_index = temp_index;
 
   /* Update video base to point to new display buffer */
   Setscreen(buffers[display_index], buffers[display_index], -1);
