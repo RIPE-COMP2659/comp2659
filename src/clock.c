@@ -12,7 +12,7 @@ unsigned long get_time(void)
     volatile unsigned long *timer = (volatile unsigned long *)0x462;
 
     long prev = Super(0); /* enter privileged mode */
-    unsigned long t = *timer;
+    unsigned long time = *timer;
     Super(prev); /* restore previous mode ASAP */
-    return t;
+    return time;
 }

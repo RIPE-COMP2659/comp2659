@@ -2,7 +2,7 @@
 ifeq ($(OS),Windows_NT)
     EXE_EXT = .exe
     RM = del /Q
-    RUN_PREFIX = 
+    RUN_PREFIX =
     NOOP = exit /b 0
 else
     EXE_EXT =
@@ -44,7 +44,7 @@ TEST_EXECS = $(TEST_MODEL_EXECS) $(TEST_EVENTS_EXECS)
 
 # Main program sources
 MAIN_EXE = dash$(EXE_EXT)
-MAIN_SRC = dash.c model/model.c model/block.c model/spike.c model/lava.c model/geo.c model/level.c model/world.c events/async.c events/cond.c events/sync.c
+MAIN_SRC = dash.c clock.c oswrap.c model/model.c model/block.c model/spike.c model/lava.c model/geo.c model/camera.c model/level.c model/world.c events/async.c events/cond.c events/sync.c render/render.c
 
 # Default target
 all: main
