@@ -14,13 +14,11 @@
 #include "render.h"
 #include <osbind.h>
 
-/* Screen buffer size - 32000 bytes for 640x400 at 8-bit */
-/* Extra 256 bytes for alignment */
-#define BUFFER_SIZE (32000 + 256)
+#define SCREEN_SIZE 32000
+#define BUFFER_SIZE (SCREEN_SIZE + 256)
 #define NUM_BUFFERS 2
-#define ALIGN_MASK 0xFF
 
-/* Two off-screen buffers for double buffering (oversized for alignment) */
+/* Off-screen buffers - oversized for 256-byte alignment */
 static UINT8 buffer_0[BUFFER_SIZE];
 static UINT8 buffer_1[BUFFER_SIZE];
 
@@ -41,48 +39,49 @@ static int render_complete = FALSE;
  * Must be called once before rendering.
  */
 void init_render_buffers(void) {
-  /* Re-initialize pointers to aligned addresses */
-  buffers[0] = (UINT8 *)(((UINT32)buffer_0 + ALIGN_MASK) & ~ALIGN_MASK);
-  buffers[1] = (UINT8 *)(((UINT32)buffer_1 + ALIGN_MASK) & ~ALIGN_MASK);
+  /* Align buffer pointers to 256-byte boundaries */
+  buffers[0] = (UINT8 *)(((UINT32)buffer_0 + 255) & 0xFFFFFF00);
+  buffers[1] = (UINT8 *)(((UINT32)buffer_1 + 255) & 0xFFFFFF00);
 
-  /* Point hardware to show buffer_0 (display_index=0 means buffers[0]) */
-  /* With render_index=1, we render to buffer_1 while screen shows buffer_0 */
+  /* Screen shows buffer 0 */
+  display_index = 0;
+  /* We render to buffer 1 */
+  render_index = 1;
+
+  /* Point hardware to show buffer 0 */
   Setscreen(buffers[display_index], buffers[display_index], -1);
 }
 
 /**
  * Get the buffer currently being rendered to.
- * Call this in render() to get the target buffer.
  */
 UINT8 *get_render_buffer(void) { return buffers[render_index]; }
 
 /**
  * Get the buffer currently displayed on screen.
- * Call this in VBL handler to get the buffer to flip to.
  */
 UINT8 *get_display_buffer(void) { return buffers[display_index]; }
 
 /**
- * Mark rendering as complete. Call after render() finishes.
- * The actual buffer swap should happen in VBL interrupt.
+ * Mark rendering as complete.
  */
 void mark_render_complete(void) { render_complete = TRUE; }
 
 /**
- * Swap buffers - call this in VBL interrupt handler.
+ * Swap buffers - call after Vsync.
  * Swaps render_index and display_index, then updates video base.
  */
 void swap_buffers(void) {
-  int temp_index;
+  int temp;
 
   if (!render_complete) {
     return;
   }
 
-  /* Swap render and display indices */
-  temp_index = render_index;
+  /* Swap indices */
+  temp = render_index;
   render_index = display_index;
-  display_index = temp_index;
+  display_index = temp;
 
   /* Update video base to point to new display buffer */
   Setscreen(buffers[display_index], buffers[display_index], -1);
@@ -97,9 +96,9 @@ void render(const Model *model, UINT8 *base) {
   const Camera *cam = &model->world.camera;
   int level_i = model->world.level_index;
   Level level = model->world.levels[level_i];
-  UINT8 *render_buf = get_render_buffer();
+  UINT8 *render_buf = buffers[render_index];
 
-  (void)base; /* base is ignored - we render to our own buffer */
+  (void)base;
 
   clear_screen((UINT32 *)render_buf);
 
@@ -119,7 +118,7 @@ void render(const Model *model, UINT8 *base) {
 
   render_geo(&model->world.geo, cam, render_buf);
 
-  /* Mark render complete - swap happens in VBL */
+  /* Mark render complete - swap happens after Vsync */
   mark_render_complete();
 }
 
@@ -127,7 +126,6 @@ void render(const Model *model, UINT8 *base) {
 void render_ground(const Model *model, UINT8 *base) {
   int rel_y =
       camera_get_relative_y(&model->world.camera, model->world.ground_y);
-  /* Draw a 4-pixel tall rectangle across the screen width (640 px) */
   plot_rectangle((UINT32 *)base, rel_y, 0, 4, 640);
 }
 
