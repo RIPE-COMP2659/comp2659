@@ -40,11 +40,11 @@ void init_render_buffers(void) {
 
   /* Align buffer 0 to 256-byte boundary */
   addr = (UINT32)buffer_0;
-  buffers[0] = (UINT8 *)((addr + 255) & 0xFFFFFF00UL);
+  buffers[0] = (UINT8 *)((addr + 255) & 0xFFFFFF00);
 
   /* Align buffer 1 to 256-byte boundary */
   addr = (UINT32)buffer_1;
-  buffers[1] = (UINT8 *)((addr + 510) & 0xFFFFFF00UL);
+  buffers[1] = (UINT8 *)((addr + 255) & 0xFFFFFF00);
 
   /* Clear both buffers */
   clear_screen((UINT32 *)buffers[0]);
