@@ -17,6 +17,9 @@ int main_game(void) {
 
   unsigned long timeThen, timeNow, timeElapsed;
 
+  /* Initialize render buffers */
+  init_render_buffers();
+
   /* Initial render */
   render(&model, 0);
 

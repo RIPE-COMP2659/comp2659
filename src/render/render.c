@@ -15,15 +15,17 @@
 #include <osbind.h>
 
 /* Screen buffer size - 32000 bytes for 640x400 at 8-bit */
+/* Extra 256 bytes for alignment */
 #define BUFFER_SIZE 32000
 #define NUM_BUFFERS 2
+#define ALIGN_MASK 0xFF
 
-/* Two off-screen buffers for double buffering, aligned to 256-byte boundary */
-static UINT8 buffer_0[BUFFER_SIZE] __attribute__((aligned(256)));
-static UINT8 buffer_1[BUFFER_SIZE] __attribute__((aligned(256)));
+/* Two off-screen buffers for double buffering (oversized for alignment) */
+static UINT8 buffer_0[BUFFER_SIZE];
+static UINT8 buffer_1[BUFFER_SIZE];
 
-/* Array of buffer pointers */
-static UINT8 *buffers[NUM_BUFFERS] = {buffer_0, buffer_1};
+/* Aligned buffer pointers - initialized in init_buffers() */
+static UINT8 *buffers[NUM_BUFFERS];
 
 /* Index of buffer currently being rendered to */
 static int render_index = 0;
@@ -33,6 +35,15 @@ static int display_index = 1;
 
 /* Flag: true when render is complete and ready for buffer swap */
 static int render_complete = FALSE;
+
+/**
+ * Initialize buffers with proper alignment.
+ * Must be called once before rendering.
+ */
+void init_render_buffers(void) {
+  buffers[0] = (UINT8 *)(((UINT32)buffer_0 + ALIGN_MASK) & ~ALIGN_MASK);
+  buffers[1] = (UINT8 *)(((UINT32)buffer_1 + ALIGN_MASK) & ~ALIGN_MASK);
+}
 
 /**
  * Get the buffer currently being rendered to.

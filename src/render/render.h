@@ -17,6 +17,12 @@
 #include "../raster/raster.h"
 
 /**
+ * Initialize buffers with proper alignment.
+ * Must be called once before rendering.
+ */
+void init_render_buffers(void);
+
+/**
  * Get the buffer currently being rendered to.
  * Call this in render() to get the target buffer.
  */
