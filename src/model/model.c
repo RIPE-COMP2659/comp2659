@@ -16,6 +16,7 @@ Model get_model(void) {
     model.col_max_li = 0; /* lava index, collision */
     model.world = get_world();
     model.old_cam = model.world.camera;
+    model.old_geo = model.world.geo; /* For rendering */
     return model;
 }
 
@@ -49,6 +50,7 @@ void model_update_collision(Model *model) {
 
 void model_update_camera(Model *model) {
     model->old_cam = model->world.camera; /* store old camera for computing deltas in view */
+    model->old_geo = model->world.geo;
     model_update_camera_bi(model);
     model_update_camera_si(model);
     model_update_camera_li(model);
