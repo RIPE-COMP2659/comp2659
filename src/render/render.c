@@ -27,8 +27,9 @@ static UINT8 buffer_1[BUFFER_SIZE];
 /* Aligned buffer pointers - set at runtime */
 static UINT8 *buffers[NUM_BUFFERS];
 
-/* Current buffer index (the one we're rendering to) */
-static int current_buffer = 0;
+/* Current buffer indices */
+static int render_index = 1;
+static int display_index = 0;
 
 /**
  * Initialize buffers and set up double buffering.
@@ -51,18 +52,19 @@ void init_render_buffers(void) {
 
   /* Set screen to show first buffer, start rendering to second */
   Setscreen(buffers[0], buffers[0], -1);
-  current_buffer = 1;
+  render_index = 1;
+  display_index = 0;
 }
 
 /**
  * Get pointer to the buffer currently being rendered to.
  */
-UINT8 *get_render_buffer(void) { return buffers[current_buffer]; }
+UINT8 *get_render_buffer(void) { return buffers[render_index]; }
 
 /**
  * Get pointer to the buffer currently displayed on screen.
  */
-UINT8 *get_display_buffer(void) { return buffers[1 - current_buffer]; }
+UINT8 *get_display_buffer(void) { return buffers[display_index]; }
 
 /**
  * Mark rendering as complete and ready for display.
@@ -76,11 +78,13 @@ void mark_render_complete(void) {
  * Switches the display to the newly rendered buffer.
  */
 void swap_buffers(void) {
-  /* Toggle to the other buffer for next frame */
-  current_buffer = 1 - current_buffer;
+  /* Swap render and display indices */
+  int temp = render_index;
+  render_index = display_index;
+  display_index = temp;
 
-  /* Show the newly rendered buffer (the one we just switched away from) */
-  Setscreen(buffers[1 - current_buffer], buffers[1 - current_buffer], -1);
+  /* Show the newly rendered buffer */
+  Setscreen(buffers[display_index], buffers[display_index], -1);
 }
 
 /* See render.h for documentation */
@@ -94,7 +98,7 @@ void render(const Model *model, UINT8 *base) {
   (void)base;
 
   /* Get the back buffer to render to */
-  render_buf = buffers[current_buffer];
+  render_buf = buffers[render_index];
 
   clear_screen((UINT32 *)render_buf);
 
