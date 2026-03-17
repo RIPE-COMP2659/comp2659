@@ -22,16 +22,16 @@
 
 /* Two off-screen buffers for double buffering (oversized for alignment) */
 static UINT8 buffer_0[BUFFER_SIZE];
-static UINT8 buffer_1[BUFFER_SIZE];
+static UINT8 buffer_1[BUFFER_SIZE + 256];
 
-/* Aligned buffer pointers - initialized in init_buffers() */
-static UINT8 *buffers[NUM_BUFFERS];
+/* Buffer pointers - initialized at compile time to avoid NULL */
+static UINT8 *buffers[NUM_BUFFERS] = {buffer_0, buffer_1};
 
 /* Index of buffer currently being rendered to */
-static int render_index = 1;
+static int render_index = 0;
 
 /* Index of buffer currently displayed on screen */
-static int display_index = 0;
+static int display_index = 1;
 
 /* Flag: true when render is complete and ready for buffer swap */
 static int render_complete = FALSE;
@@ -41,12 +41,14 @@ static int render_complete = FALSE;
  * Must be called once before rendering.
  */
 void init_render_buffers(void) {
-  /* Align buffer pointers to 256-byte boundaries */
+  /* Re-initialize pointers to aligned addresses */
   buffers[0] = (UINT8 *)(((UINT32)buffer_0 + ALIGN_MASK) & ~ALIGN_MASK);
   buffers[1] = (UINT8 *)(((UINT32)buffer_1 + ALIGN_MASK) & ~ALIGN_MASK);
 
-  /* Point hardware to our first buffer so we see something on screen */
-  Setscreen(buffers[0], buffers[0], -1);
+  /* Point hardware to show buffer_0 (display_index=1 means buffers[1] which is
+   * buffer_0 aligned) */
+  /* With render_index=0, we render to buffer_1 while screen shows buffer_0 */
+  Setscreen(buffers[display_index], buffers[display_index], -1);
 }
 
 /**
