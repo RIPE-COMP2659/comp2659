@@ -15,7 +15,7 @@
 #include <osbind.h>
 
 #define SCREEN_SIZE 32000
-#define BUFFER_SIZE (SCREEN_SIZE + 256)
+#define BUFFER_SIZE (SCREEN_SIZE + 512)
 #define NUM_BUFFERS 2
 
 /* Off-screen buffers - oversized for 256-byte alignment */
@@ -26,13 +26,16 @@ static UINT8 buffer_1[BUFFER_SIZE];
 static UINT8 *buffers[NUM_BUFFERS] = {buffer_0, buffer_1};
 
 /* Index of buffer currently being rendered to */
-static int render_index = 1;
+static int render_index = 0;
 
 /* Index of buffer currently displayed on screen */
 static int display_index = 0;
 
 /* Flag: true when render is complete and ready for buffer swap */
 static int render_complete = FALSE;
+
+/* Flag: true after init_render_buffers() has been called */
+static int buffers_initialized = FALSE;
 
 /**
  * Initialize buffers with proper alignment.
@@ -50,6 +53,9 @@ void init_render_buffers(void) {
 
   /* Point hardware to show buffer 0 */
   Setscreen(buffers[display_index], buffers[display_index], -1);
+
+  /* Mark as initialized */
+  buffers_initialized = TRUE;
 }
 
 /**
@@ -96,9 +102,12 @@ void render(const Model *model, UINT8 *base) {
   const Camera *cam = &model->world.camera;
   int level_i = model->world.level_index;
   Level level = model->world.levels[level_i];
-  UINT8 *render_buf = buffers[render_index];
+  UINT8 *render_buf;
 
   (void)base;
+
+  /* For now, always render directly to screen using Physbase */
+  render_buf = (UINT8 *)Physbase();
 
   clear_screen((UINT32 *)render_buf);
 
@@ -119,7 +128,9 @@ void render(const Model *model, UINT8 *base) {
   render_geo(&model->world.geo, cam, render_buf);
 
   /* Mark render complete - swap happens after Vsync */
-  mark_render_complete();
+  if (buffers_initialized) {
+    mark_render_complete();
+  }
 }
 
 /* See render.h for documentation */
