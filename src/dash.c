@@ -51,8 +51,6 @@ int main_game(void) {
     Vsync();
 
     timeThen = timeNow;
-
-    os_yield();
   }
 
   return 0;
