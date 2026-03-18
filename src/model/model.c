@@ -66,6 +66,7 @@ static void update_entity_indices(
     unsigned int range_right, unsigned int entity_count,
     unsigned int (*get_x)(void *, unsigned int),
     unsigned int (*get_size)(void *, unsigned int), void *entities) {
+
   unsigned int i;
 
   /* Find max first: iterate from current max to find last entity with left edge
