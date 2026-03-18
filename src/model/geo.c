@@ -49,7 +49,7 @@ Geo create_geo(unsigned int x, unsigned int y, unsigned int ground_y) {
     geo.ground_y = ground_y;
     geo.x = x;
     geo.y = y;
-    geo.y_scaled = (unsigned int)y << GEO_PHYSICS_SHIFT;
+    geo.y_scaled = y << GEO_PHYSICS_SHIFT;
     geo.size = GEO_SIZE;
     geo.jump_buffer = 0;
     geo.sprite = GEO_SPRITE;
