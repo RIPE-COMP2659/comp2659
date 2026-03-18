@@ -13,11 +13,7 @@
  *          conditional event interfaces and defines shared
  *          event return codes used by the main game loop.
  */
-#ifndef EVENTS_H
-#define EVENTS_H
 
 #include "async.h"
 #include "sync.h"
 #include "cond.h"
-
-#endif /* EVENTS_H */
