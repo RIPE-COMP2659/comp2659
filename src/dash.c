@@ -1,7 +1,7 @@
-#include "clock.h"
 #include "events/events.h"
+#include "model/clock.h"
 #include "model/model.h"
-#include "oswrap.h"
+#include "os_wrap/oswrap.h"
 #include "render/render.h"
 #include <osbind.h>
 

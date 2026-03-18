@@ -1,18 +1,17 @@
-#include "clock.h"
+#include "model/clock.h"
 #include <osbind.h>
 
-unsigned long get_time(void)
-{
-    /* Type cast of the atair memory address for the hardware timer
-     * Seems to work, but if we run into problems the Steem emulator
-     * may not come with a hardware timer.
-     *
-     * (In the actual hardware, the timer was an optional component.)
-     */
-    volatile unsigned long *timer = (volatile unsigned long *)0x462;
+unsigned long get_time(void) {
+  /* Type cast of the atair memory address for the hardware timer
+   * Seems to work, but if we run into problems the Steem emulator
+   * may not come with a hardware timer.
+   *
+   * (In the actual hardware, the timer was an optional component.)
+   */
+  volatile unsigned long *timer = (volatile unsigned long *)0x462;
 
-    long prev = Super(0); /* enter privileged mode */
-    unsigned long time = *timer;
-    Super(prev); /* restore previous mode ASAP */
-    return time;
+  long prev = Super(0); /* enter privileged mode */
+  unsigned long time = *timer;
+  Super(prev); /* restore previous mode ASAP */
+  return time;
 }
