@@ -15,16 +15,21 @@ RASTER_FOLDER = raster
 RENDER_FOLDER = render
 TESTS_FOLDER = tests
 EVENTS_FOLDER = events
+INPUT_FOLDER = input
 TESTS_MODEL_FOLDER = $(TESTS_FOLDER)\$(MODEL_FOLDER)
 TESTS_RASTER_FOLDER = $(TESTS_FOLDER)\$(RASTER_FOLDER)
 TESTS_RENDER_FOLDER = $(TESTS_FOLDER)\$(RENDER_FOLDER)
-TESTS_EVENTS_FOLDER = $(TESTS_FOLDER)\${EVENTS_FOLDER}
+TESTS_EVENTS_FOLDER = $(TESTS_FOLDER)\$(EVENTS_FOLDER)
+TESTS_INPUT_FOLDER = $(TESTS_FOLDER)\$(INPUT_FOLDER)
 UNITY_FOLDER = $(TESTS_FOLDER)\unity
 
 # File Names, Base - Events
 ASYNC = async
 COND = cond
 SYNC = sync
+
+# File Names, Base - Input
+INPUT = input
 
 # File Names, Base - Model
 BLOCK  = block
@@ -63,16 +68,17 @@ ATARI_CC     = cc68x
 SHARED_FLAGS = -g
 
 # Program Configuration
-TOS_FLAGS      = $(SHARED_FLAGS) -c -I. -I$(MODEL_FOLDER) -I$(RASTER_FOLDER) -I$(RENDER_FOLDER) -I$(EVENTS_FOLDER)
+TOS_FLAGS      = $(SHARED_FLAGS) -c -I. -I$(MODEL_FOLDER) -I$(RASTER_FOLDER) -I$(RENDER_FOLDER) -I$(EVENTS_FOLDER) -I$(INPUT_FOLDER)
 MODEL_OBJECTS  = $(BLOCK).o $(SPIKE).o $(LAVA).o $(GEO).o $(LEVEL).o $(WORLD).o $(MODEL).o $(CAMERA).o $(MAIN).o
 EVENTS_OBJECTS = $(ASYNC).o $(COND).o $(SYNC).o
 RASTER_OBJECTS = $(CLR_SCN).o $(CLR_REG).o $(PLT_PXL).o $(PLT_HOR).o $(PLT_VRT).o $(PLT_LIN).o $(PLT_REC).o $(PLT_SQR).o $(PLT_TRI).o $(BMAP_8).o $(BMAP_16).o $(BMAP_32).o $(PLT_CHR).o $(PLT_STR).o $(BOUNDS).o $(PLT_CLIP).o
 RENDER_OBJECTS = $(RENDER).o
-TOS_OBJECTS    = $(MODEL_OBJECTS) $(RASTER_OBJECTS) $(RENDER_OBJECTS) $(EVENTS_OBJECTS)
+INPUT_OBJECTS  = $(INPUT).o
+TOS_OBJECTS    = $(MODEL_OBJECTS) $(RASTER_OBJECTS) $(RENDER_OBJECTS) $(EVENTS_OBJECTS) $(INPUT_OBJECTS)
 
 TOS_NAME       = prog.tos
 # TODO: Feels redundant
-MAIN_FLAGS     = $(SHARED_FLAGS) -I. -I$(MODEL_FOLDER) -I$(RASTER_FOLDER) -I$(RENDER_FOLDER) -I$(EVENTS_FOLDER)
+MAIN_FLAGS     = $(SHARED_FLAGS) -I. -I$(MODEL_FOLDER) -I$(RASTER_FOLDER) -I$(RENDER_FOLDER) -I$(EVENTS_FOLDER) -I$(INPUT_FOLDER)
 
 # Test Configuration
 # TODO: It's a bit silly, but pretty sure we're including all our .c files for each test.
@@ -95,6 +101,9 @@ RENDER_TEST_SRC = $(TEST_SRC) $(RENDER_FOLDER)\$(RENDER).c
 TASYNC = t${ASYNC}
 TCOND = t${COND}
 TSYNC = t${SYNC}
+
+# File Names, Tests - Input
+TINPUT = t${INPUT}
 
 # File Names, Tests - Model
 TBLOCK = t${BLOCK}
@@ -168,6 +177,9 @@ $(COND).o: $(EVENTS_FOLDER)\$(COND).c $(EVENTS_FOLDER)\$(COND).h $(MODEL_FOLDER)
 $(SYNC).o: $(EVENTS_FOLDER)\$(SYNC).c $(EVENTS_FOLDER)\$(SYNC).h $(MODEL_FOLDER)\dtypes.h
 	$(ATARI_CC) $(TOS_FLAGS) $(EVENTS_FOLDER)\$(SYNC).c -o $(SYNC).o
 
+$(INPUT).o: $(INPUT_FOLDER)\$(INPUT).c $(INPUT_FOLDER)\$(INPUT).h $(MODEL_FOLDER)\dtypes.h
+	$(ATARI_CC) $(TOS_FLAGS) $(INPUT_FOLDER)\$(INPUT).c -o $(INPUT).o
+
 $(RENDER).o: $(RENDER_FOLDER)\$(RENDER).c $(RENDER_FOLDER)\$(RENDER).h $(MODEL_FOLDER)\dtypes.h $(RASTER_FOLDER)\raster.h
 	$(ATARI_CC) $(TOS_FLAGS) $(RENDER_FOLDER)\$(RENDER).c -o $(RENDER).o
 
@@ -212,6 +224,10 @@ $(TCOND):
 
 $(TSYNC):
 	$(ATARI_CC) $(EVENTS_TEST_FLAGS) $(TESTS_EVENTS_FOLDER)\$(TSYNC).c $(EVENTS_TEST_SRC) $(UNITY) -o $(TSYNC).ut
+
+# ----- Input Test Builds ----------------------------------------------------
+$(TINPUT): $(INPUT).o
+	$(ATARI_CC) $(MAIN_FLAGS) $(TESTS_INPUT_FOLDER)\$(TINPUT).c $(INPUT).o -o $(TINPUT).tos
 
 
 # TODO: For some of these, there is cascading dependencies on objects, eg chr
@@ -266,7 +282,7 @@ $(TPLT_CLIP): $(PLT_CLIP).o
 
 
 # ----- Test Execution -------------------------------------------------------
-test: $(TBLOCK) $(TGEO) $(TLAVA) $(TLEVEL) $(TSPIKE) $(TWORLD) $(TMODEL) $(TCAMERA) $(TRENDER) $(TASYNC) $(TCOND) $(TSYNC) $(TCLR_SCN) $(TCLR_REG) $(TPLT_PXL) $(TPLT_HOR) $(TPLT_VRT) $(TPLT_LIN) $(TPLT_REC) $(TPLT_SQR) $(TPLT_TRI) $(TBMAP_8) $(TBMAP_16) $(TBMAP_32) $(TPLT_CHR) $(TPLT_STR) $(TBOUNDS) $(TPLT_CLIP)
+test: $(TINPUT) $(TBLOCK) $(TGEO) $(TLAVA) $(TLEVEL) $(TSPIKE) $(TWORLD) $(TMODEL) $(TCAMERA) $(TRENDER) $(TASYNC) $(TCOND) $(TSYNC) $(TCLR_SCN) $(TCLR_REG) $(TPLT_PXL) $(TPLT_HOR) $(TPLT_VRT) $(TPLT_LIN) $(TPLT_REC) $(TPLT_SQR) $(TPLT_TRI) $(TBMAP_8) $(TBMAP_16) $(TBMAP_32) $(TPLT_CHR) $(TPLT_STR) $(TBOUNDS) $(TPLT_CLIP)
 	$(TBLOCK).ut
 	$(TGEO).ut
 	$(TLAVA).ut
@@ -348,4 +364,4 @@ $(PLT_CLIP).o: $(RASTER_FOLDER)\$(PLT_CLIP).s
 
 # ----- Output ---------------------------------------------------------------
 # Otherwise the Make can think that the commands are files.
-.PHONY: test $(TBLOCK) $(TGEO) $(TLAVA) $(TLEVEL) $(TSPIKE) $(TWORLD) $(TMODEL) $(TCAMERA) $(TRENDER) $(TASYNC) $(TCOND) $(TSYNC) $(TCLR_SCN) $(TCLR_REG) $(TPLT_PXL) $(TPLT_HOR) $(TPLT_VRT) $(TPLT_LIN) $(TPLT_REC) $(TPLT_SQR) $(TPLT_TRI) $(TBMAP_8) $(TBMAP_16) $(TBMAP_32) $(TPLT_CHR) $(TPLT_STR) $(TBOUNDS) $(TPLT_CLIP)
+.PHONY: test $(TINPUT) $(TBLOCK) $(TGEO) $(TLAVA) $(TLEVEL) $(TSPIKE) $(TWORLD) $(TMODEL) $(TCAMERA) $(TRENDER) $(TASYNC) $(TCOND) $(TSYNC) $(TCLR_SCN) $(TCLR_REG) $(TPLT_PXL) $(TPLT_HOR) $(TPLT_VRT) $(TPLT_LIN) $(TPLT_REC) $(TPLT_SQR) $(TPLT_TRI) $(TBMAP_8) $(TBMAP_16) $(TBMAP_32) $(TPLT_CHR) $(TPLT_STR) $(TBOUNDS) $(TPLT_CLIP)

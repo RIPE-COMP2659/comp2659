@@ -17,6 +17,8 @@ void test_rendering(UINT8 *base, Model *model)
     int input;
     signed int current_event;
 
+    clear_screen((UINT32 *)base);
+
     for (w_iter = 0; w_iter < 400; w_iter++) {
         /* Temporary input */
         input = Cnecin();
