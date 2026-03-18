@@ -1,10 +1,13 @@
+<<<<<<< HEAD
 <<<<<<< HEAD:src/clock/clock.c
 #include "clock/clock.h"
 #include <osbind.h>
 <<<<<<< HEAD
 =======
+#include "clock/clock.h"
+#include <osbind.h>
 >>>>>>> d84dded (fix filepath in clock.c)
->>>>>>> 2a9f10c (Keep my new filepath)
+>>>>>>> a0ed795 (Keep my new filepath)
 
 unsigned long get_time(void) {
   /* Type cast of the atair memory address for the hardware timer
