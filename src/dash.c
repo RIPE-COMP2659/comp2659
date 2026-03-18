@@ -45,8 +45,9 @@ int main_game(void) {
     on_clock_tick(&model);
     render(&model, 0);
 
-    /* Wait for VBL, then swap buffers */
-
+    /* I know its a weird order, but for some reason this way works,
+     * and the way that makes sense in my head does not.
+     */
     swap_buffers();
     Vsync();
 

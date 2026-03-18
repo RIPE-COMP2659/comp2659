@@ -42,7 +42,7 @@ void mark_render_complete(void);
 
 /**
  * Swap buffers - call this in VBL interrupt handler.
- * Swaps render_index and display_index, then updates video base.
+ * Swaps stale_buffer and display_index, then updates video base.
  */
 void swap_buffers(void);
 

@@ -28,7 +28,7 @@ static UINT8 buffer_1[BUFFER_SIZE];
 static UINT8 *buffers[NUM_BUFFERS];
 
 /* Current buffer indices */
-static int render_index = 1;
+static int stale_buffer = 1;
 static int display_index = 0;
 
 /**
@@ -38,7 +38,7 @@ static int display_index = 0;
 void init_render_buffers(void) {
   UINT32 addr;
 
-  /* Align buffer 0 to 256-byte boundary */
+  /* 255 align buffers */
   addr = (UINT32)buffer_0;
   buffers[0] = (UINT8 *)((addr + 255) & 0xFFFFFF00);
 
@@ -52,14 +52,14 @@ void init_render_buffers(void) {
 
   /* Set screen to show first buffer, start rendering to second */
   Setscreen(buffers[0], buffers[0], -1);
-  render_index = 1;
+  stale_buffer = 1;
   display_index = 0;
 }
 
 /**
  * Get pointer to the buffer currently being rendered to.
  */
-UINT8 *get_render_buffer(void) { return buffers[render_index]; }
+UINT8 *get_render_buffer(void) { return buffers[stale_buffer]; }
 
 /**
  * Get pointer to the buffer currently displayed on screen.
@@ -79,9 +79,10 @@ void mark_render_complete(void) {
  */
 void swap_buffers(void) {
   /* Swap render and display indices */
-  int temp = render_index;
-  render_index = display_index;
-  display_index = temp;
+  stale_buffer = display_index;
+
+  /* only works for 2 buffers right now- flips between 0 and 1 (XOR) */
+  display_index = display_index ^ 1;
 
   /* Show the newly rendered buffer */
   Setscreen(buffers[display_index], buffers[display_index], -1);
@@ -98,7 +99,7 @@ void render(const Model *model, UINT8 *base) {
   (void)base;
 
   /* Get the back buffer to render to */
-  render_buf = buffers[render_index];
+  render_buf = buffers[stale_buffer];
 
   clear_screen((UINT32 *)render_buf);
 
