@@ -1,5 +1,6 @@
 /**
  * input.h
+ *
  * Authors:
  *     Riley Gramlich, rgram060@mtroyal.ca, 201762060
  *     Robert Parker Hutcheson, rhutc335@mtroyal.ca, 201762335
@@ -12,9 +13,6 @@
  * routines to process user input without OS-specific calls in the main game
  * logic.
  */
-#ifndef INPUT_H
-#define INPUT_H
-
 #include <osbind.h>
 #include "../model/dtypes.h"
 
@@ -39,5 +37,3 @@ int has_input();
  *     char: The character that was pressed by the user.
  */
 char get_input();
-
-#endif /* INPUT_H */

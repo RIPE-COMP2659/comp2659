@@ -7,6 +7,7 @@ const signed int INITIAL_Y = 32;
 const signed int INITIAL_GROUND_Y = 32;
 
 /* TODO: Add tests for update_landed */
+/* TODO: geo_check_spike_collision tests missing */
 
 void setUp(void) {
     geo = create_geo(INITIAL_X, INITIAL_Y, INITIAL_GROUND_Y);

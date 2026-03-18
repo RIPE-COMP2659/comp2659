@@ -2,7 +2,6 @@
 
 /* NOTE: This is only useful if we have different sprites for multiplayer */
 /* The global sprite for geo */
-/*  below is a fancy geo sprite, currently used one is a simple block sprite
 const unsigned int GEO_SPRITE[GEO_SIZE][GEO_SIZE / WORD] = {
     {0x800C, 0x3001}, 
     {0x3FC9, 0x93FC},
@@ -37,42 +36,6 @@ const unsigned int GEO_SPRITE[GEO_SIZE][GEO_SIZE / WORD] = {
     {0x3FC9, 0x93FC},
     {0x800C, 0x3001} 
 };
-*/
-
-const unsigned int GEO_SPRITE[GEO_SIZE][GEO_SIZE / WORD] = {
-    {0xFFFF, 0xFFFF},
-    {0xFFFF, 0xFFFF},
-    {0xC000, 0x0003},
-    {0xC000, 0x0003},
-    {0xC000, 0x0003},
-    {0xC000, 0x0003},
-    {0xC000, 0x0003},
-    {0xC000, 0x0003},
-    {0xC000, 0x0003},
-    {0xC000, 0x0003},
-    {0xC000, 0x0003},
-    {0xC000, 0x0003},
-    {0xC000, 0x0003},
-    {0xC000, 0x0003},
-    {0xC000, 0x0003},
-    {0xC000, 0x0003},
-    {0xC000, 0x0003},
-    {0xC000, 0x0003},
-    {0xC000, 0x0003},
-    {0xC000, 0x0003},
-    {0xC000, 0x0003},
-    {0xC000, 0x0003},
-    {0xC000, 0x0003},
-    {0xC000, 0x0003},
-    {0xC000, 0x0003},
-    {0xC000, 0x0003},
-    {0xC000, 0x0003},
-    {0xC000, 0x0003},
-    {0xC000, 0x0003},
-    {0xC000, 0x0003},
-    {0xFFFF, 0xFFFF},
-    {0xFFFF, 0xFFFF}
-};
 
 /** See geo.h for documentation */
 Geo create_geo(unsigned int x, unsigned int y, unsigned int ground_y) {
@@ -86,7 +49,7 @@ Geo create_geo(unsigned int x, unsigned int y, unsigned int ground_y) {
     geo.ground_y = ground_y;
     geo.x = x;
     geo.y = y;
-    geo.y_scaled = (unsigned int)y << GEO_PHYSICS_SHIFT;
+    geo.y_scaled = y << GEO_PHYSICS_SHIFT;
     geo.size = GEO_SIZE;
     geo.jump_buffer = 0;
     geo.sprite = GEO_SPRITE;
@@ -129,6 +92,18 @@ signed int geo_check_square_collision(
             return COLLISION_LEFT;
         }
     } else {
+        /* penetration_depth: how many pixels Geo is 'sunken' into the block vertically.
+           We use the 'Half-Block Rule' (16px) to decide between landing and crashing. */
+        signed int penetration_depth = object_top - geo_bottom;
+
+        if (geo->dy <= 0) {
+            /* FALLING or STANDING: If we are in the top half of the block, prioritize landing.
+               This allows sliding off edges safely and 'soft' corner landings. */
+            if (penetration_depth <= 16) {
+                collision_result = COLLISION_TOP;
+            } else {
+                collision_result = COLLISION_LEFT;
+            }
         /* Moving Up: Check top corners for head-strike */
         /* Only die if we are physically hitting the bottom of the block from underneath */
         if (gy_bot < oy_bot) {
@@ -247,7 +222,7 @@ void geo_update_landed(Geo *geo) {
     if (geo_bottom <= ground_y && geo->dy <= 0) {
         geo->is_landed = TRUE;
         geo->y = geo->ground_y + geo->size;
-        geo->y_scaled = (unsigned int)geo->y << GEO_PHYSICS_SHIFT;
+        geo->y_scaled = geo->y << GEO_PHYSICS_SHIFT;
         geo->dy = 0;
     } else {
         geo->is_landed = FALSE;

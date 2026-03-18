@@ -32,10 +32,10 @@
  *     The change in y per update. It is not scalred relative to vertical
  *     position, it is scaled for a 2 block jump height and 1 second duration
  *     during a 70 FPS game
- * unsigned int is_landed:
+ * signed int is_landed:
  *     Whether geo is currently landed on the ground, which affects whether
  *     they can jump or is subject to gravity
- * unsigned int is_dead:
+ * signed int is_dead:
  *     Whether geo is currently dead, will display a game over or another
  *     attempt will be given in the future
  * unsigned int ground_y:
@@ -56,8 +56,8 @@ typedef struct {
   signed int ddy;
   unsigned int dx;
   signed int dy;
-  unsigned int is_landed;
-  unsigned int is_dead;
+  signed int is_landed;
+  signed int is_dead;
   unsigned int ground_y;
   unsigned int x;
   unsigned int y;
