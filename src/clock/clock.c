@@ -1,4 +1,4 @@
-#include "model/clock.h"
+#include "clock/clock.h"
 #include <osbind.h>
 
 unsigned long get_time(void) {
