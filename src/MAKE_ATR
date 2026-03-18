@@ -67,6 +67,7 @@ PLT_CHR = plt_chr
 PLT_STR = plt_str
 BOUNDS  = bounds
 PLT_CLIP = plt_clp
+RASTER = raster
 
 # Global Variables
 ATARI_CC     = cc68x
