@@ -1,5 +1,4 @@
 #include "model/clock.h"
-#include <osbind.h>
 
 unsigned long get_time(void) {
   /* Type cast of the atair memory address for the hardware timer
