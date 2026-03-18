@@ -189,7 +189,7 @@ void geo_update_landed(Geo *geo) {
     if (geo_bottom <= ground_y && geo->dy <= 0) {
         geo->is_landed = TRUE;
         geo->y = geo->ground_y + geo->size;
-        geo->y_scaled = (unsigned int)geo->y << GEO_PHYSICS_SHIFT;
+        geo->y_scaled = geo->y << GEO_PHYSICS_SHIFT;
         geo->dy = 0;
     } else {
         geo->is_landed = FALSE;
