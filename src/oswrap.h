@@ -16,7 +16,4 @@ unsigned int os_get_input(void);
 /* Return pointer to framebuffer base */
 unsigned char *os_framebuffer_base(void);
 
-/* Sleep or yield until next tick if desired (optional) */
-void os_yield(void);
-
 #endif /* OSWRAP_H */
