@@ -86,7 +86,7 @@ signed int geo_check_square_collision(
     } else {
         /* penetration_depth: how many pixels Geo is 'sunken' into the block vertically.
            We use the 'Half-Block Rule' (16px) to decide between landing and crashing. */
-        unsigned int penetration_depth = (unsigned int)(object_top - geo_bottom);
+        signed int penetration_depth = object_top - geo_bottom;
 
         if (geo->dy <= 0) {
             /* FALLING or STANDING: If we are in the top half of the block, prioritize landing.
