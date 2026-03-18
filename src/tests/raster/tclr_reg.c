@@ -34,6 +34,47 @@ static void set_pixel(UINT8 *base, INT16 row, INT16 col, int value) {
     }
 }
 
+/* Seed border, clear region, and verify clear/boundary behavior. */
+static void clear_region_with_black_border_assertion(
+    UINT8 *base,
+    INT16 row,
+    INT16 col,
+    UINT16 length,
+    UINT16 width
+) {
+    INT16 y;
+    INT16 x;
+
+    for (y = row - 1; y < (INT16)(row + length + 1); y++) {
+        for (x = col - 1; x < (INT16)(col + width + 1); x++) {
+            set_pixel(base, y, x, BLACK);
+        }
+    }
+
+    clear_region(mock_screen, row, col, length, width);
+
+    for (y = row; y < (INT16)(row + length); y++) {
+        TEST_ASSERT_EQUAL_INT_MESSAGE(BLACK, get_pixel(base, y, col - 1),
+            "Left boundary column cleared incorrectly");
+        TEST_ASSERT_EQUAL_INT_MESSAGE(BLACK, get_pixel(base, y, col + width),
+            "Right boundary column cleared incorrectly");
+    }
+
+    for (x = col; x < (INT16)(col + width); x++) {
+        TEST_ASSERT_EQUAL_INT_MESSAGE(BLACK, get_pixel(base, row - 1, x),
+            "Top boundary row cleared incorrectly");
+        TEST_ASSERT_EQUAL_INT_MESSAGE(BLACK, get_pixel(base, row + length, x),
+            "Bottom boundary row cleared incorrectly");
+    }
+
+    for (y = row; y < (INT16)(row + length); y++) {
+        for (x = col; x < (INT16)(col + width); x++) {
+            TEST_ASSERT_EQUAL_INT_MESSAGE(WHITE, get_pixel(base, y, x),
+                "Pixel in clear remained");
+        }
+    }
+}
+
 /* Setup - runs before each test */
 void setUp(void) {
     /* Initialize screen with all black */
@@ -125,41 +166,12 @@ void test_clear_region_single_pixel(void) {
  */
 void test_clear_region_width32_non_byte_aligned_column(void) {
     UINT8 *base = (UINT8 *)mock_screen;
-    INT16 row;
-    INT16 column;
+    const INT16 region_row = 20;
+    const INT16 region_col = 1;
+    const UINT16 region_length = 32;
+    const UINT16 region_width = 32;
 
-    /* 34x34 region set black to check boundaries and clearing */
-    for (row = 19; row < 53; row++) {
-        for (column = 0; column < 34; column++) {
-            set_pixel(base, row, column, BLACK);
-        }
-    }
-
-    clear_region(mock_screen, 20, 1, 32, 32);
-
-    /* Columns to the left and right must be black */
-    for (row = 20; row < 52; row++) {
-        TEST_ASSERT_EQUAL_INT_MESSAGE(BLACK, get_pixel(base, row, 0),
-            "Left boundary column cleared incorrectly");
-        TEST_ASSERT_EQUAL_INT_MESSAGE(BLACK, get_pixel(base, row, 33),
-            "Right boundary column cleared incorrectly");
-    }
-
-    /* Rows above and below */
-    for (column = 1; column < 33; column++) {
-        TEST_ASSERT_EQUAL_INT_MESSAGE(BLACK, get_pixel(base, 19, column),
-            "Top boundary row cleared incorrectly");
-        TEST_ASSERT_EQUAL_INT_MESSAGE(BLACK, get_pixel(base, 52, column),
-            "Bottom boundary row cleared incorrectly");
-    }
-
-    /* Every cleared pixel should be white */
-    for (row = 20; row < 52; row++) {
-        for (column = 1; column < 33; column++) {
-            TEST_ASSERT_EQUAL_INT_MESSAGE(WHITE, get_pixel(base, row, column),
-                "Pixel in clear remained");
-        }
-    }
+    clear_region_with_black_border_assertion(base, region_row, region_col, region_length, region_width);
 }
 
 /* Test all bounds clipping limits mathematically */
