@@ -46,7 +46,7 @@ TEST_EXECS = $(TEST_MODEL_EXECS) $(TEST_EVENTS_EXECS)
 
 # Main program sources
 MAIN_EXE = dash$(EXE_EXT)
-MAIN_SRC = dash.c clock.c os_wrap/oswrap.c model/model.c model/block.c model/spike.c model/lava.c model/geo.c model/camera.c model/level.c model/world.c events/async.c events/cond.c events/sync.c render/render.c
+MAIN_SRC = dash.c model/clock.c os_wrap/oswrap.c model/model.c model/block.c model/spike.c model/lava.c model/geo.c model/camera.c model/level.c model/world.c events/async.c events/cond.c events/sync.c render/render.c
 
 # Default target
 all: main
