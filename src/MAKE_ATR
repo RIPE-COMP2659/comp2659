@@ -16,16 +16,24 @@ RENDER_FOLDER = render
 TESTS_FOLDER = tests
 EVENTS_FOLDER = events
 OSWRAP_FOLDER = os_wrap
+CLOCK_FOLDER = clock
 TESTS_MODEL_FOLDER = $(TESTS_FOLDER)\$(MODEL_FOLDER)
 TESTS_RASTER_FOLDER = $(TESTS_FOLDER)\$(RASTER_FOLDER)
 TESTS_RENDER_FOLDER = $(TESTS_FOLDER)\$(RENDER_FOLDER)
 TESTS_EVENTS_FOLDER = $(TESTS_FOLDER)\${EVENTS_FOLDER}
+
+# Unused
+
+TEST_CLOCK_FOLDER = $(TESTS_FOLDER)\$(CLOCK_FOLDER)
 UNITY_FOLDER = $(TESTS_FOLDER)\unity
 
 # File Names, Base - Events
 ASYNC = async
 COND = cond
 SYNC = sync
+
+# File names, Base - Clock
+CLOCK = clock
 
 # File Names, Base - Model
 BLOCK  = block
@@ -37,6 +45,7 @@ WORLD  = world
 MODEL  = model
 MAIN   = dash
 CAMERA = camera
+OSWRAP = oswrap
 
 # File Names, Base - Render
 RENDER = render
@@ -58,6 +67,7 @@ PLT_CHR = plt_chr
 PLT_STR = plt_str
 BOUNDS  = bounds
 PLT_CLIP = plt_clp
+RASTER = raster
 
 # Global Variables
 ATARI_CC     = cc68x
@@ -67,8 +77,7 @@ SHARED_FLAGS = -g
 TOS_FLAGS      = $(SHARED_FLAGS) -c -I. -I$(MODEL_FOLDER) -I$(RASTER_FOLDER) -I$(RENDER_FOLDER) -I$(EVENTS_FOLDER) -I$(OSWRAP_FOLDER)
 MODEL_OBJECTS  = $(BLOCK).o $(SPIKE).o $(LAVA).o $(GEO).o $(LEVEL).o $(WORLD).o $(MODEL).o $(CAMERA).o $(MAIN).o
 EVENTS_OBJECTS = $(ASYNC).o $(COND).o $(SYNC).o
-OSWRAP = oswrap
-CLOCK = clock
+
 RASTER_OBJECTS = $(CLR_SCN).o $(CLR_REG).o $(PLT_PXL).o $(PLT_HOR).o $(PLT_VRT).o $(PLT_LIN).o $(PLT_REC).o $(PLT_SQR).o $(PLT_TRI).o $(BMAP_8).o $(BMAP_16).o $(BMAP_32).o $(PLT_CHR).o $(PLT_STR).o $(BOUNDS).o $(PLT_CLIP).o
 RENDER_OBJECTS = $(RENDER).o
 TOS_OBJECTS    = $(MODEL_OBJECTS) $(RASTER_OBJECTS) $(RENDER_OBJECTS) $(EVENTS_OBJECTS) $(OSWRAP).o $(CLOCK).o
@@ -159,7 +168,7 @@ $(WORLD).o: $(MODEL_FOLDER)\$(WORLD).c $(MODEL_FOLDER)\$(WORLD).h $(MODEL_FOLDER
 $(MODEL).o: $(MODEL_FOLDER)\$(MODEL).c $(MODEL_FOLDER)\$(MODEL).h $(MODEL_FOLDER)\dtypes.h
 	$(ATARI_CC) $(TOS_FLAGS) $(MODEL_FOLDER)\$(MODEL).c -o $(MODEL).o
 
-$(MAIN).o: $(MAIN).c $(MODEL_FOLDER)\$(MODEL).h $(MODEL_FOLDER)\dtypes.h raster\raster.h $(OSWRAP_FOLDER)\oswrap.h model\clock.h
+$(MAIN).o: $(MAIN).c $(MODEL_FOLDER)\$(MODEL).h $(MODEL_FOLDER)\dtypes.h $(RASTER_FOLDER)\$(RASTER).h $(OSWRAP_FOLDER)\$(OSWRAP).h $(CLOCK_FOLDER)\$(CLOCK).h
 	$(ATARI_CC) $(TOS_FLAGS) $(MAIN).c -o $(MAIN).o
 
 $(ASYNC).o: $(EVENTS_FOLDER)\$(ASYNC).c $(EVENTS_FOLDER)\$(ASYNC).h $(MODEL_FOLDER)\dtypes.h
@@ -171,14 +180,14 @@ $(COND).o: $(EVENTS_FOLDER)\$(COND).c $(EVENTS_FOLDER)\$(COND).h $(MODEL_FOLDER)
 $(SYNC).o: $(EVENTS_FOLDER)\$(SYNC).c $(EVENTS_FOLDER)\$(SYNC).h $(MODEL_FOLDER)\dtypes.h
 	$(ATARI_CC) $(TOS_FLAGS) $(EVENTS_FOLDER)\$(SYNC).c -o $(SYNC).o
 
-$(RENDER).o: $(RENDER_FOLDER)\$(RENDER).c $(RENDER_FOLDER)\$(RENDER).h $(MODEL_FOLDER)\dtypes.h $(RASTER_FOLDER)\raster.h
+$(RENDER).o: $(RENDER_FOLDER)\$(RENDER).c $(RENDER_FOLDER)\$(RENDER).h $(MODEL_FOLDER)\dtypes.h $(RASTER_FOLDER)\$(RASTER).h
 	$(ATARI_CC) $(TOS_FLAGS) $(RENDER_FOLDER)\$(RENDER).c -o $(RENDER).o
 
 $(OSWRAP).o: $(OSWRAP_FOLDER)\$(OSWRAP).c $(OSWRAP_FOLDER)\$(OSWRAP).h
 	$(ATARI_CC) $(TOS_FLAGS) $(OSWRAP_FOLDER)\$(OSWRAP).c -o $(OSWRAP).o
 
-$(CLOCK).o: model\$(CLOCK).c model\$(CLOCK).h
-	$(ATARI_CC) $(TOS_FLAGS) model\$(CLOCK).c -o $(CLOCK).o
+$(CLOCK).o: $(CLOCK_FOLDER)\$(CLOCK).c $(CLOCK_FOLDER)\$(CLOCK).h
+	$(ATARI_CC) $(TOS_FLAGS) $(CLOCK_FOLDER)\$(CLOCK).c -o $(CLOCK).o
 
 
 $(CLR_SCN).o: $(RASTER_FOLDER)\$(CLR_SCN).s

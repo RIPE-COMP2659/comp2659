@@ -1,0 +1,40 @@
+<<<<<<< HEAD
+<<<<<<< HEAD:src/clock/clock.c
+#include "clock/clock.h"
+#include <osbind.h>
+<<<<<<< HEAD
+=======
+>>>>>>> d84dded (fix filepath in clock.c)
+>>>>>>> 2a9f10c (Keep my new filepath)
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD:src/clock/clock.c
+#include "clock/clock.h"
+#include <osbind.h>
+=======
+#include "model/clock.h"
+>>>>>>> 866c544 (Remove osbind.h from clock.c, put in .h):src/model/clock.c
+=======
+<<<<<<< HEAD
+#include "model/clock.h"
+=======
+#include "clock/clock.h"
+#include <osbind.h>
+>>>>>>> d84dded (fix filepath in clock.c)
+>>>>>>> a0ed795 (Keep my new filepath)
+>>>>>>> 4ead0b0 (fix conflicts (i dont know how there were any))
+
+unsigned long get_time(void) {
+  /* Type cast of the atair memory address for the hardware timer
+   * Seems to work, but if we run into problems the Steem emulator
+   * may not come with a hardware timer.
+   *
+   * (In the actual hardware, the timer was an optional component.)
+   */
+  volatile unsigned long *timer = (volatile unsigned long *)0x462;
+
+  long prev = Super(0); /* enter privileged mode */
+  unsigned long time = *timer;
+  Super(prev); /* restore previous mode ASAP */
+  return time;
+}

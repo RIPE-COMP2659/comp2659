@@ -1,4 +1,7 @@
-#include "model/clock.h"
+<<<<<<< HEAD:src/clock/clock.c
+#include "clock/clock.h"
+#include <osbind.h>
+>>>>>>> d84dded (fix filepath in clock.c)
 
 unsigned long get_time(void) {
   /* Type cast of the atair memory address for the hardware timer
