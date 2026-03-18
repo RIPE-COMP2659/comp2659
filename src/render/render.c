@@ -20,6 +20,17 @@
 #define BUFFER_SIZE (SCREEN_SIZE + 256)
 #define NUM_BUFFERS 2
 
+/* Buffer alignment constants */
+#define ALIGNMENT_MASK 0xFFFFFF00 /* Mask to zero lower 8 bits */
+#define ALIGNMENT_PADDING 255     /* Round up to next 256-byte boundary */
+
+/**
+ * Align address to 256-byte boundary.
+ * Rounds up to ensure proper alignment.
+ */
+#define ALIGN_TO_256(addr)                                                     \
+  ((UINT8 *)(((UINT32)(addr) + ALIGNMENT_PADDING) & ALIGNMENT_MASK))
+
 /* Two off-screen buffers - oversized for alignment */
 static UINT8 buffer_0[BUFFER_SIZE];
 static UINT8 buffer_1[BUFFER_SIZE];
@@ -38,13 +49,9 @@ static int display_index = 0;
 void init_render_buffers(void) {
   UINT32 addr;
 
-  /* 255 align buffers */
-  addr = (UINT32)buffer_0;
-  buffers[0] = (UINT8 *)((addr + 255) & 0xFFFFFF00);
-
-  /* Align buffer 1 to 256-byte boundary */
-  addr = (UINT32)buffer_1;
-  buffers[1] = (UINT8 *)((addr + 255) & 0xFFFFFF00);
+  /* Align buffers to 256-byte boundary */
+  buffers[0] = ALIGN_TO_256(buffer_0);
+  buffers[1] = ALIGN_TO_256(buffer_1);
 
   /* Clear both buffers */
   clear_screen((UINT32 *)buffers[0]);
