@@ -150,6 +150,7 @@ static void clear_sprite_region(UINT8 *base, int rel_y, int rel_x, unsigned int 
     }
 }
 
+/* TODO: Logic around stale rendering doesn't feel right. Shouldn't need to N-2 frame clear */
 /* See render.h for documentation */
 void render(const Model *model, UINT8 *base)
 {
