@@ -14,7 +14,8 @@
  */
 #include "world.h"
 
-#define CAMERA_OFFSET 160
+#define CAMERA_X_OFFSET 160
+#define CAMERA_Y_OFFSET 260
 
 /* TODO: Level index management, currently never updated */
 /* TODO: Levels must be in ascending x value order or logic will break */
@@ -41,7 +42,7 @@ World get_world(void)
     /* TODO: Should probably not be hard coded for starting x */
     /* TODO: Added some additional height to test the start, can be removed */
     Geo geo = create_geo(
-        CAMERA_OFFSET,
+        CAMERA_X_OFFSET,
         ground_y + GEO_SIZE + GEO_SIZE,
         ground_y);
 
@@ -50,16 +51,19 @@ World get_world(void)
 
 void world_reset_level(World *world)
 {
-    world->geo = create_geo(CAMERA_OFFSET, world->ground_y + GEO_SIZE, world->ground_y);
+    world->geo = create_geo(CAMERA_X_OFFSET, world->ground_y + GEO_SIZE, world->ground_y);
     world->camera = create_camera(0, SCREEN_HEIGHT);
 }
 
 void world_update(World *world)
 {
     geo_update(&world->geo);
+    /* TODO: Camera tracking is stuck to Geo instead of delayed vertical movement */
     camera_update_coordinates(
         &world->camera,
-        world->geo.x - CAMERA_OFFSET, SCREEN_HEIGHT);
+        world->geo.x - CAMERA_X_OFFSET, 
+        world->geo.y + CAMERA_Y_OFFSET
+    );
 }
 
 void world_update_collisions(
