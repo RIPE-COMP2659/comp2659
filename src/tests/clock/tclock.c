@@ -4,6 +4,7 @@
 void setUp(void) {}
 void tearDown(void) {}
 
+/* TODO: Testing is garbage */
 void test_get_time_returns_value(void)
 {
     unsigned long a = get_time();
