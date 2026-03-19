@@ -65,6 +65,7 @@ void init_render_buffers(void)
     display_index = 0;
 }
 
+/* TODO: The use of this on death needs a refactor, works but it's bad */
 void clear_render_buffers(void)
 {
     clear_screen((UINT32 *)buffers[0]);
