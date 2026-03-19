@@ -80,6 +80,8 @@ signed int geo_check_square_collision(
 
     /* TODO: Optimize logic after determining desired behaviour based on
        gameplay */
+    /* TODO: This is busted on positive dy and there's some funny business 
+       on being below a block */
     if (geo_right < object_left || geo_left > object_right ||
         geo_top < object_bottom || geo_bottom > object_top) {
         collision_result = COLLISION_NONE;
