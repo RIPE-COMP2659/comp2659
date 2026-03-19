@@ -49,6 +49,9 @@
  *     The scaled y value of the top of Geo, see header defines for details
  * unsigned int size:
  *     The length and width of Geo in pixels
+ * unsigned int jump_buffer:
+ *     The number of frames in which a jump can be queued even if Geo can't
+ *     yet jump
  * const unsigned int (*sprite)[GEO_SIZE / WORD]:
  *     The pointer to the sprite of Geo, a 32x32 pixel image
  */
@@ -128,7 +131,7 @@ signed int geo_check_spike_collision(Geo *geo, unsigned int spike_x,
                                      unsigned int spike_size);
 
 /**
- * Makes Geo jump by setting dy to a constant value if Geo is currently landed
+ * Makes Geo jump by setting the jump buffer, which will queue a jump
  *
  * Params:
  *     Geo *geo:
