@@ -2,7 +2,7 @@
 ifeq ($(OS),Windows_NT)
     EXE_EXT = .exe
     RM = del /Q
-    RUN_PREFIX = 
+    RUN_PREFIX =
     NOOP = exit /b 0
 else
     EXE_EXT =
@@ -26,21 +26,27 @@ COVERAGE_FLAGS = -fprofile-arcs -ftest-coverage -O0
 # -I. means include from current directory (for helloworld.h)
 # -Itests/unity means include from tests/unity subdirectory (for unity.h)
 # -Imodel means include from model subdirectory (for entity headers)
-INCLUDES = -I. -Itests/unity -Imodel
+# -Ievents means include from events subdirectory (for event headers)
+# -Ios_wrap means include from os_wrap subdirectory (for oswrap headers)
+OSWRAP_FOLDER = os_wrap
+INCLUDES = -I. -Itests/unity -Imodel -Ievents -I$(OSWRAP_FOLDER)
 
 # Source files - automatically discover all .c files in src directory (excluding tests/)
-SRC = $(filter-out tests/%, $(wildcard *.c model/*.c))
+SRC = $(filter-out tests/%, $(wildcard *.c model/*.c events/*.c))
 SRC_BASENAMES = $(basename $(SRC))
 UNITY_FILES = tests/unity/unity.c
-TEST_SUPPORT_SRC = $(filter-out main.c,$(SRC))
+TEST_SUPPORT_SRC = $(filter-out dash.c,$(SRC))
 
-# Dynamically discover test files (all .c files in tests/model/)
-TEST_SRC_FILES = $(wildcard tests/model/*.c)
-TEST_EXECS = $(TEST_SRC_FILES:tests/model/%.c=%$(EXE_EXT))
+# Dynamically discover test files (all .c files in tests/model/ and tests/events/)
+TEST_MODEL_FILES = $(wildcard tests/model/*.c)
+TEST_EVENTS_FILES = $(wildcard tests/events/*.c)
+TEST_MODEL_EXECS = $(TEST_MODEL_FILES:tests/model/%.c=%$(EXE_EXT))
+TEST_EVENTS_EXECS = $(TEST_EVENTS_FILES:tests/events/%.c=%$(EXE_EXT))
+TEST_EXECS = $(TEST_MODEL_EXECS) $(TEST_EVENTS_EXECS)
 
 # Main program sources
-MAIN_EXE = main$(EXE_EXT)
-MAIN_SRC = main.c model/block.c model/spike.c model/lava.c model/geo.c model/level.c model/world.c
+MAIN_EXE = dash$(EXE_EXT)
+MAIN_SRC = dash.c model/clock.c os_wrap/oswrap.c model/model.c model/block.c model/spike.c model/lava.c model/geo.c model/camera.c model/level.c model/world.c events/async.c events/cond.c events/sync.c render/render.c
 
 # Default target
 all: main
@@ -52,10 +58,12 @@ RUN_CMD = $(RUN_PREFIX)
 test: $(TEST_EXECS)
 	$(foreach exec,$(TEST_EXECS),$(RUN_CMD)$(exec) && ) $(NOOP)
 
-# Build test executables (pattern rule)
+# Build test executables (pattern rules)
 # Each test compiles with its corresponding source file: test_NAME.c compiles with NAME.c
-#%$(EXE_EXT): tests/model/%.c $(UNITY_FILES) $(TEST_SUPPORT_SRC)
 %$(EXE_EXT): tests/model/%.c $(UNITY_FILES) $(TEST_SUPPORT_SRC)
+	$(CC) $(CFLAGS) $(COVERAGE_FLAGS) $(INCLUDES) -DTESTING $< $(TEST_SUPPORT_SRC) $(UNITY_FILES) -o $@
+
+%$(EXE_EXT): tests/events/%.c $(UNITY_FILES) $(TEST_SUPPORT_SRC)
 	$(CC) $(CFLAGS) $(COVERAGE_FLAGS) $(INCLUDES) -DTESTING $< $(TEST_SUPPORT_SRC) $(UNITY_FILES) -o $@
 
 # Build the main program

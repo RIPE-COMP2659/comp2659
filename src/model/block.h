@@ -1,3 +1,6 @@
+#ifndef BLOCK_H
+#define BLOCK_H
+
 #include "dtypes.h"
 
 /* Global size of all blocks and their sprites */
@@ -37,3 +40,5 @@ typedef struct {
  *    Block: Constructed object with respective x, y, default size, and sprite
  */
 Block create_block(unsigned int x, unsigned int y);
+
+#endif
