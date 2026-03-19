@@ -31,27 +31,59 @@ Model get_model(void)
     model.col_max_li = 0; /* lava index, collision */
     model.world = get_world();
     model.old_cam = model.world.camera;
-    model.old_geo = model.world.geo; /* For rendering */
+    model.prev_cam = model.world.camera;
+    model.stale_cam = model.world.camera;
+    model.old_geo = model.world.geo;
+    model.prev_geo = model.world.geo;
+    model.stale_geo = model.world.geo;
     return model;
 }
 
-void model_update(Model *model)
+static void model_reset_indices(Model *model)
 {
+    model->cam_min_bi = 0;
+    model->cam_max_bi = 0;
+    model->cam_min_si = 0;
+    model->cam_max_si = 0;
+    model->cam_min_li = 0;
+    model->cam_max_li = 0;
+    model->col_min_bi = 0;
+    model->col_max_bi = 0;
+    model->col_min_si = 0;
+    model->col_max_si = 0;
+    model->col_min_li = 0;
+    model->col_max_li = 0;
+}
+
+signed int model_update(Model *model)
+{
+    signed int reset_occurred;
+
     world_update(&model->world);
-    model_update_camera(model);
     model_update_collision(model);
     world_update_collisions(&model->world, model->col_min_bi, model->col_max_bi,
                             model->col_min_si, model->col_max_si,
                             model->col_min_li, model->col_max_li);
-    model_check_death(model);
+    reset_occurred = model_check_death(model);
+    model_update_camera(model);
+
+    return reset_occurred;
 }
 
-void model_check_death(Model *model)
+signed int model_check_death(Model *model)
 {
+    signed int return_value;
+
     if (model->world.geo.is_dead == TRUE)
     {
         world_reset_level(&model->world);
+        model_reset_indices(model);
+        return_value = TRUE;
+    } else {
+        return_value = FALSE;
     }
+
+    return return_value;
 }
 
 void model_update_collision(Model *model)
@@ -62,7 +94,11 @@ void model_update_collision(Model *model)
 }
 
 void model_update_camera(Model *model) {
-    model->old_cam = model->world.camera; /* store old camera for computing deltas in view */
+    model->stale_cam = model->prev_cam;   /* advance: 2-frame-old camera for clearing stale buffer */
+    model->prev_cam  = model->old_cam;    /* shift previous down */
+    model->old_cam   = model->world.camera; /* store current camera */
+    model->stale_geo = model->prev_geo;
+    model->prev_geo = model->old_geo;
     model->old_geo = model->world.geo;
     model_update_camera_bi(model);
     model_update_camera_si(model);

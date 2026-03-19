@@ -23,6 +23,12 @@
 void init_render_buffers(void);
 
 /**
+ * Clear all render/display buffers immediately.
+ * Used when the game state jumps discontinuously, such as on death reset.
+ */
+void clear_render_buffers(void);
+
+/**
  * Get the buffer currently being rendered to.
  * Call this in render() to get the target buffer.
  */

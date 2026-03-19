@@ -15,6 +15,7 @@ int main_game(void)
     Model model = get_model();
     UINT8 quit = FALSE;
     UINT8 game_won = FALSE;
+    signed int died_this_frame;
     unsigned int input;
     signed int current_event;
     unsigned long timeThen, timeNow, timeElapsed;
@@ -43,7 +44,12 @@ int main_game(void)
         timeNow = get_time();
         timeElapsed = timeNow - timeThen;
 
-        on_clock_tick(&model);
+        died_this_frame = on_clock_tick(&model);
+
+        if (died_this_frame == TRUE)
+        {
+            clear_render_buffers();
+        }
 
         current_event = check_level_complete(&model);
         if (current_event == EVENT_LEVEL_DONE) {
@@ -52,10 +58,6 @@ int main_game(void)
 
         render(&model, 0);
 
-        /* I know its a weird order, but for some reason this way works,
-         * and the way that makes sense in my head does not.
-         */
-        swap_buffers();
         Vsync();
 
         timeThen = timeNow;

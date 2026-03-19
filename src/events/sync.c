@@ -13,4 +13,4 @@
  */
 #include "sync.h"
 
-void on_clock_tick(Model *model) { model_update(model); }
+signed int on_clock_tick(Model *model) { return model_update(model); }

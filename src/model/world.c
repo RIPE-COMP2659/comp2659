@@ -50,10 +50,8 @@ World get_world(void)
 
 void world_reset_level(World *world)
 {
-    world->geo.x = CAMERA_OFFSET;
-    world->geo.y = world->ground_y + GEO_SIZE;
-    world->geo.y_scaled = world->geo.y << GEO_PHYSICS_SHIFT;
-    world->geo.is_dead = FALSE;
+    world->geo = create_geo(CAMERA_OFFSET, world->ground_y + GEO_SIZE, world->ground_y);
+    world->camera = create_camera(0, SCREEN_HEIGHT);
 }
 
 void world_update(World *world)

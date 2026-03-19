@@ -65,6 +65,12 @@ void init_render_buffers(void)
     display_index = 0;
 }
 
+void clear_render_buffers(void)
+{
+    clear_screen((UINT32 *)buffers[0]);
+    clear_screen((UINT32 *)buffers[1]);
+}
+
 /**
  * Get pointer to the buffer currently being rendered to.
  */
@@ -148,7 +154,7 @@ void render(const Model *model, UINT8 *base)
 {
     unsigned int i;
     const Camera *cam = &model->world.camera;
-    const Camera *old_cam = &model->old_cam;
+    const Camera *stale_cam = &model->stale_cam;
     int level_i = model->world.level_index;
     Level level = model->world.levels[level_i];
     int input;
@@ -157,16 +163,16 @@ void render(const Model *model, UINT8 *base)
     /* TODO: Refactor function contract to remove base */
     (void)base;
 
-    /*    clear_ground(base, old_cam, model->world.ground_y);
-        clear_blocks(base, old_cam, level.blocks, model->cam_min_bi, model->cam_max_bi);
-        clear_spikes(base, old_cam, level.spikes, model->cam_min_si, model->cam_max_si);
-        clear_lava(base, old_cam, level.lava, model->cam_min_li, model->cam_max_li);
-        clear_geo(base, old_cam, &model->old_geo);  Needed because geo's position isn't static */
+
 
     /* Get the back buffer to render to */
     render_buf = buffers[stale_buffer];
 
-    clear_screen((UINT32 *)render_buf); /* TODO: Get rid of */
+    clear_ground(render_buf, stale_cam, model->world.ground_y);
+    clear_blocks(render_buf, stale_cam, level.blocks, model->cam_min_bi, model->cam_max_bi);
+    clear_spikes(render_buf, stale_cam, level.spikes, model->cam_min_si, model->cam_max_si);
+    clear_lava(render_buf, stale_cam, level.lava, model->cam_min_li, model->cam_max_li);
+    clear_geo(render_buf, stale_cam, &model->stale_geo);
 
     render_ground(model, render_buf);
 
@@ -186,6 +192,11 @@ void render(const Model *model, UINT8 *base)
     }
 
     render_geo(&model->world.geo, cam, render_buf);
+
+            /* I know its a weird order, but for some reason this way works,
+         * and the way that makes sense in my head does not.
+         */
+        swap_buffers();
 }
 
 void clear_geo(UINT8 *base, const Camera *camera, const Geo *geo)
