@@ -58,6 +58,7 @@ void world_reset_level(World *world)
 void world_update(World *world)
 {
     geo_update(&world->geo);
+    /* TODO: Camera tracking is stuck to Geo instead of delayed vertical movement */
     camera_update_coordinates(
         &world->camera,
         world->geo.x - CAMERA_X_OFFSET, 
