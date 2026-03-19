@@ -159,6 +159,7 @@ void geo_update(Geo *geo) {
     geo->x += geo->dx;
     geo->dy += geo->ddy;
 
+    /* TODO: Revisit clamping, might be able to simplify physics */
     if (geo->dy < GEO_TERMINAL_DY_SCALED) {
         geo->dy = GEO_TERMINAL_DY_SCALED;
     }
