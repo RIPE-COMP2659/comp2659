@@ -1,3 +1,17 @@
+/**
+ * raster.h
+ * Authors:
+ *     Riley Gramlich, rgram060@mtroyal.ca, 201762060
+ *     Robert Parker Hutcheson, rhutc335@mtroyal.ca, 201762335
+ *     Isaac Klein, iklei977@mtroyal.ca, 201763977
+ *     Eduard Mykhailets, emykh268@mtroyal.ca, 201750268
+ * Course: COMP 2659-001, Computing Machinery II, Winter 2026
+ * Instructor: Nolan Shaw
+ *
+ * PURPOSE: Public raster plotting API. Declares functions for pixel,
+ *          line, rectangle, bitmap, and character plotting used by
+ *          the renderer and tests.
+ */
 #ifndef RASTER_H
 #define RASTER_H
 

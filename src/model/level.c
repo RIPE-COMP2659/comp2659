@@ -1,3 +1,17 @@
+/**
+ * level.c
+ * Authors:
+ *     Riley Gramlich, rgram060@mtroyal.ca, 201762060
+ *     Robert Parker Hutcheson, rhutc335@mtroyal.ca, 201762335
+ *     Isaac Klein, iklei977@mtroyal.ca, 201763977
+ *     Eduard Mykhailets, emykh268@mtroyal.ca, 201750268
+ * Course: COMP 2659-001, Computing Machinery II, Winter 2026
+ * Instructor: Nolan Shaw
+ *
+ * PURPOSE: Level definitions and helpers. Provides convenience functions
+ *          to create Level structures and returns a static array of
+ *          predefined levels used by the game.
+ */
 #include "level.h"
 
 /* Constants for level sizes */
@@ -9,14 +23,14 @@
 #define L1_LAVA_SIZE 5
 
 Level create_level(
-    Block* blocks,
-    Spike* spikes,
-    Lava* lava,
+    Block *blocks,
+    Spike *spikes,
+    Lava *lava,
     unsigned int blocks_size,
     unsigned int spikes_size,
     unsigned int lava_size,
-    unsigned int end_x
-) {
+    unsigned int end_x)
+{
     Level level;
 
     level.blocks = blocks;
@@ -30,7 +44,8 @@ Level create_level(
     return level;
 }
 
-Level get_level1(void) {
+Level get_level1(void)
+{
     static Block level_blocks[L1_BLOCKS_SIZE];
     static Spike level_spikes[L1_SPIKES_SIZE];
     static Lava level_lava[L1_LAVA_SIZE];
@@ -97,7 +112,8 @@ Level get_level1(void) {
     );
 }
 
-Level* get_levels(void) {
+Level *get_levels(void)
+{
     static Level levels[NUM_LEVELS];
 
     levels[0] = get_level1();

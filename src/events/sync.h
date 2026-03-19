@@ -8,4 +8,4 @@
  *     Model *model:
  *         The game model to be updated, assumed not to be null.
  */
-void on_clock_tick(Model *model);
+signed int on_clock_tick(Model *model);

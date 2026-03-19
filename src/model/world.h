@@ -60,10 +60,9 @@ World create_world(Level *levels, Geo geo, unsigned int ground_y);
 World get_world(void);
 
 /**
- * Resets the current level by resetting geo's position to the start of the
- * level and setting is_dead to false. Note that this does not reset the
- * camera, as it will be updated on the next world_update call, and does not
- * reset any blocks, spikes, or lava, as they are static in our current levels
+ * Resets the current level by resetting geo and camera to the level start.
+ * Blocks, spikes, and lava are not reset because they are static in the
+ * current levels.
  *
  * Params:
  *     World *world:

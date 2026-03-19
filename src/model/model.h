@@ -24,6 +24,12 @@ typedef struct {
     unsigned int col_max_si; /* spike index, collision */
     unsigned int col_min_li; /* lava index, collision */
     unsigned int col_max_li; /* lava index, collision */
+    Camera old_cam;   /* camera from last model_update, for computing camera deltas */
+    Camera prev_cam;  /* camera from 2 updates ago (intermediate shift) */
+    Camera stale_cam; /* camera from 2 updates ago used to clear the stale buffer */
+    Geo old_geo;      /* geo from last model_update */
+    Geo prev_geo;     /* geo from 2 updates ago (intermediate shift) */
+    Geo stale_geo;    /* geo from 2 updates ago used to clear the stale buffer */
 } Model;
 
 /**
@@ -47,13 +53,13 @@ Model get_model(void);
  *     Model *model:
  *         Pointer to the model to update
  */
-void model_update(Model *model);
+signed int model_update(Model *model);
 
 /**
  * Checks if Geo is dead, and if so, resets the level. Called each frame in
  * model_update after updating the world and collisions
  */
-void model_check_death(Model *model);
+signed int model_check_death(Model *model);
 
 /**
  * Updates the camera indices within the model, delegating to each of the

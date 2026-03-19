@@ -15,9 +15,18 @@
 ; OPTIMIZATION: For best performance, use 32-pixel (4-byte) width with word-aligned starting address.
 ; Falls back to generic byte-by-byte clearing for other widths or odd addresses.
 ;
-
-SCREEN_HEIGHT equ 400           
-
+; clr_reg.s
+; Authors:
+;     Riley Gramlich, rgram060@mtroyal.ca, 201762060
+;     Robert Parker Hutcheson, rhutc335@mtroyal.ca, 201762335
+;     Isaac Klein, iklei977@mtroyal.ca, 201763977
+;     Eduard Mykhailets, emykh268@mtroyal.ca, 201750268
+; Course: COMP 2659-001, Computing Machinery II, Winter 2026
+; Instructor: Nolan Shaw
+;
+; PURPOSE: Registers and helpers for clearing regions / color registers.
+;
+SCREEN_HEIGHT equ 400                           ; Screen height in pixels
         xdef    _clear_region
 
 base    equ     8               
@@ -43,7 +52,7 @@ check_top_clip:
         move.w  length(a6),d1
         add.w   d0,d1                           ; d1 = length + row (row is negative)
         ble     done                            ; If still <= 0, entirely off screen
-        move.w  d1,length(a6)                  ; Update length to clipped height
+        move.w  d1,length(a6)                   ; Update length to clipped height
         clr.w   row(a6)                         ; Set row to 0 (top of screen)
         
   
