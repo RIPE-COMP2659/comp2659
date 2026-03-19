@@ -163,8 +163,6 @@ void render(const Model *model, UINT8 *base)
     /* TODO: Refactor function contract to remove base */
     (void)base;
 
-
-
     /* Get the back buffer to render to */
     render_buf = buffers[stale_buffer];
 
@@ -193,10 +191,7 @@ void render(const Model *model, UINT8 *base)
 
     render_geo(&model->world.geo, cam, render_buf);
 
-            /* I know its a weird order, but for some reason this way works,
-         * and the way that makes sense in my head does not.
-         */
-        swap_buffers();
+    swap_buffers();
 }
 
 void clear_geo(UINT8 *base, const Camera *camera, const Geo *geo)
