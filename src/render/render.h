@@ -17,6 +17,42 @@
 #include "../raster/raster.h"
 
 /**
+ * Initialize buffers with proper alignment.
+ * Must be called once before rendering.
+ */
+void init_render_buffers(void);
+
+/**
+ * Clear all render/display buffers immediately.
+ * Used when the game state jumps discontinuously, such as on death reset.
+ */
+void clear_render_buffers(void);
+
+/**
+ * Get the buffer currently being rendered to.
+ * Call this in render() to get the target buffer.
+ */
+UINT8 *get_render_buffer(void);
+
+/**
+ * Get the buffer currently displayed on screen.
+ * Call this in VBL handler to get the buffer to flip to.
+ */
+UINT8 *get_display_buffer(void);
+
+/**
+ * Mark rendering as complete. Call after render() finishes.
+ * The actual buffer swap should happen in VBL interrupt.
+ */
+void mark_render_complete(void);
+
+/**
+ * Swap buffers - call this in VBL interrupt handler.
+ * Swaps stale_buffer and display_index, then updates video base.
+ */
+void swap_buffers(void);
+
+/**
  * The master rendering function, which will render a single frame. Delegates
  * to the remaining render functions in render, only renders objects within
  * the camera's active indices as dictated by the model. Currently clears

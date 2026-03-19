@@ -3,9 +3,17 @@
 ;
 ; void plot_clipped_bitmap(UINT8 *base, UINT16 row, UINT16 col, const void *bitmap, UINT16 height, UINT16 width, UINT16 status, UINT16 new_width);
 ;________________________________________________________________
-
-;--------------------------------------------------------------------------------------------
-;                       !MIGRATE to pass-by-register for faster performance in the future!
+; plt_clp.s
+; Authors:
+;     Riley Gramlich, rgram060@mtroyal.ca, 201762060
+;     Robert Parker Hutcheson, rhutc335@mtroyal.ca, 201762335
+;     Isaac Klein, iklei977@mtroyal.ca, 201763977
+;     Eduard Mykhailets, emykh268@mtroyal.ca, 201750268
+; Course: COMP 2659-001, Computing Machinery II, Winter 2026
+; Instructor: Nolan Shaw
+;
+; PURPOSE: Plot a clipped bitmap region to the screen.
+;
 ;                       This will avoid read/writes to memory, which costs us clock cycles
 ;--------------------------------------------------------------------------------------------
 
@@ -201,6 +209,7 @@ plot_lclip_entry:
                 
         rts
 
+; TODO: THIS MIGHT NOT BE NECESSARY BECAUSE OF PATCH IN RENDERING
 ;----------------------------------------------------------------
 ; Internal subroutine: do_plot_left_clip_shifted
 ; Plots a left-clipped bitmap when abs(col) is not byte-aligned.
