@@ -127,9 +127,9 @@ signed int geo_check_spike_collision(
        Since sy is the top, py is sy at the top and sy - 31 at the bottom. */
 
     /* Top peaks (checking both pixels for the apex) */
-    unsigned int py = spike_y;
-    unsigned int px1 = spike_x + 15;
-    unsigned int px2 = spike_x + 16;
+    signed int py = spike_y;
+    signed int px1 = spike_x + 15;
+    signed int px2 = spike_x + 16;
 
     if ((px1 >= gx_left && px1 <= gx_right && py <= gy_top && py >= gy_bottom) ||
         (px2 >= gx_left && px2 <= gx_right && py <= gy_top && py >= gy_bottom)) {
