@@ -1,3 +1,11 @@
+; plt_pxl.s
+; Authors:
+;     Riley Gramlich, rgram060@mtroyal.ca, 201762060
+;     Robert Parker Hutcheson, rhutc335@mtroyal.ca, 201762335
+;     Isaac Klein, iklei977@mtroyal.ca, 201763977
+;     Eduard Mykhailets, emykh268@mtroyal.ca, 201750268
+; Course: COMP 2659-001, Computing Machinery II, Winter 2026
+; Instructor: Nolan Shaw
 ;
 ; PURPOSE: Plots a single pixel on the screen.
 ;
@@ -24,22 +32,26 @@ _plot_pixel:
         movem.l d0-d2/a0,-(sp)
         movea.l base(a6),a0                     ; get base address
                 
+calc_row_offset:
                 ; Calculate and add row offset: row * 80 bytes
         move.w  row(a6),d0
         mulu.w  #80,d0                          ; screen width in bytes
         adda.l  d0,a0                           ; add row offset
                 
+calc_col_offset:
                 ; Calculate and add col byte offset: col / 8
         move.w  col(a6),d1
         move.w  d1,d2                           ; save col for bit calculation
         lsr.w   #3,d1                           ; d1 = col / 8 (byte offset)
         adda.w  d1,a0                           ; a0 now points to the byte
                 
+calc_bit_pos:
                 ; Calculate bit position: 7 - (col % 8)
         andi.w  #7,d2                           ; d2 = col % 8
         moveq   #7,d0
         sub.w   d2,d0                           ; d0 = 7 - (col % 8) = bit position
                 
+set_pixel_bit:
                 ; Set the bit
         bset    d0,(a0)                         ; set bit d0 in byte at (a0)
 
@@ -47,4 +59,4 @@ _plot_pixel:
         unlk    a6
         rts
 
-                
+        

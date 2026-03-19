@@ -15,9 +15,18 @@
 ; OPTIMIZATION: For best performance, use 32-pixel (4-byte) width with word-aligned starting address.
 ; Falls back to generic byte-by-byte clearing for other widths or odd addresses.
 ;
-
-
-
+; clr_reg.s
+; Authors:
+;     Riley Gramlich, rgram060@mtroyal.ca, 201762060
+;     Robert Parker Hutcheson, rhutc335@mtroyal.ca, 201762335
+;     Isaac Klein, iklei977@mtroyal.ca, 201763977
+;     Eduard Mykhailets, emykh268@mtroyal.ca, 201750268
+; Course: COMP 2659-001, Computing Machinery II, Winter 2026
+; Instructor: Nolan Shaw
+;
+; PURPOSE: Registers and helpers for clearing regions / color registers.
+;
+SCREEN_HEIGHT equ 400                           ; Screen height in pixels
         xdef    _clear_region
 
 base    equ     8               
@@ -27,15 +36,48 @@ length  equ     16
 width   equ     18
 
 
-_clear_region:  
+_clear_region: 
+
         link    a6,#0
-        movem.l d0-d7/a0-a6,-(sp)
+        movem.l d0-d7/a0-a5,-(sp)
+
+                ; Check vertical bounds
+
+check_top_clip:
+                ; Vertical clipping first - check if top edge is off screen
+        move.w  row(a6),d0
+        bge     check_bottom
+
+                ; Handle top clipping (row < 0)
+        move.w  length(a6),d1
+        add.w   d0,d1                           ; d1 = length + row (row is negative)
+        ble     done                            ; If still <= 0, entirely off screen
+        move.w  d1,length(a6)                   ; Update length to clipped height
+        clr.w   row(a6)                         ; Set row to 0 (top of screen)
+        
+  
+check_bottom:
+        move.w  row(a6),d0
+        cmp.w   #SCREEN_HEIGHT,d0
+        bge     done                            ; If row >= SCREEN_HEIGHT, entirely off bottom
+
+        add.w   length(a6),d0                   ; d0 = row + height (bottom edge Y)
+        cmp.w   #SCREEN_HEIGHT,d0
+        ble     v_clip_done                     ; If bottom edge <= SCREEN_HEIGHT, skip bottom clip
+
+                ; Partially off bottom
+        move.w  #SCREEN_HEIGHT,d0
+        sub.w   row(a6),d0                      ; d0 = SCREEN_HEIGHT - row
+        move.w  d0,length(a6)                   ; Update height to fit exactly on screen
+
+v_clip_done:
 
         tst.w   length(a6)                      ; nothing to clear if length == 0
         beq     done
         tst.w   width(a6)                       ; nothing to clear if width == 0
         beq     done
 
+calc_screen_offsets:
         movea.l base(a6),a0                     ; get base address
                 
                 ; Calculate and add row offset: row * 80 bytes
@@ -49,11 +91,17 @@ _clear_region:
         ext.l   d0                              ; extend to long
         adda.l  d0,a0                           ; add col offset in bytes
 
+check_alignment:
                 ; Check if width == 32 pixels (4 bytes) for optimization
         move.w  width(a6),d0
         cmpi.w  #32,d0                          ; check if exactly 32 pixels
         bne     unoptimized
-                
+
+                ; 32-pixel fast path only valid when col is byte-aligned
+        move.w  col(a6),d0
+        andi.w  #7,d0                           ; d0 = col % 8
+        bne     unoptimized
+
                 ; Ensure word alignment for move.l (address must be even)
         move.l  a0,d1
         btst    #0,d1                           ; test if address is odd
@@ -73,7 +121,7 @@ row_loop_32: move.l d1,(a0)                     ; write 1 long (4 bytes)
         adda.w  #80,a0                          ; move to next row (80 bytes per row)
         dbra    d7,row_loop_32
                 
-        movem.l (sp)+,d0-d7/a0-a6
+        movem.l (sp)+,d0-d7/a0-a5
         unlk    a6
         rts
 
@@ -95,6 +143,7 @@ unoptimized:
         addq.w  #7,d6
         lsr.w   #3,d6                           ; d6 = number of bytes touched per row
 
+prep_unoptimized_loop:
         move.w  length(a6),d7
         subq.w  #1,d7                           ; adjust for dbra
 
@@ -177,6 +226,8 @@ next_row:
         dbra    d7,row_loop
 
 done:
-        movem.l (sp)+,d0-d7/a0-a6
+        movem.l (sp)+,d0-d7/a0-a5
         unlk    a6
         rts
+
+        

@@ -14,9 +14,17 @@
 ;
 ; // `char` is a 1 byte integer. This is so that calling scope can do switch cases (returns 2 values because its assembly, and I can do that)
 ;________________________________________________________________
-
-;--------------------------------------------------------------------------------------------
-;                       !MIGRATE to pass-by-register for faster performance in the future!
+; bounds.s
+; Authors:
+;     Riley Gramlich, rgram060@mtroyal.ca, 201762060
+;     Robert Parker Hutcheson, rhutc335@mtroyal.ca, 201762335
+;     Isaac Klein, iklei977@mtroyal.ca, 201763977
+;     Eduard Mykhailets, emykh268@mtroyal.ca, 201750268
+; Course: COMP 2659-001, Computing Machinery II, Winter 2026
+; Instructor: Nolan Shaw
+;
+; PURPOSE: Helper routines for bounding/region calculations used by raster code.
+;
 ;                       This will avoid read/writes to memory, which costs us clock cycles
 ;--------------------------------------------------------------------------------------------
 
@@ -46,6 +54,7 @@ _check_bounds:
 ;
 ; Then check for edge clipping cases
 
+check_x_bounds:
         ; Check if entirely right of screen
         cmpi.w  #640,d1                         ; col >= 640?
         bge     entirely_out
@@ -55,6 +64,7 @@ _check_bounds:
         add.w   d3,d4                           ; d4 = col + width
         blt     entirely_out                    ; if col + width <= 0
 
+check_y_bounds:
         ; Check if entirely below screen
         cmpi.w  #400,d0                         ; row >= 400?
         bgt     entirely_out
@@ -64,6 +74,7 @@ _check_bounds:
         add.w   d2,d4                           ; d4 = row + height
         blt     entirely_out                    ; if row + height <= 0
 
+check_partial_clip:
         ; Now check for partial clipping
         tst.w   d1                              ; col < 0 ?
         blt     left_edge
@@ -112,3 +123,5 @@ done:
         movem.l (sp)+,d2-d7/a0-a5               ; restore registers (d0,d1 have return values)
         unlk    a6
         rts
+
+        

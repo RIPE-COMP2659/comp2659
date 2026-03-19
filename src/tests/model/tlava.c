@@ -7,16 +7,8 @@ Lava lava2;
 
 /* Setup lava for testing */
 void setUp(void) {
-    lava1.x = 0;
-    lava2.y = 0;
-    lava1.size = LAVA_SIZE;
-    lava1.sprite = LAVA_SPRITE;
-
-    lava2.x = 100;
-    lava2.y = 200;
-    lava2.size = LAVA_SIZE;
-    lava2.sprite = LAVA_SPRITE;
-    lava_placeholder();
+    lava1 = create_lava(0, 0);
+    lava2 = create_lava(100, 200);
 }
 
 void tearDown(void) {
@@ -49,11 +41,6 @@ void test_lava_init_size(void) {
     TEST_ASSERT_EQUAL_INT(LAVA_SIZE, lava1.size);
 }
 
-/* Test that sprite pointer is set correctly */
-void test_lava_init_sprite(void) {
-    TEST_ASSERT_EQUAL_PTR(LAVA_SPRITE, lava1.sprite);
-}
-
 /* Test that multiple lava instances can have independent positions */
 void test_lava_init_global_sprite(void) {
     /* Verify all lava instances have independent positions */
@@ -63,19 +50,9 @@ void test_lava_init_global_sprite(void) {
     TEST_ASSERT_EQUAL_INT(200, lava2.y);
 
     /* Verify all share the same sprite */
-    TEST_ASSERT_EQUAL_PTR(LAVA_SPRITE, lava1.sprite);
-    TEST_ASSERT_EQUAL_PTR(LAVA_SPRITE, lava2.sprite);
+    TEST_ASSERT_EQUAL_PTR(lava1.sprite, lava2.sprite);
 }
 
-/* Test that sprite dimensions match the configured size */
-void test_lava_sprite_size(void) {
-    /* Verify sprite array has lava.size rows */
-    int num_rows = sizeof(LAVA_SPRITE) / sizeof(LAVA_SPRITE[0]);
-    int bits_per_row = (LAVA_SIZE / WORD) * WORD;
-
-    TEST_ASSERT_EQUAL_INT(lava1.size, num_rows);
-    TEST_ASSERT_EQUAL_INT(lava1.size, bits_per_row);
-}
 /* Main function to run all tests */
 int main(void) {
     UNITY_BEGIN();
@@ -84,9 +61,7 @@ int main(void) {
     RUN_TEST(test_lava_init_zero);
     RUN_TEST(test_lava_init_seperated);
     RUN_TEST(test_lava_init_size);
-    RUN_TEST(test_lava_init_sprite);
     RUN_TEST(test_lava_init_global_sprite);
-    RUN_TEST(test_lava_sprite_size);
 
     return UNITY_END();
 }

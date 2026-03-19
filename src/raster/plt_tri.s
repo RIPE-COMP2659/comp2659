@@ -18,9 +18,18 @@
 ;________________________________________________________________
 ; Draws a filled right-angled triangle by drawing horizontal lines row by row.
 ; Uses plot_horizontal_line for each scanline.
-
+; plt_tri.s
+; Authors:
+;     Riley Gramlich, rgram060@mtroyal.ca, 201762060
+;     Robert Parker Hutcheson, rhutc335@mtroyal.ca, 201762335
+;     Isaac Klein, iklei977@mtroyal.ca, 201763977
+;     Eduard Mykhailets, emykh268@mtroyal.ca, 201750268
+; Course: COMP 2659-001, Computing Machinery II, Winter 2026
+; Instructor: Nolan Shaw
+;
+; PURPOSE: Plots a triangle on the screen given by the coordinate of the 90° angle, the length of the base, the length of the height, and the direction of the triangle.
+;
         xdef    _plot_triangle
-        xref    _plot_horizontal_line
 
 base    equ     8                               ; UINT32* (4 bytes)
 row     equ     12                              ; UINT16 (2 bytes)
@@ -29,50 +38,43 @@ base_tri equ    16                              ; UINT16 (2 bytes)
 height  equ     18                              ; UINT16 (2 bytes)
 direction equ   20                              ; UINT8 (1 byte, but padded to 2)
 
-
 _plot_triangle:
         link    a6,#0
-        movem.l d0-d7/a0-a6,-(sp)
+        movem.l d0-d7/a0-a1,-(sp)
                 
-                ; Check direction and branch
-        move.b  direction(a6),d0
-        andi.w  #$ff,d0                         ; clear upper byte
+        ; Check height and direction
+        move.w  height(a6),d7                   ; d7 = total height
+        beq     done                            ; if height = 0, exit
+        
+        move.w  direction(a6),d0
+        andi.w  #3,d0                           ; mask to 4 valid directions (0,1,2,3)
+        
         cmpi.w  #0,d0
         beq     dir_top_left
         cmpi.w  #1,d0
         beq     dir_top_right
         cmpi.w  #2,d0
         beq     dir_bottom_left
-        cmpi.w  #3,d0
-        beq     dir_bottom_right
-        bra     done                            ; invalid direction
+        bra     dir_bottom_right
 
 dir_top_left:
-                ; Direction 0: 90° angle at top-left
-                ; Triangle expands rightward and downward
-                ; Row i has line of length: (base * (i+1)) / height
+        ; Direction 0: 90° angle at top-left
+        ; Triangle expands rightward and downward
+        ; Row i has line of length: (base * (height - i)) / height
                 
-        move.w  height(a6),d7                   ; loop counter
-        beq     done                            ; if height = 0, exit
-        subq.w  #1,d7                           ; adjust for dbra
         moveq   #0,d6                           ; current row offset (0 to height-1)
+        subq.w  #1,d7                           ; adjust for dbra
                 
-tl_loop:                                        ; Calculate line length: (base_tri * (d6 + 1)) / height
-        move.w  d6,d0
-        addq.w  #1,d0                           ; d0 = row_offset + 1
-        move.w  base_tri(a6),d1
-        mulu.w  d1,d0                           ; d0 = base * (row_offset + 1)
-        move.w  height(a6),d1
-        divu.w  d1,d0                           ; d0 = (base * (row_offset + 1)) / height
+tl_loop:
+        bsr     calc_length                     ; d0 = calculated line length
+        
+        move.w  row(a6),d1
+        add.w   d6,d1                           ; current_row = row + d6
                 
-                ; Draw horizontal line at (row + d6, col, length = d0)
-        move.w  row(a6),d2
-        add.w   d6,d2                           ; current_row = row + d6
-                
-                ; Call plot_horizontal_line(base, current_row, col, length)
+        ; Call plot_horizontal_line(base, current_row, col, length)
         move.w  d0,-(sp)                        ; push length
         move.w  col(a6),-(sp)                   ; push col
-        move.w  d2,-(sp)                        ; push current_row
+        move.w  d1,-(sp)                        ; push current_row
         move.l  base(a6),-(sp)                  ; push base
         jsr     _plot_horizontal_line
         adda.w  #10,sp                          ; clean up stack (4+2+2+2)
@@ -82,32 +84,25 @@ tl_loop:                                        ; Calculate line length: (base_t
         bra     done
 
 dir_top_right:
-                ; Direction 1: 90° angle at top-right
-                ; Triangle expands leftward and downward
-                ; Row i has line of length: (base * (i+1)) / height, ending at col
+        ; Direction 1: 90° angle at top-right
+        ; Triangle expands leftward and downward
                 
-        move.w  height(a6),d7
-        beq     done
-        subq.w  #1,d7
-        moveq   #0,d6
+        moveq   #0,d6                           ; current row offset
+        subq.w  #1,d7                           ; adjust for dbra
                 
-tr_loop: move.w d6,d0
-        addq.w  #1,d0
-        move.w  base_tri(a6),d1
-        mulu.w  d1,d0
-        move.w  height(a6),d1
-        divu.w  d1,d0                           ; d0 = line length
+tr_loop:
+        bsr     calc_length                     ; d0 = calculated line length
+        
+        move.w  row(a6),d1
+        add.w   d6,d1                           ; current_row = row + d6
+        
+        move.w  col(a6),d2
+        sub.w   d0,d2                           ; start_col = col - length
                 
-        move.w  row(a6),d2
-        add.w   d6,d2                           ; current_row
-                
-        move.w  col(a6),d3
-        sub.w   d0,d3                           ; start_col = col - length
-                
-                ; Call plot_horizontal_line(base, current_row, start_col, length)
+        ; Call plot_horizontal_line(base, current_row, start_col, length)
         move.w  d0,-(sp)
-        move.w  d3,-(sp)
         move.w  d2,-(sp)
+        move.w  d1,-(sp)
         move.l  base(a6),-(sp)
         jsr     _plot_horizontal_line
         adda.w  #10,sp
@@ -117,70 +112,74 @@ tr_loop: move.w d6,d0
         bra     done
 
 dir_bottom_left:
-                ; Direction 2: 90° angle at bottom-left
-                ; Triangle expands rightward and upward
-                ; Row i (from top) has line of length: (base * i) / height
+        ; Direction 2: 90° angle at bottom-left
+        ; Triangle expands rightward and upward
                 
-        move.w  height(a6),d7
-        beq     done
-        subq.w  #1,d7
-        move.w  d7,d6                           ; start from height-1, go down to 0
+        moveq   #0,d6                           ; current row offset
+        subq.w  #1,d7                           ; adjust for dbra
                 
-bl_loop: move.w d6,d0
-        addq.w  #1,d0
-        move.w  base_tri(a6),d1
-        mulu.w  d1,d0
-        move.w  height(a6),d1
-        divu.w  d1,d0                           ; d0 = line length
+bl_loop:
+        bsr     calc_length                     ; d0 = calculated line length
+        
+        move.w  row(a6),d1
+        sub.w   d6,d1                           ; current_row = row - d6 (going upward)
                 
-        move.w  row(a6),d2
-        sub.w   d6,d2                           ; current_row = row - d6 (going upward)
-                
-                ; Call plot_horizontal_line(base, current_row, col, length)
+        ; Call plot_horizontal_line(base, current_row, col, length)
         move.w  d0,-(sp)
         move.w  col(a6),-(sp)
-        move.w  d2,-(sp)
+        move.w  d1,-(sp)
         move.l  base(a6),-(sp)
         jsr     _plot_horizontal_line
         adda.w  #10,sp
                 
-        dbra    d6,bl_loop
+        addq.w  #1,d6
+        dbra    d7,bl_loop
         bra     done
 
 dir_bottom_right:
-                ; Direction 3: 90° angle at bottom-right
-                ; Triangle expands leftward and upward
+        ; Direction 3: 90° angle at bottom-right
+        ; Triangle expands leftward and upward
                 
-        move.w  height(a6),d7
-        beq     done
-        subq.w  #1,d7
-        move.w  d7,d6
+        moveq   #0,d6                           ; current row offset
+        subq.w  #1,d7                           ; adjust for dbra
                 
-br_loop: move.w d6,d0
-        addq.w  #1,d0
-        move.w  base_tri(a6),d1
-        mulu.w  d1,d0
-        move.w  height(a6),d1
-        divu.w  d1,d0                           ; d0 = line length
+br_loop:
+        bsr     calc_length                     ; d0 = calculated line length
+        
+        move.w  row(a6),d1
+        sub.w   d6,d1                           ; current_row = row - d6 (going upward)
+        
+        move.w  col(a6),d2
+        sub.w   d0,d2                           ; start_col = col - length
                 
-        move.w  row(a6),d2
-        sub.w   d6,d2                           ; current_row = row - d6
-                
-        move.w  col(a6),d3
-        sub.w   d0,d3                           ; start_col = col - length
-                
-                ; Call plot_horizontal_line(base, current_row, start_col, length)
+        ; Call plot_horizontal_line(base, current_row, start_col, length)
         move.w  d0,-(sp)
-        move.w  d3,-(sp)
         move.w  d2,-(sp)
+        move.w  d1,-(sp)
         move.l  base(a6),-(sp)
         jsr     _plot_horizontal_line
         adda.w  #10,sp
                 
-        dbra    d6,br_loop
+        addq.w  #1,d6
+        dbra    d7,br_loop
+        bra     done
+
+
+; ---------------------------------------------------------------
+; Helper Routine: calc_length
+; Calculates the length of the horizontal line for the current row
+; Equation: d0 = (base_tri * (height - d6)) / height
+; ---------------------------------------------------------------
+calc_length:
+        move.w  height(a6),d0
+        sub.w   d6,d0                           ; d0 = remaining height
+        mulu.w  base_tri(a6),d0                 ; d0 = base_tri * remaining height
+        divu.w  height(a6),d0                   ; d0 = (base_tri * remaining height) / total height
+        rts
 
 done:
-        movem.l (sp)+,d0-d7/a0-a6
+        movem.l (sp)+,d0-d7/a0-a1
         unlk    a6
         rts
 
+        
