@@ -24,12 +24,8 @@ typedef struct {
     unsigned int col_max_si; /* spike index, collision */
     unsigned int col_min_li; /* lava index, collision */
     unsigned int col_max_li; /* lava index, collision */
-    Camera old_cam;   /* camera from last model_update, for computing camera deltas */
     Camera prev_cam;  /* camera from 2 updates ago (intermediate shift) */
-    Camera stale_cam; /* camera from 2 updates ago used to clear the stale buffer */
-    Geo old_geo;      /* geo from last model_update */
     Geo prev_geo;     /* geo from 2 updates ago (intermediate shift) */
-    Geo stale_geo;    /* geo from 2 updates ago used to clear the stale buffer */
 } Model;
 
 /**

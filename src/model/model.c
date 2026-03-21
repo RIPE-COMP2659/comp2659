@@ -30,12 +30,8 @@ Model get_model(void)
     model.col_min_li = 0; /* lava index, collision */
     model.col_max_li = 0; /* lava index, collision */
     model.world = get_world();
-    model.old_cam = model.world.camera;
     model.prev_cam = model.world.camera;
-    model.stale_cam = model.world.camera;
-    model.old_geo = model.world.geo;
     model.prev_geo = model.world.geo;
-    model.stale_geo = model.world.geo;
     return model;
 }
 
@@ -58,6 +54,10 @@ static void model_reset_indices(Model *model)
 signed int model_update(Model *model)
 {
     signed int reset_occurred;
+
+    /* Save N-1 before world_update moves camera and geo to N */
+    model->prev_cam = model->world.camera;
+    model->prev_geo = model->world.geo;
 
     world_update(&model->world);
     model_update_collision(model);
@@ -94,12 +94,6 @@ void model_update_collision(Model *model)
 }
 
 void model_update_camera(Model *model) {
-    model->stale_cam = model->prev_cam;   /* advance: 2-frame-old camera for clearing stale buffer */
-    model->prev_cam  = model->old_cam;    /* shift previous down */
-    model->old_cam   = model->world.camera; /* store current camera */
-    model->stale_geo = model->prev_geo;
-    model->prev_geo = model->old_geo;
-    model->old_geo = model->world.geo;
     model_update_camera_bi(model);
     model_update_camera_si(model);
     model_update_camera_li(model);
