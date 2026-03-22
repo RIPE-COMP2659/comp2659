@@ -15,6 +15,8 @@
 #ifndef RASTER_H
 #define RASTER_H
 
+#include "../shared/dtypes.h"
+
 #define BYTES_PER_SCREEN 32000
 
 /*
@@ -23,15 +25,6 @@
  Calling scope should only need to refer to this file for usage.
 
 */
-/* Type definitions for signed and unsigned integers */
-typedef char INT8;
-typedef short INT16;
-typedef long INT32;
-
-typedef unsigned char UINT8;
-typedef unsigned short UINT16;
-typedef unsigned long UINT32;
-
 /*----- Function: clear_screen -----
 
 PURPOSE: Clears the entire screen.
