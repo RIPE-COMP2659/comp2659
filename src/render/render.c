@@ -202,9 +202,12 @@ void render(const Model *model, UINT8 *base)
     /* Step 4: Clear F (now stale) using N-1 (prev_cam, prev_geo) */
     clear_buf = buffers[stale_buffer];
     clear_ground(clear_buf, prev_cam, model->world.ground_y);
-    clear_blocks(clear_buf, prev_cam, level.blocks, model->cam_min_bi, model->cam_max_bi);
-    clear_spikes(clear_buf, prev_cam, level.spikes, model->cam_min_si, model->cam_max_si);
-    clear_lava(clear_buf, prev_cam, level.lava, model->cam_min_li, model->cam_max_li);
+    clear_blocks(clear_buf, prev_cam, level.blocks,
+                 model->cam_min_bi_prev, model->cam_max_bi_prev);
+    clear_spikes(clear_buf, prev_cam, level.spikes,
+                 model->cam_min_si_prev, model->cam_max_si_prev);
+    clear_lava(clear_buf, prev_cam, level.lava,
+               model->cam_min_li_prev, model->cam_max_li_prev);
     clear_geo(clear_buf, prev_cam, &model->prev_geo);
 
 

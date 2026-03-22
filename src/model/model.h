@@ -18,6 +18,12 @@ typedef struct {
     unsigned int cam_max_si; /* spike index, camera */
     unsigned int cam_min_li; /* lava index, camera */
     unsigned int cam_max_li; /* lava index, camera */
+    unsigned int cam_min_bi_prev; /* block index, camera, previous update */
+    unsigned int cam_max_bi_prev; /* block index, camera, previous update */
+    unsigned int cam_min_si_prev; /* spike index, camera, previous update */
+    unsigned int cam_max_si_prev; /* spike index, camera, previous update */
+    unsigned int cam_min_li_prev; /* lava index, camera, previous update */
+    unsigned int cam_max_li_prev; /* lava index, camera, previous update */
     unsigned int col_min_bi; /* block index, collision */
     unsigned int col_max_bi; /* block index, collision */
     unsigned int col_min_si; /* spike index, collision */

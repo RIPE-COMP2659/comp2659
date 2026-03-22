@@ -23,6 +23,12 @@ Model get_model(void)
     model.cam_max_si = 0; /* spike index, camera */
     model.cam_min_li = 0; /* lava index, camera */
     model.cam_max_li = 0; /* lava index, camera */
+    model.cam_min_bi_prev = 0; /* block index, camera, previous update */
+    model.cam_max_bi_prev = 0; /* block index, camera, previous update */
+    model.cam_min_si_prev = 0; /* spike index, camera, previous update */
+    model.cam_max_si_prev = 0; /* spike index, camera, previous update */
+    model.cam_min_li_prev = 0; /* lava index, camera, previous update */
+    model.cam_max_li_prev = 0; /* lava index, camera, previous update */
     model.col_min_bi = 0; /* block index, collision */
     model.col_max_bi = 0; /* block index, collision */
     model.col_min_si = 0; /* spike index, collision */
@@ -37,12 +43,21 @@ Model get_model(void)
 
 static void model_reset_indices(Model *model)
 {
+    /* TODO: The cam_*_prev don't need to happen, no time to resolve bug */
+    /* Ideally the indices would not need the previous state */
+    /* Instead something like rendering might increase the min index */
     model->cam_min_bi = 0;
     model->cam_max_bi = 0;
     model->cam_min_si = 0;
     model->cam_max_si = 0;
     model->cam_min_li = 0;
     model->cam_max_li = 0;
+    model->cam_min_bi_prev = 0;
+    model->cam_max_bi_prev = 0;
+    model->cam_min_si_prev = 0;
+    model->cam_max_si_prev = 0;
+    model->cam_min_li_prev = 0;
+    model->cam_max_li_prev = 0;
     model->col_min_bi = 0;
     model->col_max_bi = 0;
     model->col_min_si = 0;
@@ -55,9 +70,14 @@ signed int model_update(Model *model)
 {
     signed int reset_occurred;
 
-    /* Save N-1 before world_update moves camera and geo to N */
     model->prev_cam = model->world.camera;
     model->prev_geo = model->world.geo;
+    model->cam_min_bi_prev = model->cam_min_bi;
+    model->cam_max_bi_prev = model->cam_max_bi;
+    model->cam_min_si_prev = model->cam_min_si;
+    model->cam_max_si_prev = model->cam_max_si;
+    model->cam_min_li_prev = model->cam_min_li;
+    model->cam_max_li_prev = model->cam_max_li;
 
     world_update(&model->world);
     model_update_collision(model);
