@@ -1,7 +1,7 @@
 #ifndef BLOCK_H
 #define BLOCK_H
 
-#include "dtypes.h"
+#include "../shared/dtypes.h"
 
 /* Global size of all blocks and their sprites */
 #define BLOCK_SIZE 32

@@ -12,7 +12,7 @@
  */
 
 #include "../../input/input.h"
-#include "../../model/dtypes.h"
+#include "../../shared/dtypes.h"
 #include <osbind.h>
 
 int main() {
