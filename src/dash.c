@@ -58,8 +58,6 @@ int main_game(void)
 
         render(&model, 0);
 
-        Vsync();
-
         timeThen = timeNow;
     }
     return 0;
