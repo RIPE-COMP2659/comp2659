@@ -1,7 +1,7 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-#include "dtypes.h"
+#include "../shared/dtypes.h"
 
 /* NOTE: Missing some documentation on the funny business with how these
  * offsets work when passed to raster functions. */

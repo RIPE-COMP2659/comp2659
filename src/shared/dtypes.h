@@ -8,9 +8,7 @@
  * Course: COMP 2659-001, Computing Machinery II, Winter 2026
  * Instructor: Nolan Shaw
  *
- * PURPOSE: Shared data type and constant definitions used throughout
- *          the model and rendering subsystems (booleans, sizes,
- *          screen dimensions and collision codes).
+ * Shared data type and constant definitions used throughout the game.
  */
 #ifndef DTYPES_H
 #define DTYPES_H
