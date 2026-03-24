@@ -65,6 +65,7 @@ UINT8 read_psg(unsigned int reg) {
 
 /** See psg.h for documentation */
 void set_tone(unsigned int channel, unsigned int tuning) {
+    /* Tuning is 1111 1111 1111 at max */
     if (channel <= 2 && tuning <= 0xFFF) {
         write_psg(channel * 2, tuning & 0xFF); /* Fine for lower 8 bits */
         write_psg(channel * 2 + 1, (tuning >> 8) & 0x0F); /* Coarse for upper 4 */
@@ -73,7 +74,7 @@ void set_tone(unsigned int channel, unsigned int tuning) {
 
 /** See psg.h for documentation */
 void set_volume(unsigned int channel, unsigned int volume) {
-    if (channel <= 2 && volume <= 0x0F) {
+    if (channel <= 2 && volume <= 15) {
         write_psg(LEVEL_A + channel, volume);
     }
 }
@@ -85,29 +86,21 @@ void enable_channel(
     unsigned int tone_on,
     unsigned int noise_on
 ) {
-    UINT8 mixer;
-    UINT8 tone_mask;
-    UINT8 noise_mask;
-
+    /* NOTE: We could remove some variables for slight speed increase at
+       the cost of readability */
     if (channel <= 2 && tone_on <= 1 && noise_on <= 1) {
-        mixer = read_psg(MIXER);
+        /* Flip bits because it's enabled on low */
+        /* Importantly, it goes CBACBA for the lower six bits, where top 3 
+           are the noise bits and bottom 3 are the tone bits */
+        UINT8 mask = (!noise_on << (channel + 3)) | (!tone_on << channel);
+        UINT8 current_mix = read_psg(MIXER);
 
-        tone_mask = (UINT8)(1u << channel);
-        noise_mask = (UINT8)(1u << (channel + 3));
+        /* Clear the bits for the channel we're changing */
+        current_mix = current_mix & ~(0x09 << channel);
+        /* Then set the new values */
+        current_mix = current_mix | mask;
 
-        if (tone_on) {
-            mixer = (UINT8)(mixer & (UINT8)(~tone_mask));
-        } else {
-            mixer = (UINT8)(mixer | tone_mask);
-        }
-
-        if (noise_on) {
-            mixer = (UINT8)(mixer & (UINT8)(~noise_mask));
-        } else {
-            mixer = (UINT8)(mixer | noise_mask);
-        }
-
-        write_psg(MIXER, mixer);
+        write_psg(MIXER, current_mix);
     }
 }
 
