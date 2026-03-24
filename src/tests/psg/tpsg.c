@@ -65,9 +65,9 @@ void test_read_psg(void) {
 
     fine = read_psg(0);
     if (fine == 248) {
-        Cconws("test_read_psg: Fine passed...\r\n");
+        Cconws("test_read_psg: Fine test passed...\r\n");
     } else {
-        Cconws("test_read_psg: Fine failed, expected 248, got ");
+        Cconws("test_read_psg: Fine test failed, expected 248, got ");
         print_uint((unsigned int)fine);
         Cconws("\r\n");
     }
@@ -87,12 +87,25 @@ void test_set_tone(void) {
     Cnecin();
 }
 
+void test_set_volume(void) {
+    Cconws("test_set_volume: Setting channel A volume to 15, "
+           "press any key to continue...\r\n");
+    set_volume(0, 15);
+    Cnecin();
+
+    Cconws("test_set_volume: Setting channel A volume to 0, "
+           "press any key to continue...\r\n");
+    set_volume(0, 0);
+    Cnecin();
+}
+
 int main() {
     Cconws("PSG test started...\r\n");
 
     test_write_psg();
     test_read_psg();
     test_set_tone();
+    test_set_volume();
 
     return 0;
 }
