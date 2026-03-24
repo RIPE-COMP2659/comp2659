@@ -88,3 +88,13 @@ void enable_channel(
  * Silences all PSG sound production
  */
 void stop_sound();
+
+/**
+ * The following functions are the same as the above, without input validation
+ * or super calls. The above functions all wrap their quick counterpart. So if
+ * they work, then so do their quick counterparts
+ */
+void write_psg_q(unsigned int reg, UINT8 val);
+UINT8 read_psg_q(unsigned int reg);
+void set_tone_q(unsigned int channel, unsigned int tuning);
+void set_volume_q(unsigned int channel, unsigned int volume);

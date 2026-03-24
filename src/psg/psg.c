@@ -35,12 +35,17 @@ void write_psg(unsigned int reg, UINT8 val) {
     if (reg <= IO_PORT_B) {
         long old_ssp = Super(0);
 
-        *REG_SELECT_PTR = reg;
-        *REG_WRITE_PTR = val;
+        write_psg_q(reg, val);
 
         Super(old_ssp);
     }
 };
+
+/** See psg.h for documentation */
+void write_psg_q(unsigned int reg, UINT8 val) {
+    *REG_SELECT_PTR = reg;
+    *REG_WRITE_PTR = val;
+}
 
 /** See psg.h for documentation */
 UINT8 read_psg(unsigned int reg) {
@@ -49,8 +54,7 @@ UINT8 read_psg(unsigned int reg) {
         long old_ssp = Super(0);
         UINT8 value;
 
-        *REG_SELECT_PTR = reg;
-        value = *REG_READ_PTR;
+        value = read_psg_q(reg);
 
         Super(old_ssp);
 
@@ -64,19 +68,48 @@ UINT8 read_psg(unsigned int reg) {
 };
 
 /** See psg.h for documentation */
+UINT8 read_psg_q(unsigned int reg) {
+    *REG_SELECT_PTR = reg;
+    return *REG_READ_PTR;
+}
+
+/** See psg.h for documentation */
 void set_tone(unsigned int channel, unsigned int tuning) {
     /* Tuning is 1111 1111 1111 at max */
     if (channel <= 2 && tuning <= 0xFFF) {
-        write_psg(channel * 2, tuning & 0xFF); /* Fine for lower 8 bits */
-        write_psg(channel * 2 + 1, (tuning >> 8) & 0x0F); /* Coarse for upper 4 */
+        long old_ssp = Super(0);
+
+        set_tone_q(channel, tuning);
+
+        Super(old_ssp);
     }
+}
+
+/** See psg.h for documentation */
+void set_tone_q(unsigned int channel, unsigned int tuning) {
+    /* NOTE: Do not hand-modify this code, copy write_psg / write_psg_q
+       This just speeds up function calls */
+    *REG_SELECT_PTR = channel * 2;
+    *REG_WRITE_PTR = tuning & 0xFF;
+    *REG_SELECT_PTR = channel * 2 + 1;
+    *REG_WRITE_PTR = (tuning >> 8) & 0x0F;
 }
 
 /** See psg.h for documentation */
 void set_volume(unsigned int channel, unsigned int volume) {
     if (channel <= 2 && volume <= 15) {
-        write_psg(LEVEL_A + channel, volume);
+        long old_ssp = Super(0);
+
+        set_volume_q(channel, volume);
     }
+}
+
+/** See psg.h for documentation */
+void set_volume_q(unsigned int channel, unsigned int volume) {
+    /* NOTE: Do not hand-modify this code, copy write_psg / write_psg_q
+       This just speeds up function calls */
+    *REG_SELECT_PTR = LEVEL_A + channel;
+    *REG_WRITE_PTR = volume;
 }
 
 /* TODO: Below this point needs love, same with accompanying tests */
