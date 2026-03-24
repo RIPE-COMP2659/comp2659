@@ -78,6 +78,7 @@ void set_volume(unsigned int channel, unsigned int volume) {
     }
 }
 
+/* TODO: Below this point needs love, same with accompanying tests */
 /** See psg.h for documentation */
 void enable_channel(
     unsigned int channel,
