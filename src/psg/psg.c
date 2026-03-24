@@ -25,16 +25,7 @@
 #define REG_SELECT_PTR  ((volatile char *)0xFF8800)
 #define REG_WRITE_PTR   ((volatile char *)0xFF8802)
 
-/**
- * Writes the given byte value (0-255) to the given PSG register (0-15). This
- * is a helper routine to be used by the other functions in this module
- *
- * Params:
- *     unsigned int reg:
- *         The PSG register to write to (0-15)
- *     UINT8 val:
- *         The value to write to the PSG register (0-255)
- */
+/** See psg.h for documentation */
 void write_psg(unsigned int reg, UINT8 val) {
     /* Checking 0 <= val <= 255 is redundant because of data type */
     /* Checking 0 <= reg is redundant because of data type*/
@@ -48,18 +39,23 @@ void write_psg(unsigned int reg, UINT8 val) {
     }
 };
 
-int main()
-{
-    write_psg(A_FINE, 248);		/* set channel A fine tune = 248 */
-    write_psg(A_COARSE, 50);	/* set channel A coarse tune = 50 */
-    write_psg(MIXER, 0x3E);	/* enable channel A on mixer */
-    write_psg(LEVEL_A, 11);	/* set channel A volume = 11 */
+/** See psg.h for documentation */
+UINT8 read_psg(unsigned int reg) {
+    /* Checking 0 <= reg is redundant because of data type */
+    if (reg <= IO_PORT_B) {
+        long old_ssp = Super(0);
+        UINT8 value;
 
-	while (!Cconis())		/* tone now playing, await key */
-		;
+        *REG_SELECT_PTR = reg;
+        value = *REG_WRITE_PTR;
 
-    write_psg(LEVEL_A, 0);	/* set channel A volume = 0 */
+        Super(old_ssp);
 
-	Cnecin();
-	return 0;
-}
+        return value;
+    } else {
+        /* There's not a graceful way to handle this, returning a value gives
+           a false sense of confidence, but there's no way to give an error
+           code */
+        Pterm(1);
+    }
+};

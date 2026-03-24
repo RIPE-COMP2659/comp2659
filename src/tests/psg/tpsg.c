@@ -33,10 +33,32 @@ void test_write_psg(void) {
         ;
 }
 
+void test_read_psg(void) {
+    UINT8 fine;
+    UINT8 coarse;
+
+    write_psg(0, 248); /* set channel A fine tune = 248 */
+    write_psg(1, 50); /* set channel A coarse tune = 50 */
+
+    fine = read_psg(0);
+    coarse = read_psg(1);
+
+    if (fine == 248 && coarse == 50) {
+        Cconws("test_read_psg: Passed\r\n");
+    } else {
+        Cconws("test_read_psg: Failed\r\n");
+    }
+
+    Cconws("Press any key to continue...\r\n");
+    while (!Cconis())
+        ;
+}
+
 int main() {
     Cconws("PSG test started...\r\n");
 
     test_write_psg();
+    test_read_psg();
 
     return 0;
 }
