@@ -29,7 +29,9 @@ void write_psg(unsigned int reg, UINT8 val);
 
 /**
  * Useful for testing purposes, but unlikely to be used in either the music
- * or effects modules
+ * or effects modules. Do not use this function in rapid succession, because
+ * there are timing issues with the reading. Otherwise the register doesn't
+ * have time to update
  *
  * Params:
  *     unsigned int reg:
@@ -48,9 +50,9 @@ UINT8 read_psg(unsigned int reg);
  *     unsigned int reg:
  *         The channel the tone will play from, 0=A, 1=B, 2=C
  *     unsigned int tuning:
- *         The 12-bit tuning value to load into the tone registers, the coarse
- *         register gets the upper 8 bits, and the fine register gets the
- *         lower 4 bits
+ *         The 12-bit tuning value to load into the tone registers, the fine
+ *         register gets the lower 8 bits, and the coarse register gets the
+ *         upper 4 bits
  */
 void set_tone(unsigned int channel, unsigned int tuning);
 
