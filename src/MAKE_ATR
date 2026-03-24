@@ -16,6 +16,7 @@ RENDER_FOLDER = render
 TESTS_FOLDER = tests
 EVENTS_FOLDER = events
 INPUT_FOLDER = input
+PSG_FOLDER = psg
 CLOCK_FOLDER = clock
 SHARED_FOLDER = shared
 TESTS_MODEL_FOLDER = $(TESTS_FOLDER)\$(MODEL_FOLDER)
@@ -23,6 +24,7 @@ TESTS_RASTER_FOLDER = $(TESTS_FOLDER)\$(RASTER_FOLDER)
 TESTS_RENDER_FOLDER = $(TESTS_FOLDER)\$(RENDER_FOLDER)
 TESTS_EVENTS_FOLDER = $(TESTS_FOLDER)\$(EVENTS_FOLDER)
 TESTS_INPUT_FOLDER = $(TESTS_FOLDER)\$(INPUT_FOLDER)
+TESTS_PSG_FOLDER = $(TESTS_FOLDER)\$(PSG_FOLDER)
 TESTS_CLOCK_FOLDER = $(TESTS_FOLDER)\$(CLOCK_FOLDER)
 UNITY_FOLDER = $(TESTS_FOLDER)\unity
 
@@ -36,6 +38,9 @@ CLOCK = clock
 
 # File Names, Base - Input
 INPUT = input
+
+# File Names, Base - PSG
+PSG = psg
 
 # File Names, Base - Model
 BLOCK  = block
@@ -116,6 +121,9 @@ TSYNC = t${SYNC}
 # File Names, Tests - Input
 TINPUT = t${INPUT}
 
+# File Names, Tests - PSG
+TPSG = t${PSG}
+
 # File Names, Tests - Model
 TBLOCK = t${BLOCK}
 TGEO   = t${GEO}
@@ -193,6 +201,9 @@ $(SYNC).o: $(EVENTS_FOLDER)\$(SYNC).c $(EVENTS_FOLDER)\$(SYNC).h $(SHARED_FOLDER
 $(INPUT).o: $(INPUT_FOLDER)\$(INPUT).c $(INPUT_FOLDER)\$(INPUT).h $(SHARED_FOLDER)\dtypes.h
 	$(ATARI_CC) $(TOS_FLAGS) $(INPUT_FOLDER)\$(INPUT).c -o $(INPUT).o
 
+$(PSG).o: $(PSG_FOLDER)\$(PSG).c $(PSG_FOLDER)\$(PSG).h $(SHARED_FOLDER)\dtypes.h
+	$(ATARI_CC) $(TOS_FLAGS) $(PSG_FOLDER)\$(PSG).c -o $(PSG).o
+
 $(RENDER).o: $(RENDER_FOLDER)\$(RENDER).c $(RENDER_FOLDER)\$(RENDER).h $(SHARED_FOLDER)\dtypes.h $(RASTER_FOLDER)\$(RASTER).h
 	$(ATARI_CC) $(TOS_FLAGS) $(RENDER_FOLDER)\$(RENDER).c -o $(RENDER).o
 
@@ -248,6 +259,10 @@ $(TSYNC):
 # ----- Input Test Builds ----------------------------------------------------
 $(TINPUT): $(INPUT).o
 	$(ATARI_CC) $(MAIN_FLAGS) $(TESTS_INPUT_FOLDER)\$(TINPUT).c $(INPUT).o -o $(TINPUT).tos
+
+# ----- PSG Test Builds ------------------------------------------------------
+$(TPSG): $(PSG).o
+	$(ATARI_CC) $(MAIN_FLAGS) $(TESTS_PSG_FOLDER)\$(TPSG).c $(PSG).o -o $(TPSG).tos
 
 
 # TODO: For some of these, there is cascading dependencies on objects, eg chr
@@ -307,7 +322,7 @@ $(TCLOCK): $(CLOCK).o
 
 
 # ----- Test Execution -------------------------------------------------------
-test: $(TINPUT) $(TBLOCK) $(TGEO) $(TLAVA) $(TLEVEL) $(TSPIKE) $(TWORLD) $(TMODEL) $(TCAMERA) $(TRENDER) $(TASYNC) $(TCOND) $(TSYNC) $(TCLR_SCN) $(TCLR_REG) $(TPLT_PXL) $(TPLT_HOR) $(TPLT_VRT) $(TPLT_LIN) $(TPLT_REC) $(TPLT_SQR) $(TPLT_TRI) $(TBMAP_8) $(TBMAP_16) $(TBMAP_32) $(TPLT_CHR) $(TPLT_STR) $(TBOUNDS) $(TPLT_CLIP)
+test: $(TINPUT) $(TPSG) $(TBLOCK) $(TGEO) $(TLAVA) $(TLEVEL) $(TSPIKE) $(TWORLD) $(TMODEL) $(TCAMERA) $(TRENDER) $(TASYNC) $(TCOND) $(TSYNC) $(TCLR_SCN) $(TCLR_REG) $(TPLT_PXL) $(TPLT_HOR) $(TPLT_VRT) $(TPLT_LIN) $(TPLT_REC) $(TPLT_SQR) $(TPLT_TRI) $(TBMAP_8) $(TBMAP_16) $(TBMAP_32) $(TPLT_CHR) $(TPLT_STR) $(TBOUNDS) $(TPLT_CLIP)
 	$(TBLOCK).ut
 	$(TGEO).ut
 	$(TLAVA).ut
@@ -386,4 +401,4 @@ $(PLT_CLIP).o: $(RASTER_FOLDER)\$(PLT_CLIP).s
 
 # ----- Output ---------------------------------------------------------------
 # Otherwise the Make can think that the commands are files.
-.PHONY: test $(TINPUT) $(TBLOCK) $(TGEO) $(TLAVA) $(TLEVEL) $(TSPIKE) $(TWORLD) $(TMODEL) $(TCAMERA) $(TRENDER) $(TASYNC) $(TCOND) $(TSYNC) $(TCLR_SCN) $(TCLR_REG) $(TPLT_PXL) $(TPLT_HOR) $(TPLT_VRT) $(TPLT_LIN) $(TPLT_REC) $(TPLT_SQR) $(TPLT_TRI) $(TBMAP_8) $(TBMAP_16) $(TBMAP_32) $(TPLT_CHR) $(TPLT_STR) $(TBOUNDS) $(TPLT_CLIP)
+.PHONY: test $(TINPUT) $(TPSG) $(TBLOCK) $(TGEO) $(TLAVA) $(TLEVEL) $(TSPIKE) $(TWORLD) $(TMODEL) $(TCAMERA) $(TRENDER) $(TASYNC) $(TCOND) $(TSYNC) $(TCLR_SCN) $(TCLR_REG) $(TPLT_PXL) $(TPLT_HOR) $(TPLT_VRT) $(TPLT_LIN) $(TPLT_REC) $(TPLT_SQR) $(TPLT_TRI) $(TBMAP_8) $(TBMAP_16) $(TBMAP_32) $(TPLT_CHR) $(TPLT_STR) $(TBOUNDS) $(TPLT_CLIP)
