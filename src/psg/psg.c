@@ -154,10 +154,27 @@ void enable_channel_q(
     */
 }
 
-/* TODO: Below this requires refinement and testing */
 /** See psg.h for documentation */
 void stop_sound() {
-    UINT8 mixer = read_psg(MIXER);
-    mixer = mixer | 0x3F; /* disable tone/noise for channels A-C */
-    write_psg(MIXER, mixer);
+    long old_ssp = Super(0);
+
+    stop_sound_q();
+
+    Super(old_ssp);
+}
+
+/** See psg.h for documentation */
+void stop_sound_q() {
+    /* NOTE: Do not hand modify this code, copy read_psg / write_psg q */
+    UINT8 mixer;
+    *REG_SELECT_PTR = MIXER;
+    *REG_WRITE_PTR = *REG_READ_PTR | 0x3F;
+    /* Explanation:
+           1. We select the register to be read as the mixer, MIXER
+           2. That value is in the READ_PTR area, *REG_READ_PTR
+           3. We set the bits for disabling tone/noise for channels A-C, | 0x3F
+               - 0x3F = 0011 1111, leave the upper bits, disable is high
+           4. We write the new value to the mixer, already by *REG_SELECT_PTR
+                - We can do this because MIXER is already set
+    */
 }

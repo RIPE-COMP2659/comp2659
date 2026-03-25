@@ -92,7 +92,7 @@ void stop_sound();
 /**
  * The following functions are the same as the above, without input validation
  * or super calls. The above functions all wrap their quick counterpart. So if
- * they work, then so do their quick counterparts
+ * they work, then so do their quick counterparts.
  */
 void write_psg_q(unsigned int reg, UINT8 val);
 UINT8 read_psg_q(unsigned int reg);
@@ -103,3 +103,4 @@ void enable_channel_q(
     unsigned int tone_on,
     unsigned int noise_on
 );
+void stop_sound_q();

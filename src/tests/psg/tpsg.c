@@ -155,7 +155,7 @@ void test_enable_channel(void) {
 
     wait(30000); /* Can't rely on keyboard */
 
-    Cconws("test_enable_channel: Disabling channel B tone, press any key to"
+    Cconws("test_enable_channel: Disabling channel B tone, press any key to "
            "continue...\r\n");
     enable_channel(1, 0, 0);
     Cnecin();
