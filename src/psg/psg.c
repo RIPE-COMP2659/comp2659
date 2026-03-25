@@ -114,31 +114,48 @@ void set_volume_q(unsigned int channel, unsigned int volume) {
     *REG_WRITE_PTR = volume;
 }
 
-/* TODO: Below this point needs love, same with accompanying tests */
 /** See psg.h for documentation */
 void enable_channel(
     unsigned int channel,
     unsigned int tone_on,
     unsigned int noise_on
 ) {
-    /* NOTE: We could remove some variables for slight speed increase at
-       the cost of readability */
     if (channel <= 2 && tone_on <= 1 && noise_on <= 1) {
-        /* Flip bits because it's enabled on low */
-        /* Importantly, it goes CBACBA for the lower six bits, where top 3 
-           are the noise bits and bottom 3 are the tone bits */
-        UINT8 mask = (!noise_on << (channel + 3)) | (!tone_on << channel);
-        UINT8 current_mix = read_psg(MIXER);
+        long old_ssp = Super(0);
 
-        /* Clear the bits for the channel we're changing */
-        current_mix = current_mix & ~(0x09 << channel);
-        /* Then set the new values */
-        current_mix = current_mix | mask;
+        enable_channel_q(channel, tone_on, noise_on);
 
-        write_psg(MIXER, current_mix);
+        Super(old_ssp);
     }
 }
 
+/** See psg.h for documentation */
+void enable_channel_q(
+    unsigned int channel,
+    unsigned int tone_on,
+    unsigned int noise_on
+) {
+    /* NOTE: Don't hand modify this code, copy function calls */
+    UINT8 current_mix;
+    *REG_SELECT_PTR = MIXER;
+    *REG_WRITE_PTR = (*REG_READ_PTR & (0xF6 << channel))
+        | ((!noise_on << (channel + 3)) | (!tone_on << channel));
+    /* Explanation:
+           1. We select the register to be read as the mixer, MIXER
+           2. That value is in the READ_PTR area, *REG_READ_PTR
+           3. We clear the values for the channel, & (0xF6 << channel)
+                  - 0xF6 = 1111 0110, clearing noise and tone for channel
+                  - Noise upper 3, tone lower 2nd, CBACBA see manual for more
+           4. We create the new values for the channel, ((!noise_on << . . .
+                  - Noise and tone are set by enable on low, need to invert
+                    because assignment specifications require 1 to enable
+           5. We combine the cleared value and new value, either side of |
+           6. We write the new value to the mixer, already by *REG_SELECT_PTR
+                  - We can do this because MIXER is already set
+    */
+}
+
+/* TODO: Below this requires refinement and testing */
 /** See psg.h for documentation */
 void stop_sound() {
     UINT8 mixer;

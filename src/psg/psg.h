@@ -98,3 +98,8 @@ void write_psg_q(unsigned int reg, UINT8 val);
 UINT8 read_psg_q(unsigned int reg);
 void set_tone_q(unsigned int channel, unsigned int tuning);
 void set_volume_q(unsigned int channel, unsigned int volume);
+void enable_channel_q(
+    unsigned int channel,
+    unsigned int tone_on,
+    unsigned int noise_on
+);

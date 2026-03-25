@@ -143,19 +143,19 @@ void test_enable_channel(void) {
     enable_channel(2, 1, 1);
     set_volume(2, 10);
 
-    wait(10000); /* Make sure keyboard sound stopped */
+    wait(30000); /* Make sure keyboard sound stopped */
 
     Cconws("test_enable_channel: Disabling channel A tone, "
            "press any key to continue...\r\n");
     enable_channel(0, 0, 0);
 
-    wait(10000); /* Make sure keyboard sound stopped */
+    wait(30000); /* Make sure keyboard sound stopped */
 
     Cconws("test_enable_channel: Disabling channel C tone, "
            "press any key to continue...\r\n");
     enable_channel(2, 0, 0);
 
-    wait(10000); /* Make sure keyboard sound stopped */
+    wait(30000); /* Make sure keyboard sound stopped */
 
     Cconws("test_enable_channel: Disabling channel B tone, "
            "no sound should be present, press any key to continue...\r\n");
