@@ -136,15 +136,14 @@ void enable_channel_q(
     unsigned int noise_on
 ) {
     /* NOTE: Don't hand modify this code, copy function calls */
-    UINT8 current_mix;
     *REG_SELECT_PTR = MIXER;
-    *REG_WRITE_PTR = (*REG_READ_PTR & (0xF6 << channel))
+    *REG_WRITE_PTR = (*REG_READ_PTR & ~(0x09 << channel))
         | ((!noise_on << (channel + 3)) | (!tone_on << channel));
     /* Explanation:
            1. We select the register to be read as the mixer, MIXER
            2. That value is in the READ_PTR area, *REG_READ_PTR
-           3. We clear the values for the channel, & (0xF6 << channel)
-                  - 0xF6 = 1111 0110, clearing noise and tone for channel
+           3. We clear the values for the channel, & (0x09 << channel)
+                  - 0x09 = 0000 1001, clearing noise and tone for channel
                   - Noise upper 3, tone lower 2nd, CBACBA see manual for more
            4. We create the new values for the channel, ((!noise_on << . . .
                   - Noise and tone are set by enable on low, need to invert
