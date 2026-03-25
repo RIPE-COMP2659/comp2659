@@ -143,23 +143,37 @@ void test_enable_channel(void) {
     enable_channel(2, 1, 1);
     set_volume(2, 10);
 
-    wait(30000); /* Make sure keyboard sound stopped */
+    wait(30000); /* Can't rely on keyboard */
 
-    Cconws("test_enable_channel: Disabling channel A tone, "
-           "press any key to continue...\r\n");
+    Cconws("test_enable_channel: Disabling channel A tone...\r\n");
     enable_channel(0, 0, 0);
 
-    wait(30000); /* Make sure keyboard sound stopped */
+    wait(30000); /* Can't rely on keyboard */
 
-    Cconws("test_enable_channel: Disabling channel C tone, "
-           "press any key to continue...\r\n");
+    Cconws("test_enable_channel: Disabling channel C tone...\r\n");
     enable_channel(2, 0, 0);
 
-    wait(30000); /* Make sure keyboard sound stopped */
+    wait(30000); /* Can't rely on keyboard */
 
-    Cconws("test_enable_channel: Disabling channel B tone, "
-           "no sound should be present, press any key to continue...\r\n");
+    Cconws("test_enable_channel: Disabling channel B tone...\r\n");
     enable_channel(1, 0, 0);
+    Cnecin();
+}
+
+void test_stop_sound(void) {
+    Cconws("test_stop_sound: Enabling all channels tone...\r\n");
+    enable_channel(0, 1, 1);
+    set_volume(0, 10);
+    enable_channel(1, 1, 1);
+    set_volume(1, 10);
+    enable_channel(2, 1, 1);
+    set_volume(2, 10);
+
+    wait(30000); /* Can't rely on keyboard */
+
+    Cconws("test_stop_sound: Stopping all sound, "
+           "press any key to continue...\r\n");
+    stop_sound();
     Cnecin();
 }
 
@@ -171,6 +185,7 @@ int main() {
     test_set_tone();
     test_set_volume();
     test_enable_channel();
+    test_stop_sound();
 
     return 0;
 }
