@@ -178,6 +178,97 @@ void test_stop_sound(void) {
     Cnecin();
 }
 
+/** A demo of a not working perfectly song, but close enough to demo */
+void test_song_of_storms(void) {
+    long old_ssp;
+
+    Cconws("test_song_of_storms: Prepared, "
+           "press any key to continue...\r\n");
+    Cnecin();
+    wait(30000);
+
+    old_ssp = Super(0);
+
+    /* Volumes */
+    set_volume_q(0, 10);
+    set_volume_q(1, 0);
+    set_volume_q(2, 0);
+
+    /* Channels */
+    enable_channel_q(0, 1, 0);
+    enable_channel_q(1, 0, 0);
+    enable_channel_q(2, 0, 0);
+
+    set_tone_q(0, D5); set_volume_q(0, 10); wait(12000);
+    set_tone_q(0, F5); wait(12000);
+    set_tone_q(0, D6); wait(24000);
+    set_volume_q(0, 0); wait(24000);
+
+    set_tone_q(0, D5); set_volume_q(0, 10); wait(12000);
+    set_tone_q(0, F5); wait(12000);
+    set_tone_q(0, D6); wait(24000);
+    set_volume_q(0, 0); wait(24000);
+
+    set_tone_q(0, E6); set_volume_q(0, 10); wait(24000);
+    set_tone_q(0, F6); wait(16000);
+    set_tone_q(0, E6); wait(16000);
+    set_tone_q(0, F6); wait(16000);
+
+    set_tone_q(0, E6); set_volume_q(0, 10); wait(12000);
+    set_tone_q(0, C6); wait(12000);
+    set_tone_q(0, A5); wait(48000);
+
+    set_tone_q(0, A5); set_volume_q(0, 10); wait(12000);
+    set_tone_q(0, D5); wait(12000);
+    set_tone_q(0, F5); wait(12000);
+    set_tone_q(0, G5); wait(36000);
+
+    set_tone_q(0, A5); set_volume_q(0, 10); wait(72000);
+
+    set_tone_q(0, A5); set_volume_q(0, 10); wait(12000);
+    set_tone_q(0, D5); wait(12000);
+    set_tone_q(0, F5); wait(12000);
+    set_tone_q(0, G5); wait(36000);
+
+    set_tone_q(0, F5); set_volume_q(0, 10); wait(72000);
+
+    set_tone_q(0, D5); set_volume_q(0, 10); wait(12000);
+    set_tone_q(0, F5); wait(12000);
+    set_tone_q(0, D6); wait(24000);
+    set_volume_q(0, 0); wait(24000);
+
+    set_tone_q(0, D5); set_volume_q(0, 10); wait(12000);
+    set_tone_q(0, F5); wait(12000);
+    set_tone_q(0, D6); wait(24000);
+    set_volume_q(0, 0); wait(24000);
+
+    set_tone_q(0, E6); set_volume_q(0, 10); wait(24000);
+    set_tone_q(0, F6); wait(16000);
+    set_tone_q(0, E6); wait(16000);
+    set_tone_q(0, F6); wait(16000);
+
+    set_tone_q(0, E6); set_volume_q(0, 10); wait(12000);
+    set_tone_q(0, C6); wait(12000);
+    set_tone_q(0, A5); wait(48000);
+
+    set_tone_q(0, A5); set_volume_q(0, 10); wait(12000);
+    set_tone_q(0, D5); wait(12000);
+    set_tone_q(0, F5); wait(12000);
+    set_tone_q(0, G5); wait(36000);
+
+    set_tone_q(0, A5); set_volume_q(0, 10); wait(36000);
+    set_tone_q(0, A5); wait(36000);
+
+    set_tone_q(0, D5); set_volume_q(0, 10); wait(72000);
+    set_tone_q(0, D5); wait(72000);
+
+    set_volume_q(0, 0); wait(1);
+
+    stop_sound_q();
+
+    Super(old_ssp);
+}
+
 int main() {
     Cconws("PSG test started...\r\n");
 
@@ -187,6 +278,7 @@ int main() {
     test_set_volume();
     test_enable_channel();
     test_stop_sound();
+    test_song_of_storms();
 
     return 0;
 }

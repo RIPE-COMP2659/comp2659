@@ -13,6 +13,7 @@
  * enabling or disabling channels.
  */
 #include "../shared/dtypes.h"
+#include "notes.h"
 #include <osbind.h>  /* for Super() */
 
 /**
