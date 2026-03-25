@@ -157,13 +157,7 @@ void enable_channel_q(
 /* TODO: Below this requires refinement and testing */
 /** See psg.h for documentation */
 void stop_sound() {
-    UINT8 mixer;
-
-    set_volume(0, 0);
-    set_volume(1, 0);
-    set_volume(2, 0);
-
-    mixer = read_psg(MIXER);
-    mixer = (UINT8)(mixer | 0x3F); /* disable tone/noise for channels A-C */
+    UINT8 mixer = read_psg(MIXER);
+    mixer = mixer | 0x3F; /* disable tone/noise for channels A-C */
     write_psg(MIXER, mixer);
 }
