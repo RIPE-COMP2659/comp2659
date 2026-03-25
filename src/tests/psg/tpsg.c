@@ -36,6 +36,13 @@ static void print_uint(unsigned int value) {
     }
 }
 
+static void wait(unsigned int cycles) {
+    volatile unsigned int i;
+    for (i = 0; i < cycles; i++) {
+        /* Do nothing, just waste time */
+    }
+}
+
 void test_write_psg(void) {
     write_psg(0, 248); /* set channel A fine tune = 248 */
     write_psg(1, 1); /* set channel A coarse tune = 1 */
@@ -60,6 +67,8 @@ void test_read_psg(void) {
     UINT8 fine;
     UINT8 coarse;
 
+    wait(10000); /* Make sure keyboard sound stopped */
+
     write_psg(0, 248); /* set channel A fine tune = 248 */
     write_psg(1, 1); /* set channel A coarse tune = 1 */
 
@@ -69,6 +78,15 @@ void test_read_psg(void) {
     } else {
         Cconws("test_read_psg: Fine test failed, expected 248, got ");
         print_uint((unsigned int)fine);
+        Cconws("\r\n");
+    }
+
+    coarse = read_psg(1);
+    if (coarse == 1) {
+        Cconws("test_read_psg: Coarse test passed...\r\n");
+    } else {
+        Cconws("test_read_psg: Coarse test failed, expected 1, got ");
+        print_uint((unsigned int)coarse);
         Cconws("\r\n");
     }
 
@@ -99,7 +117,51 @@ void test_set_volume(void) {
     Cnecin();
 }
 
+void test_enable_channel(void) {
+    UINT8 mixer_state;
 
+    Cconws("test_enable_channel: Enabling channel A tone, "
+           "press any key to continue...\r\n");
+    enable_channel(0, 1, 1);
+    set_tone(0, 504);
+    set_volume(0, 11);
+    Cnecin();
+
+    Cconws("test_enable_channel: Disabling channel A tone, "
+           "press any key to continue...\r\n");
+    enable_channel(0, 0, 0);
+    Cnecin();
+
+    wait(10000); /* Make sure keyboard sound stopped */
+
+    Cconws("test_enable_channel: Enabling all channels tone, "
+           "press any key to continue...\r\n");
+    enable_channel(0, 1, 1);
+    set_volume(0, 10);
+    enable_channel(1, 1, 1);
+    set_volume(1, 10);
+    enable_channel(2, 1, 1);
+    set_volume(2, 10);
+
+    wait(10000); /* Make sure keyboard sound stopped */
+
+    Cconws("test_enable_channel: Disabling channel A tone, "
+           "press any key to continue...\r\n");
+    enable_channel(0, 0, 0);
+
+    wait(10000); /* Make sure keyboard sound stopped */
+
+    Cconws("test_enable_channel: Disabling channel C tone, "
+           "press any key to continue...\r\n");
+    enable_channel(2, 0, 0);
+
+    wait(10000); /* Make sure keyboard sound stopped */
+
+    Cconws("test_enable_channel: Disabling channel B tone, "
+           "no sound should be present, press any key to continue...\r\n");
+    enable_channel(1, 0, 0);
+    Cnecin();
+}
 
 int main() {
     Cconws("PSG test started...\r\n");
@@ -108,6 +170,7 @@ int main() {
     test_read_psg();
     test_set_tone();
     test_set_volume();
+    test_enable_channel();
 
     return 0;
 }

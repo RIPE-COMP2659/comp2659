@@ -101,6 +101,8 @@ void set_volume(unsigned int channel, unsigned int volume) {
         long old_ssp = Super(0);
 
         set_volume_q(channel, volume);
+
+        Super(old_ssp);
     }
 }
 
