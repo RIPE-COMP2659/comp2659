@@ -43,6 +43,34 @@ static void wait(unsigned int cycles) {
     }
 }
 
+void test_crash(void) {
+    long old_ssp = Super(0);
+
+    wait(30000); /* Make sure keyboard sound stopped */
+
+    Cconws("test_crash: Playing crash, "
+           "press any key to continue...\r\n");
+
+    enable_channel_q(CHANNEL_A, 0, 1);
+    enable_channel_q(CHANNEL_B, 0, 0);
+    enable_channel_q(CHANNEL_C, 0, 0);
+    set_volume_q(CHANNEL_A, 15);
+    write_psg_q(NOISE_FREQ, 0x1F);
+    write_psg_q(LEVEL_A,    0x10);
+    /* TODO: Tune the timing */
+    write_psg_q(ENV_FINE,   0xFF);
+    write_psg_q(ENV_COARSE, 0xFF);
+    write_psg_q(ENV_SHAPE,  0x00);
+
+    Super(old_ssp);
+
+    Cnecin();
+    stop_sound();
+    Cconws("test_crash: Sound stopped, "
+           "press any key to continue...\r\n");
+    Cnecin();
+}
+
 void test_write_psg(void) {
     write_psg(A_FINE, 248); /* set channel A fine tune = 248 */
     write_psg(A_COARSE, 1); /* set channel A coarse tune = 1 */
@@ -272,6 +300,7 @@ void test_song_of_storms(void) {
 int main() {
     Cconws("PSG test started...\r\n");
 
+    test_crash();
     test_write_psg();
     test_read_psg();
     test_set_tone();
