@@ -34,6 +34,11 @@
 #define IO_PORT_A       14  /* I/O port A data */
 #define IO_PORT_B       15  /* I/O port B data */
 
+/* Channel Constants */
+#define CHANNEL_A       0
+#define CHANNEL_B       1
+#define CHANNEL_C       2
+
 /**
  * Writes the given byte value (0-255) to the given PSG register (0-15). This
  * is a helper routine to be used by the other functions in this module

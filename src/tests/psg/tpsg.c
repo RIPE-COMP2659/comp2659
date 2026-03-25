@@ -44,20 +44,20 @@ static void wait(unsigned int cycles) {
 }
 
 void test_write_psg(void) {
-    write_psg(0, 248); /* set channel A fine tune = 248 */
-    write_psg(1, 1); /* set channel A coarse tune = 1 */
-    write_psg(7, 0x3E); /* enable channel A on mixer */
-    write_psg(8, 11); /* set channel A volume = 11 */
+    write_psg(A_FINE, 248); /* set channel A fine tune = 248 */
+    write_psg(A_COARSE, 1); /* set channel A coarse tune = 1 */
+    write_psg(MIXER, 0x3E); /* enable channel A on mixer */
+    write_psg(LEVEL_A, 11); /* set channel A volume = 11 */
     Cconws("test_write_psg: Tone should be playing, "
            "press any key to stop...\r\n");
     Cnecin();
 
-    write_psg(8, 0); /* set channel A volume = 0 */
+    write_psg(LEVEL_A, 0); /* set channel A volume = 0 */
     Cconws("test_write_psg: Tone should have stopped, "
            "press any key to continue...\r\n");
     Cnecin();
 
-    write_psg(16, 0);
+    write_psg(IO_PORT_B + 1, 0);
     Cconws("test_write_psg: Invalid register write should have no change, "
            "press any key to continue...\r\n");
     Cnecin();
@@ -69,10 +69,10 @@ void test_read_psg(void) {
 
     wait(10000); /* Make sure keyboard sound stopped */
 
-    write_psg(0, 248); /* set channel A fine tune = 248 */
-    write_psg(1, 1); /* set channel A coarse tune = 1 */
+    write_psg(A_FINE, 248); /* set channel A fine tune = 248 */
+    write_psg(A_COARSE, 1); /* set channel A coarse tune = 1 */
 
-    fine = read_psg(0);
+    fine = read_psg(A_FINE);
     if (fine == 248) {
         Cconws("test_read_psg: Fine test passed...\r\n");
     } else {
@@ -81,7 +81,7 @@ void test_read_psg(void) {
         Cconws("\r\n");
     }
 
-    coarse = read_psg(1);
+    coarse = read_psg(A_COARSE);
     if (coarse == 1) {
         Cconws("test_read_psg: Coarse test passed...\r\n");
     } else {
@@ -100,20 +100,20 @@ void test_set_tone(void) {
     /* 0001 = 1 Coarse */
     Cconws("test_set_tone: Setting channel A to same tune as test_write, "
            "press any key to continue...\r\n");
-    set_tone(0, 504);
-    write_psg(8, 11);
+    set_tone(CHANNEL_A, 504);
+    write_psg(LEVEL_A, 11);
     Cnecin();
 }
 
 void test_set_volume(void) {
     Cconws("test_set_volume: Setting channel A volume to 15, "
            "press any key to continue...\r\n");
-    set_volume(0, 15);
+    set_volume(CHANNEL_A, 15);
     Cnecin();
 
     Cconws("test_set_volume: Setting channel A volume to 0, "
            "press any key to continue...\r\n");
-    set_volume(0, 0);
+    set_volume(CHANNEL_A, 0);
     Cnecin();
 }
 
@@ -122,53 +122,53 @@ void test_enable_channel(void) {
 
     Cconws("test_enable_channel: Enabling channel A tone, "
            "press any key to continue...\r\n");
-    enable_channel(0, 1, 1);
-    set_tone(0, 504);
-    set_volume(0, 11);
+    enable_channel(CHANNEL_A, 1, 1);
+    set_tone(CHANNEL_A, 504);
+    set_volume(CHANNEL_A, 11);
     Cnecin();
 
     Cconws("test_enable_channel: Disabling channel A tone, "
            "press any key to continue...\r\n");
-    enable_channel(0, 0, 0);
+    enable_channel(CHANNEL_A, 0, 0);
     Cnecin();
 
     wait(10000); /* Make sure keyboard sound stopped */
 
     Cconws("test_enable_channel: Enabling all channels tone, "
            "press any key to continue...\r\n");
-    enable_channel(0, 1, 1);
-    set_volume(0, 10);
-    enable_channel(1, 1, 1);
-    set_volume(1, 10);
-    enable_channel(2, 1, 1);
-    set_volume(2, 10);
+    enable_channel(CHANNEL_A, 1, 1);
+    set_volume(CHANNEL_A, 10);
+    enable_channel(CHANNEL_B, 1, 1);
+    set_volume(CHANNEL_B, 10);
+    enable_channel(CHANNEL_C, 1, 1);
+    set_volume(CHANNEL_C, 10);
 
     wait(30000); /* Can't rely on keyboard */
 
     Cconws("test_enable_channel: Disabling channel A tone...\r\n");
-    enable_channel(0, 0, 0);
+    enable_channel(CHANNEL_A, 0, 0);
 
     wait(30000); /* Can't rely on keyboard */
 
     Cconws("test_enable_channel: Disabling channel C tone...\r\n");
-    enable_channel(2, 0, 0);
+    enable_channel(CHANNEL_C, 0, 0);
 
     wait(30000); /* Can't rely on keyboard */
 
     Cconws("test_enable_channel: Disabling channel B tone, press any key to "
            "continue...\r\n");
-    enable_channel(1, 0, 0);
+    enable_channel(CHANNEL_B, 0, 0);
     Cnecin();
 }
 
 void test_stop_sound(void) {
     Cconws("test_stop_sound: Enabling all channels tone...\r\n");
-    enable_channel(0, 1, 1);
-    set_volume(0, 10);
-    enable_channel(1, 1, 1);
-    set_volume(1, 10);
-    enable_channel(2, 1, 1);
-    set_volume(2, 10);
+    enable_channel(CHANNEL_A, 1, 1);
+    set_volume(CHANNEL_A, 10);
+    enable_channel(CHANNEL_B, 1, 1);
+    set_volume(CHANNEL_B, 10);
+    enable_channel(CHANNEL_C, 1, 1);
+    set_volume(CHANNEL_C, 10);
 
     wait(30000); /* Can't rely on keyboard */
 
@@ -190,79 +190,79 @@ void test_song_of_storms(void) {
     old_ssp = Super(0);
 
     /* Volumes */
-    set_volume_q(0, 10);
-    set_volume_q(1, 0);
-    set_volume_q(2, 0);
+    set_volume_q(CHANNEL_A, 10);
+    set_volume_q(CHANNEL_B, 0);
+    set_volume_q(CHANNEL_C, 0);
 
     /* Channels */
-    enable_channel_q(0, 1, 0);
-    enable_channel_q(1, 0, 0);
-    enable_channel_q(2, 0, 0);
+    enable_channel_q(CHANNEL_A, 1, 0);
+    enable_channel_q(CHANNEL_B, 0, 0);
+    enable_channel_q(CHANNEL_C, 0, 0);
 
-    set_tone_q(0, D5); set_volume_q(0, 10); wait(12000);
-    set_tone_q(0, F5); wait(12000);
-    set_tone_q(0, D6); wait(24000);
-    set_volume_q(0, 0); wait(24000);
+    set_tone_q(CHANNEL_A, D5); set_volume_q(CHANNEL_A, 10); wait(12000);
+    set_tone_q(CHANNEL_A, F5); wait(12000);
+    set_tone_q(CHANNEL_A, D6); wait(24000);
+    set_volume_q(CHANNEL_A, 0); wait(24000);
 
-    set_tone_q(0, D5); set_volume_q(0, 10); wait(12000);
-    set_tone_q(0, F5); wait(12000);
-    set_tone_q(0, D6); wait(24000);
-    set_volume_q(0, 0); wait(24000);
+    set_tone_q(CHANNEL_A, D5); set_volume_q(CHANNEL_A, 10); wait(12000);
+    set_tone_q(CHANNEL_A, F5); wait(12000);
+    set_tone_q(CHANNEL_A, D6); wait(24000);
+    set_volume_q(CHANNEL_A, 0); wait(24000);
 
-    set_tone_q(0, E6); set_volume_q(0, 10); wait(24000);
-    set_tone_q(0, F6); wait(16000);
-    set_tone_q(0, E6); wait(16000);
-    set_tone_q(0, F6); wait(16000);
+    set_tone_q(CHANNEL_A, E6); set_volume_q(CHANNEL_A, 10); wait(24000);
+    set_tone_q(CHANNEL_A, F6); wait(16000);
+    set_tone_q(CHANNEL_A, E6); wait(16000);
+    set_tone_q(CHANNEL_A, F6); wait(16000);
 
-    set_tone_q(0, E6); set_volume_q(0, 10); wait(12000);
-    set_tone_q(0, C6); wait(12000);
-    set_tone_q(0, A5); wait(48000);
+    set_tone_q(CHANNEL_A, E6); set_volume_q(CHANNEL_A, 10); wait(12000);
+    set_tone_q(CHANNEL_A, C6); wait(12000);
+    set_tone_q(CHANNEL_A, A5); wait(48000);
 
-    set_tone_q(0, A5); set_volume_q(0, 10); wait(12000);
-    set_tone_q(0, D5); wait(12000);
-    set_tone_q(0, F5); wait(12000);
-    set_tone_q(0, G5); wait(36000);
+    set_tone_q(CHANNEL_A, A5); set_volume_q(CHANNEL_A, 10); wait(12000);
+    set_tone_q(CHANNEL_A, D5); wait(12000);
+    set_tone_q(CHANNEL_A, F5); wait(12000);
+    set_tone_q(CHANNEL_A, G5); wait(36000);
 
-    set_tone_q(0, A5); set_volume_q(0, 10); wait(72000);
+    set_tone_q(CHANNEL_A, A5); set_volume_q(CHANNEL_A, 10); wait(72000);
 
-    set_tone_q(0, A5); set_volume_q(0, 10); wait(12000);
-    set_tone_q(0, D5); wait(12000);
-    set_tone_q(0, F5); wait(12000);
-    set_tone_q(0, G5); wait(36000);
+    set_tone_q(CHANNEL_A, A5); set_volume_q(CHANNEL_A, 10); wait(12000);
+    set_tone_q(CHANNEL_A, D5); wait(12000);
+    set_tone_q(CHANNEL_A, F5); wait(12000);
+    set_tone_q(CHANNEL_A, G5); wait(36000);
 
-    set_tone_q(0, F5); set_volume_q(0, 10); wait(72000);
+    set_tone_q(CHANNEL_A, F5); set_volume_q(CHANNEL_A, 10); wait(72000);
 
-    set_tone_q(0, D5); set_volume_q(0, 10); wait(12000);
-    set_tone_q(0, F5); wait(12000);
-    set_tone_q(0, D6); wait(24000);
-    set_volume_q(0, 0); wait(24000);
+    set_tone_q(CHANNEL_A, D5); set_volume_q(CHANNEL_A, 10); wait(12000);
+    set_tone_q(CHANNEL_A, F5); wait(12000);
+    set_tone_q(CHANNEL_A, D6); wait(24000);
+    set_volume_q(CHANNEL_A, 0); wait(24000);
 
-    set_tone_q(0, D5); set_volume_q(0, 10); wait(12000);
-    set_tone_q(0, F5); wait(12000);
-    set_tone_q(0, D6); wait(24000);
-    set_volume_q(0, 0); wait(24000);
+    set_tone_q(CHANNEL_A, D5); set_volume_q(CHANNEL_A, 10); wait(12000);
+    set_tone_q(CHANNEL_A, F5); wait(12000);
+    set_tone_q(CHANNEL_A, D6); wait(24000);
+    set_volume_q(CHANNEL_A, 0); wait(24000);
 
-    set_tone_q(0, E6); set_volume_q(0, 10); wait(24000);
-    set_tone_q(0, F6); wait(16000);
-    set_tone_q(0, E6); wait(16000);
-    set_tone_q(0, F6); wait(16000);
+    set_tone_q(CHANNEL_A, E6); set_volume_q(CHANNEL_A, 10); wait(24000);
+    set_tone_q(CHANNEL_A, F6); wait(16000);
+    set_tone_q(CHANNEL_A, E6); wait(16000);
+    set_tone_q(CHANNEL_A, F6); wait(16000);
 
-    set_tone_q(0, E6); set_volume_q(0, 10); wait(12000);
-    set_tone_q(0, C6); wait(12000);
-    set_tone_q(0, A5); wait(48000);
+    set_tone_q(CHANNEL_A, E6); set_volume_q(CHANNEL_A, 10); wait(12000);
+    set_tone_q(CHANNEL_A, C6); wait(12000);
+    set_tone_q(CHANNEL_A, A5); wait(48000);
 
-    set_tone_q(0, A5); set_volume_q(0, 10); wait(12000);
-    set_tone_q(0, D5); wait(12000);
-    set_tone_q(0, F5); wait(12000);
-    set_tone_q(0, G5); wait(36000);
+    set_tone_q(CHANNEL_A, A5); set_volume_q(CHANNEL_A, 10); wait(12000);
+    set_tone_q(CHANNEL_A, D5); wait(12000);
+    set_tone_q(CHANNEL_A, F5); wait(12000);
+    set_tone_q(CHANNEL_A, G5); wait(36000);
 
-    set_tone_q(0, A5); set_volume_q(0, 10); wait(36000);
-    set_tone_q(0, A5); wait(36000);
+    set_tone_q(CHANNEL_A, A5); set_volume_q(CHANNEL_A, 10); wait(36000);
+    set_tone_q(CHANNEL_A, A5); wait(36000);
 
-    set_tone_q(0, D5); set_volume_q(0, 10); wait(72000);
-    set_tone_q(0, D5); wait(72000);
+    set_tone_q(CHANNEL_A, D5); set_volume_q(CHANNEL_A, 10); wait(72000);
+    set_tone_q(CHANNEL_A, D5); wait(72000);
 
-    set_volume_q(0, 0); wait(1);
+    set_volume_q(CHANNEL_A, 0); wait(1);
 
     stop_sound_q();
 
