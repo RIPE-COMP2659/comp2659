@@ -16,6 +16,24 @@
 #include "notes.h"
 #include <osbind.h>  /* for Super() */
 
+/* PSG Registers */
+#define A_FINE          0   /* Channel A fine tune */
+#define A_COARSE        1   /* Channel A coarse tune */
+#define B_FINE          2   /* Channel B fine tune */
+#define B_COARSE        3   /* Channel B coarse tune */
+#define C_FINE          4   /* Channel C fine tune */
+#define C_COARSE        5   /* Channel C coarse tune */
+#define NOISE_FREQ      6   /* Noise frequency */
+#define MIXER           7   /* Mixer and I/O control */
+#define LEVEL_A         8   /* Channel A level */
+#define LEVEL_B         9   /* Channel B level */
+#define LEVEL_C         10  /* Channel C level */
+#define ENV_FINE        11  /* Envelope fine tune */
+#define ENV_COARSE      12  /* Envelope coarse tune */
+#define ENV_SHAPE       13  /* Envelope shape */
+#define IO_PORT_A       14  /* I/O port A data */
+#define IO_PORT_B       15  /* I/O port B data */
+
 /**
  * Writes the given byte value (0-255) to the given PSG register (0-15). This
  * is a helper routine to be used by the other functions in this module
