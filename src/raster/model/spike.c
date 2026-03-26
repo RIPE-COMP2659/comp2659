@@ -1,0 +1,61 @@
+/**
+ * spike.c
+ * Authors:
+ *     Riley Gramlich, rgram060@mtroyal.ca, 201762060
+ *     Robert Parker Hutcheson, rhutc335@mtroyal.ca, 201762335
+ *     Isaac Klein, iklei977@mtroyal.ca, 201763977
+ *     Eduard Mykhailets, emykh268@mtroyal.ca, 201750268
+ * Course: COMP 2659-001, Computing Machinery II, Winter 2026
+ * Instructor: Nolan Shaw
+ *
+ * PURPOSE: Spike entity implementation and sprite data.
+ */
+#include "spike.h"
+
+/* The global sprite for a spike, all spike sprites point here */
+static const unsigned int SPIKE_SPRITE[SPIKE_SIZE][SPIKE_SIZE / WORD] = {
+    {0x0001, 0x8000}, /* 1 */
+    {0x0001, 0x8000},
+    {0x0003, 0xC000},
+    {0x0003, 0xC000},
+    {0x0006, 0x6000},
+    {0x0006, 0x6000},
+    {0x000C, 0x3000},
+    {0x000C, 0x3000}, /* 8 */
+    {0x0018, 0x1800},
+    {0x0018, 0x1800},
+    {0x0030, 0x0C00},
+    {0x0030, 0x0C00},
+    {0x0060, 0x0600},
+    {0x0060, 0x0600},
+    {0x00C0, 0x0300},
+    {0x00C0, 0x0300}, /* 16 */
+    {0x0180, 0x0180},
+    {0x0180, 0x0180},
+    {0x0300, 0x00C0},
+    {0x0300, 0x00C0},
+    {0x0600, 0x0060},
+    {0x0600, 0x0060},
+    {0x0C00, 0x0030},
+    {0x0C00, 0x0030}, /* 24 */
+    {0x1800, 0x0018},
+    {0x1800, 0x0018},
+    {0x3000, 0x000C},
+    {0x3000, 0x000C},
+    {0x6000, 0x0006},
+    {0x6000, 0x0006},
+    {0xC000, 0x0003},
+    {0xC000, 0x0003} /* 32 */
+};
+
+Spike create_spike(unsigned int x, unsigned int y)
+{
+  Spike spike;
+
+  spike.x = x;
+  spike.y = y;
+  spike.size = SPIKE_SIZE;
+  spike.sprite = SPIKE_SPRITE;
+
+  return spike;
+}

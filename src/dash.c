@@ -3,6 +3,7 @@
 #include "model/model.h"
 #include "render/render.h"
 #include "input/input.h"
+#include "splash/splash.h"
 #include <osbind.h>
 
 #define JUMP 32
@@ -20,8 +21,15 @@ int main_game(void)
     signed int current_event;
     unsigned long timeThen, timeNow, timeElapsed;
 
+    UINT8 init = splash_screen();
+
     /* Initialize render buffers */
     init_render_buffers();
+
+    if (init == 0)
+    {
+        return 0;
+    }
 
     /* Initial render */
     render(&model, 0);
@@ -52,7 +60,8 @@ int main_game(void)
         }
 
         current_event = check_level_complete(&model);
-        if (current_event == EVENT_LEVEL_DONE) {
+        if (current_event == EVENT_LEVEL_DONE)
+        {
             printf("Level Complete!\n"); /* TODO: Level complete handling gracefully */
         }
 
