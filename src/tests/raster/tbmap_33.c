@@ -450,6 +450,150 @@ void test_plot_bitmap_33_off_right_non_byte_v2(void)
     assert_and_verify_bitmap_32(x, y, mock_screen, bitmap);
 }
 
+void test_plot_bitmap_33_on_top_byte_v1(void)
+{
+    UINT32 bitmap[BITMAP_33_WORD_COUNT];
+    INT16 x = SCREEN_WIDTH_PIXELS >> 2;
+    INT16 y = 0;
+
+    init_bitmap_32_v1(bitmap);
+    plot_bitmap_33(x, y, mock_screen, bitmap);
+
+    assert_and_verify_bitmap_32(x, y, mock_screen, bitmap);
+}
+
+void test_plot_bitmap_33_on_top_byte_v2(void)
+{
+    UINT32 bitmap[BITMAP_33_WORD_COUNT];
+    INT16 x = SCREEN_WIDTH_PIXELS >> 2;
+    INT16 y = 0;
+
+    init_bitmap_32_v2(bitmap);
+    plot_bitmap_33(x, y, mock_screen, bitmap);
+
+    assert_and_verify_bitmap_32(x, y, mock_screen, bitmap);
+}
+
+void test_plot_bitmap_33_on_top_non_byte_v1(void)
+{
+    UINT32 bitmap[BITMAP_33_WORD_COUNT];
+    INT16 x = SCREEN_WIDTH_PIXELS >> 2;
+    INT16 y = 1;
+
+    init_bitmap_32_v1(bitmap);
+    plot_bitmap_33(x, y, mock_screen, bitmap);
+
+    assert_and_verify_bitmap_32(x, y, mock_screen, bitmap);
+}
+
+void test_plot_bitmap_33_on_top_non_byte_v2(void)
+{
+    UINT32 bitmap[BITMAP_33_WORD_COUNT];
+    INT16 x = SCREEN_WIDTH_PIXELS >> 2;
+    INT16 y = 1;
+
+    init_bitmap_32_v2(bitmap);
+    plot_bitmap_33(x, y, mock_screen, bitmap);
+
+    assert_and_verify_bitmap_32(x, y, mock_screen, bitmap);
+}
+
+void test_plot_bitmap_33_partial_top_byte_v1(void)
+{
+    UINT32 bitmap[BITMAP_33_WORD_COUNT];
+    INT16 x = SCREEN_WIDTH_PIXELS >> 2;
+    INT16 y = -8;
+
+    init_bitmap_32_v1(bitmap);
+    plot_bitmap_33(x, y, mock_screen, bitmap);
+
+    assert_and_verify_bitmap_32(x, y, mock_screen, bitmap);
+}
+
+void test_plot_bitmap_33_partial_top_byte_v2(void)
+{
+    UINT32 bitmap[BITMAP_33_WORD_COUNT];
+    INT16 x = SCREEN_WIDTH_PIXELS >> 2;
+    INT16 y = -8;
+
+    init_bitmap_32_v2(bitmap);
+    plot_bitmap_33(x, y, mock_screen, bitmap);
+
+    assert_and_verify_bitmap_32(x, y, mock_screen, bitmap);
+}
+
+void test_plot_bitmap_33_partial_top_non_byte_v1(void)
+{
+    UINT32 bitmap[BITMAP_33_WORD_COUNT];
+    INT16 x = SCREEN_WIDTH_PIXELS >> 2;
+    INT16 y = -7;
+
+    init_bitmap_32_v1(bitmap);
+    plot_bitmap_33(x, y, mock_screen, bitmap);
+
+    assert_and_verify_bitmap_32(x, y, mock_screen, bitmap);
+}
+
+void test_plot_bitmap_33_partial_top_non_byte_v2(void)
+{
+    UINT32 bitmap[BITMAP_33_WORD_COUNT];
+    INT16 x = SCREEN_WIDTH_PIXELS >> 2;
+    INT16 y = -7;
+
+    init_bitmap_32_v2(bitmap);
+    plot_bitmap_33(x, y, mock_screen, bitmap);
+
+    assert_and_verify_bitmap_32(x, y, mock_screen, bitmap);
+}
+
+void test_plot_bitmap_33_off_top_byte_v1(void)
+{
+    UINT32 bitmap[BITMAP_33_WORD_COUNT];
+    INT16 x = SCREEN_WIDTH_PIXELS >> 2;
+    INT16 y = -BITMAP_32_SIZE;
+
+    init_bitmap_32_v1(bitmap);
+    plot_bitmap_33(x, y, mock_screen, bitmap);
+
+    assert_and_verify_bitmap_32(x, y, mock_screen, bitmap);
+}
+
+void test_plot_bitmap_33_off_top_byte_v2(void)
+{
+    UINT32 bitmap[BITMAP_33_WORD_COUNT];
+    INT16 x = SCREEN_WIDTH_PIXELS >> 2;
+    INT16 y = -BITMAP_32_SIZE;
+
+    init_bitmap_32_v2(bitmap);
+    plot_bitmap_33(x, y, mock_screen, bitmap);
+
+    assert_and_verify_bitmap_32(x, y, mock_screen, bitmap);
+}
+
+void test_plot_bitmap_33_off_top_non_byte_v1(void)
+{
+    UINT32 bitmap[BITMAP_33_WORD_COUNT];
+    INT16 x = SCREEN_WIDTH_PIXELS >> 2;
+    INT16 y = -BITMAP_32_SIZE - 1;
+
+    init_bitmap_32_v1(bitmap);
+    plot_bitmap_33(x, y, mock_screen, bitmap);
+
+    assert_and_verify_bitmap_32(x, y, mock_screen, bitmap);
+}
+
+void test_plot_bitmap_33_off_top_non_byte_v2(void)
+{
+    UINT32 bitmap[BITMAP_33_WORD_COUNT];
+    INT16 x = SCREEN_WIDTH_PIXELS >> 2;
+    INT16 y = -BITMAP_32_SIZE - 1;
+
+    init_bitmap_32_v2(bitmap);
+    plot_bitmap_33(x, y, mock_screen, bitmap);
+
+    assert_and_verify_bitmap_32(x, y, mock_screen, bitmap);
+}
+
 int main(void)
 {
     UNITY_BEGIN();
@@ -480,6 +624,18 @@ int main(void)
     RUN_TEST(test_plot_bitmap_33_off_right_byte_v2);
     RUN_TEST(test_plot_bitmap_33_off_right_non_byte_v1);
     RUN_TEST(test_plot_bitmap_33_off_right_non_byte_v2);
+    RUN_TEST(test_plot_bitmap_33_on_top_byte_v1);
+    RUN_TEST(test_plot_bitmap_33_on_top_byte_v2);
+    RUN_TEST(test_plot_bitmap_33_on_top_non_byte_v1);
+    RUN_TEST(test_plot_bitmap_33_on_top_non_byte_v2);
+    RUN_TEST(test_plot_bitmap_33_partial_top_byte_v1);
+    RUN_TEST(test_plot_bitmap_33_partial_top_byte_v2);
+    RUN_TEST(test_plot_bitmap_33_partial_top_non_byte_v1);
+    RUN_TEST(test_plot_bitmap_33_partial_top_non_byte_v2);
+    RUN_TEST(test_plot_bitmap_33_off_top_byte_v1);
+    RUN_TEST(test_plot_bitmap_33_off_top_byte_v2);
+    RUN_TEST(test_plot_bitmap_33_off_top_non_byte_v1);
+    RUN_TEST(test_plot_bitmap_33_off_top_non_byte_v2);
 
     return UNITY_END();
 }
