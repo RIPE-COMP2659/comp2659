@@ -27,7 +27,7 @@ int main_game(void)
     render(&model, 0);
 
     /* Start background music (driven by update_music from the main loop) */
-    start_music();
+    start_music(SONG_TETRIS);
 
     timeThen = get_time();
     while (quit != TRUE && game_won != TRUE)

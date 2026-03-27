@@ -13,8 +13,14 @@ typedef struct {
     unsigned int duration; /* Duration in 70Hz VBL ticks */
 } Note;
 
-/* Begins the playing of the song */
-void start_music(void);
+/* Enum to easily swap songs in start_music() */
+typedef enum {
+    SONG_BOURREE,
+    SONG_TETRIS
+} SongChoice;
+
+/* Updated to take a SongChoice enum */
+void start_music(SongChoice song);
 
 /* Advances the notes based on VBL ticks elapsed */
 void update_music(UINT32 time_elapsed);
