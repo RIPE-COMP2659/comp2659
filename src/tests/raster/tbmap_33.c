@@ -22,60 +22,28 @@ static int get_pixel(INT16 x, INT16 y, UINT8* screen_ptr)
     return masked_value;
 }
 
-static void init_bitmap_33_1(UINT32 *bitmap)
+/* Read a single pixel from a bitmap */
+static int get_bitmap_32_pixel(INT16 x, INT16 y, const UINT32 *bitmap)
 {
-    INT16 y;
-
-    for (y = 0; y < BITMAP_33_SIZE; y++) {
-        if ((y & 1) == 0) {
-            bitmap[y * 2] = 0xAAAAAAAAu;
-            bitmap[(y * 2) + 1] = 0x80000000u;
-        } else {
-            bitmap[y * 2] = 0x55555555u;
-            bitmap[(y * 2) + 1] = 0x00000000u;
-        }
-    }
+    INT16 y_offset = y * 2;
+    INT16 word_index = y_offset + (x >> 5);
+    INT16 bit_shift = 31 - (x & 31);
+    UINT32 value = bitmap[word_index];
+    int result = (value >> bit_shift) & 1;
+    return result;
 }
 
-static void init_bitmap_33_2(UINT32 *bitmap)
-{
-    INT16 y;
-
-    for (y = 0; y < BITMAP_33_SIZE; y++) {
-        if ((y & 1) == 0) {
-            bitmap[y * 2] = 0x55555555u;
-            bitmap[(y * 2) + 1] = 0x00000000u;
-        } else {
-            bitmap[y * 2] = 0xAAAAAAAAu;
-            bitmap[(y * 2) + 1] = 0x80000000u;
-        }
-    }
-}
-
-static int get_bitmap_33_pixel(const UINT32 *bitmap, INT16 y, INT16 x)
-{
-    UINT32 value;
-
-    if (x < 32) {
-        value = bitmap[y * 2];
-        return (int)((value >> (31 - x)) & 1u);
-    }
-
-    value = bitmap[(y * 2) + 1];
-    return (int)((value >> 31) & 1u);
-}
-
-static void verify_bitmap_33_pixels(
+static void verify_bitmap_32_pixels(
+    INT16 x,
+    INT16 y,
     UINT8 *base,
-    INT16 start_y,
-    INT16 start_x,
     const UINT32 *bitmap
 )
 {
     INT16 src_y;
 
     for (src_y = 0; src_y < BITMAP_33_SIZE; src_y++) {
-        const INT16 dst_y = start_y + src_y;
+        const INT16 dst_y = y + src_y;
         INT16 src_x;
 
         if (dst_y < 0 || dst_y >= SCREEN_HEIGHT_PIXELS) {
@@ -83,16 +51,46 @@ static void verify_bitmap_33_pixels(
         }
 
         for (src_x = 0; src_x < BITMAP_33_SIZE; src_x++) {
-            const INT16 dst_x = start_x + src_x;
+            const INT16 dst_x = x + src_x;
 
             if (dst_x >= 0 && dst_x < SCREEN_WIDTH_PIXELS) {
-                const int expected = get_bitmap_33_pixel(bitmap, src_y, src_x);
+                const int expected = get_bitmap_32_pixel(src_x, src_y, bitmap);
                 TEST_ASSERT_EQUAL_INT_MESSAGE(
                     expected,
                     get_pixel(dst_x, dst_y, base),
                     "Bitmap pixel mismatch"
                 );
             }
+        }
+    }
+}
+
+static void init_bitmap_32_v1(UINT32 *bitmap)
+{
+    INT16 y;
+
+    for (y = 0; y < BITMAP_33_SIZE; y++) {
+        if ((y & 1) == 0) {
+            bitmap[y * 2] = 0xAAAAAAAAu;
+            bitmap[(y * 2) + 1] = 0x80000000u;
+        } else {
+            bitmap[y * 2] = 0x55555555u;
+            bitmap[(y * 2) + 1] = 0x00000000u;
+        }
+    }
+}
+
+static void init_bitmap_32_v2(UINT32 *bitmap)
+{
+    INT16 y;
+
+    for (y = 0; y < BITMAP_33_SIZE; y++) {
+        if ((y & 1) == 0) {
+            bitmap[y * 2] = 0x55555555u;
+            bitmap[(y * 2) + 1] = 0x00000000u;
+        } else {
+            bitmap[y * 2] = 0xAAAAAAAAu;
+            bitmap[(y * 2) + 1] = 0x80000000u;
         }
     }
 }
@@ -106,40 +104,40 @@ void tearDown(void)
 {
 }
 
-void test_plot_bitmap_33_center_1(void)
+void test_plot_bitmap_33_center_v1(void)
 {
     UINT32 bitmap[BITMAP_33_WORD_COUNT];
     INT16 x;
     INT16 y;
 
-    init_bitmap_33_1(bitmap);
-    x = SCREEN_WIDTH_PIXELS / 2;
-    y = SCREEN_HEIGHT_PIXELS / 2;
+    init_bitmap_32_v1(bitmap);
+    x = SCREEN_WIDTH_PIXELS >> 2;
+    y = SCREEN_HEIGHT_PIXELS >> 2;
 
     plot_bitmap_33(x, y, mock_screen, bitmap);
-    verify_bitmap_33_pixels(mock_screen, y, x, bitmap);
+    verify_bitmap_32_pixels(x, y, mock_screen, bitmap);
 }
 
-void test_plot_bitmap_33_center_2(void)
+void test_plot_bitmap_33_center_v2(void)
 {
     UINT32 bitmap[BITMAP_33_WORD_COUNT];
     INT16 x;
     INT16 y;
 
-    init_bitmap_33_2(bitmap);
-    x = SCREEN_WIDTH_PIXELS / 2;
-    y = SCREEN_HEIGHT_PIXELS / 2;
+    init_bitmap_32_v2(bitmap);
+    x = SCREEN_WIDTH_PIXELS >> 2;
+    y = SCREEN_HEIGHT_PIXELS >> 2;
 
     plot_bitmap_33(x, y, mock_screen, bitmap);
-    verify_bitmap_33_pixels(mock_screen, y, x, bitmap);
+    verify_bitmap_32_pixels(x, y, mock_screen, bitmap);
 }
 
 int main(void)
 {
     UNITY_BEGIN();
 
-    RUN_TEST(test_plot_bitmap_33_center_1);
-    RUN_TEST(test_plot_bitmap_33_center_2);
+    RUN_TEST(test_plot_bitmap_33_center_v1);
+    RUN_TEST(test_plot_bitmap_33_center_v2);
 
     return UNITY_END();
 }
