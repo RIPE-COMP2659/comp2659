@@ -62,10 +62,23 @@ static int chA_ticks_remaining = 0;
 static const Note* current_song = 0;
 static int current_song_len = 0;
 
+/* Helper to advance index without using modulus. Uses bitwise AND
+ * when length is power-of-two, otherwise falls back to branch.
+ */
+static int advance_index(int idx, int len) {
+    idx++;
+    if ((len & (len - 1)) == 0) {
+        return idx & (len - 1);
+    }
+    if (idx >= len) idx = 0;
+    return idx;
+}
+
 
 /* --- FUNCTIONS --- */
 
 void start_music(SongChoice song) {
+    long old_ssp;
     /* Route the song choice to the correct array */
     switch (song) {
         case SONG_BOURREE:
@@ -87,7 +100,7 @@ void start_music(SongChoice song) {
 
     /* Initialize PSG channels securely */
     {
-        long old_ssp = Super(0);
+        old_ssp = Super(0);
         enable_channel_q(CHANNEL_A, 1, 0);
         enable_channel_q(CHANNEL_B, 0, 0);
         enable_channel_q(CHANNEL_C, 0, 0);
@@ -104,6 +117,7 @@ void start_music(SongChoice song) {
 }
 
 void update_music(UINT32 time_elapsed) {
+    long old_ssp;
     if (!is_playing || time_elapsed == 0 || current_song_len == 0) return;
 
     /* --- UPDATE CHANNEL A (MELODY) --- */
@@ -111,18 +125,18 @@ void update_music(UINT32 time_elapsed) {
     
     if (chA_ticks_remaining <= 0) {
         /* Advance circular array */
-        chA_index = (chA_index + 1) % current_song_len;
+        chA_index = advance_index(chA_index, current_song_len);
         
         /* Carry over negative ticks to keep exact timing */
         chA_ticks_remaining += current_song[chA_index].duration;
 
         if (current_song[chA_index].pitch == REST) {
-            long old_ssp = Super(0);
+            old_ssp = Super(0);
             set_volume_q(CHANNEL_A, 0);
             Super(old_ssp);
         } else {
             /* Reset volume to emulate articulation */
-            long old_ssp = Super(0);
+            old_ssp = Super(0);
             set_volume_q(CHANNEL_A, 0);
             set_volume_q(CHANNEL_A, 10);
             set_tone_q(CHANNEL_A, current_song[chA_index].pitch);
@@ -132,10 +146,9 @@ void update_music(UINT32 time_elapsed) {
 }
 
 void stop_music(void) {
+    long old_ssp;
     is_playing = 0;
-    {
-        long old_ssp = Super(0);
-        set_volume_q(CHANNEL_A, 0);
-        Super(old_ssp);
-    }
+    old_ssp = Super(0);
+    set_volume_q(CHANNEL_A, 0);
+    Super(old_ssp);
 }
