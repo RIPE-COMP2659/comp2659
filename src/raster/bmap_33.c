@@ -37,12 +37,9 @@ void plot_bitmap_33(INT16 x, INT16 y, UINT8* base, UINT32* bitmap)
 {
     INT16 src_row;
 
-    Cconws("Called bmap_33...\r\n");
-
     for (src_row = 0; src_row < BITMAP_33_SIZE; src_row++) {
         const INT16 dst_row = (INT16)(y + src_row);
-        const UINT32 left_32 = bitmap[src_row * 2];
-        const UINT32 right_1 = bitmap[(src_row * 2) + 1];
+        const UINT32 row_bits = bitmap[src_row];
         INT16 src_col;
 
         if (dst_row < 0 || dst_row >= SCREEN_HEIGHT_PIXELS) {
@@ -51,16 +48,7 @@ void plot_bitmap_33(INT16 x, INT16 y, UINT8* base, UINT32* bitmap)
 
         for (src_col = 0; src_col < 32; src_col++) {
             const INT16 dst_col = (INT16)(x + src_col);
-            const UINT8 value = (UINT8)((left_32 >> (31 - src_col)) & 1u);
-
-            if (value != 0u && dst_col >= 0 && dst_col < SCREEN_WIDTH_PIXELS) {
-                plotPixel(dst_col, dst_row, base);
-            }
-        }
-
-        {
-            const INT16 dst_col = (INT16)(x + 32);
-            const UINT8 value = (UINT8)((right_1 >> 31) & 1u);
+            const UINT8 value = (UINT8)((row_bits >> (31 - src_col)) & 1u);
 
             if (value != 0u && dst_col >= 0 && dst_col < SCREEN_WIDTH_PIXELS) {
                 plotPixel(dst_col, dst_row, base);

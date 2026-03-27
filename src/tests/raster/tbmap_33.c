@@ -7,8 +7,9 @@
 #define SCREEN_WIDTH_BYTES (SCREEN_WIDTH_PIXELS / 8)
 #define SCREEN_HEIGHT_PIXELS 400
 #define BITMAP_33_SIZE 32
+#define WHITE 0
 
-#define BITMAP_33_WORD_COUNT (BITMAP_33_SIZE * 2)
+#define BITMAP_33_WORD_COUNT BITMAP_33_SIZE
 
 static UINT8 mock_screen[SCREEN_SIZE_BYTES];
 
@@ -25,44 +26,89 @@ static int get_pixel(INT16 x, INT16 y, UINT8* screen_ptr)
 /* Read a single pixel from a bitmap */
 static int get_bitmap_32_pixel(INT16 x, INT16 y, const UINT32 *bitmap)
 {
-    INT16 y_offset = y * 2;
-    INT16 word_index = y_offset + (x >> 5);
-    INT16 bit_shift = 31 - (x & 31);
+    INT16 word_index = y;
+    INT16 bit_shift = 31 - x;
     UINT32 value = bitmap[word_index];
     int result = (value >> bit_shift) & 1;
     return result;
 }
 
+/* Assert one-pixel border around a 32x32 bitmap draw region remains clear. */
+static void assert_bitmap_32_borders(INT16 x, INT16 y, UINT8 *base)
+{
+    INT16 y_screen;
+    INT16 x_screen;
+    const INT16 left_x = x - 1;
+    const INT16 right_x = x + BITMAP_33_SIZE;
+    const INT16 top_y = y - 1;
+    const INT16 bottom_y = y + BITMAP_33_SIZE;
+
+    for (y_screen = y; y_screen < (INT16)(y + BITMAP_33_SIZE); y_screen++) {
+        if (y_screen >= 0 && y_screen < SCREEN_HEIGHT_PIXELS) {
+            if (left_x >= 0 && left_x < SCREEN_WIDTH_PIXELS) {
+                TEST_ASSERT_EQUAL_INT_MESSAGE(WHITE, get_pixel(left_x, y_screen, base),
+                    "Left boundary column cleared incorrectly");
+            }
+
+            if (right_x >= 0 && right_x < SCREEN_WIDTH_PIXELS) {
+                TEST_ASSERT_EQUAL_INT_MESSAGE(WHITE, get_pixel(right_x, y_screen, base),
+                    "Right boundary column cleared incorrectly");
+            }
+        }
+    }
+
+    for (x_screen = x; x_screen < (INT16)(x + BITMAP_33_SIZE); x_screen++) {
+        if (x_screen >= 0 && x_screen < SCREEN_WIDTH_PIXELS) {
+            if (top_y >= 0 && top_y < SCREEN_HEIGHT_PIXELS) {
+                TEST_ASSERT_EQUAL_INT_MESSAGE(WHITE, get_pixel(x_screen, top_y, base),
+                    "Top boundary row cleared incorrectly");
+            }
+
+            if (bottom_y >= 0 && bottom_y < SCREEN_HEIGHT_PIXELS) {
+                TEST_ASSERT_EQUAL_INT_MESSAGE(WHITE, get_pixel(x_screen, bottom_y, base),
+                    "Bottom boundary row cleared incorrectly");
+            }
+        }
+    }
+}
+
+/* Verify bitmap pixels exactly match expected data, with screen bounds clipping. */
 static void verify_bitmap_32_pixels(
+    INT16 x,
+    INT16 y,
+    UINT8 *base,
+    const UINT32 *bitmap
+) {
+    INT16 x_bitmap;
+    INT16 y_bitmap;
+
+    for (y_bitmap = 0; y_bitmap < BITMAP_33_SIZE; y_bitmap++) {
+        const INT16 y_screen = y + y_bitmap;
+
+        if (y_screen >= 0 && y_screen < SCREEN_HEIGHT_PIXELS) {
+            for (x_bitmap = 0; x_bitmap < BITMAP_33_SIZE; x_bitmap++) {
+                const INT16 x_screen = x + x_bitmap;
+
+                if (x_screen >= 0 && x_screen < SCREEN_WIDTH_PIXELS) {
+                    TEST_ASSERT_EQUAL_INT_MESSAGE(
+                        get_bitmap_32_pixel(x_bitmap, y_bitmap, bitmap),
+                        get_pixel(x_screen, y_screen, base),
+                        "Bitmap pixel mismatch");
+                }
+            }
+        }
+    }
+}
+
+static void assert_and_verify_bitmap_32(
     INT16 x,
     INT16 y,
     UINT8 *base,
     const UINT32 *bitmap
 )
 {
-    INT16 src_y;
-
-    for (src_y = 0; src_y < BITMAP_33_SIZE; src_y++) {
-        const INT16 dst_y = y + src_y;
-        INT16 src_x;
-
-        if (dst_y < 0 || dst_y >= SCREEN_HEIGHT_PIXELS) {
-            continue;
-        }
-
-        for (src_x = 0; src_x < BITMAP_33_SIZE; src_x++) {
-            const INT16 dst_x = x + src_x;
-
-            if (dst_x >= 0 && dst_x < SCREEN_WIDTH_PIXELS) {
-                const int expected = get_bitmap_32_pixel(src_x, src_y, bitmap);
-                TEST_ASSERT_EQUAL_INT_MESSAGE(
-                    expected,
-                    get_pixel(dst_x, dst_y, base),
-                    "Bitmap pixel mismatch"
-                );
-            }
-        }
-    }
+    assert_bitmap_32_borders(x, y, base);
+    verify_bitmap_32_pixels(x, y, base, bitmap);
 }
 
 static void init_bitmap_32_v1(UINT32 *bitmap)
@@ -70,13 +116,7 @@ static void init_bitmap_32_v1(UINT32 *bitmap)
     INT16 y;
 
     for (y = 0; y < BITMAP_33_SIZE; y++) {
-        if ((y & 1) == 0) {
-            bitmap[y * 2] = 0xAAAAAAAAu;
-            bitmap[(y * 2) + 1] = 0x80000000u;
-        } else {
-            bitmap[y * 2] = 0x55555555u;
-            bitmap[(y * 2) + 1] = 0x00000000u;
-        }
+        bitmap[y] = ((y & 1) == 0) ? 0xAAAAAAAAu : 0x55555555u;
     }
 }
 
@@ -85,13 +125,7 @@ static void init_bitmap_32_v2(UINT32 *bitmap)
     INT16 y;
 
     for (y = 0; y < BITMAP_33_SIZE; y++) {
-        if ((y & 1) == 0) {
-            bitmap[y * 2] = 0x55555555u;
-            bitmap[(y * 2) + 1] = 0x00000000u;
-        } else {
-            bitmap[y * 2] = 0xAAAAAAAAu;
-            bitmap[(y * 2) + 1] = 0x80000000u;
-        }
+        bitmap[y] = ((y & 1) == 0) ? 0x55555555u : 0xAAAAAAAAu;
     }
 }
 
@@ -115,7 +149,7 @@ void test_plot_bitmap_33_center_v1(void)
     y = SCREEN_HEIGHT_PIXELS >> 2;
 
     plot_bitmap_33(x, y, mock_screen, bitmap);
-    verify_bitmap_32_pixels(x, y, mock_screen, bitmap);
+    assert_and_verify_bitmap_32(x, y, mock_screen, bitmap);
 }
 
 void test_plot_bitmap_33_center_v2(void)
@@ -129,7 +163,7 @@ void test_plot_bitmap_33_center_v2(void)
     y = SCREEN_HEIGHT_PIXELS >> 2;
 
     plot_bitmap_33(x, y, mock_screen, bitmap);
-    verify_bitmap_32_pixels(x, y, mock_screen, bitmap);
+    assert_and_verify_bitmap_32(x, y, mock_screen, bitmap);
 }
 
 int main(void)
