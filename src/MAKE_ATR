@@ -41,6 +41,13 @@ INPUT = input
 
 # File Names, Base - PSG
 PSG = psg
+MUSIC = music
+
+# PSG object group (PSG base object + music object)
+PSG_OBJECTS = $(PSG).o $(MUSIC).o
+
+# File Names, Tests - PSG (song integration)
+TSONG = tsong
 
 # File Names, Base - Model
 BLOCK  = block
@@ -80,14 +87,14 @@ ATARI_CC     = cc68x
 SHARED_FLAGS = -g
 
 # Program Configuration
-TOS_FLAGS      = $(SHARED_FLAGS) -c -I. -I$(MODEL_FOLDER) -I$(SHARED_FOLDER) -I$(RASTER_FOLDER) -I$(RENDER_FOLDER) -I$(EVENTS_FOLDER) -I$(INPUT_FOLDER) -I$(CLOCK_FOLDER)
+TOS_FLAGS      = $(SHARED_FLAGS) -c -I. -I$(MODEL_FOLDER) -I$(SHARED_FOLDER) -I$(RASTER_FOLDER) -I$(RENDER_FOLDER) -I$(EVENTS_FOLDER) -I$(INPUT_FOLDER) -I$(CLOCK_FOLDER) -I$(PSG_FOLDER)
 MODEL_OBJECTS  = $(BLOCK).o $(SPIKE).o $(LAVA).o $(GEO).o $(LEVEL).o $(WORLD).o $(MODEL).o $(CAMERA).o $(MAIN).o
 EVENTS_OBJECTS = $(ASYNC).o $(COND).o $(SYNC).o
 CLOCK_OBJECTS = $(CLOCK).o
 RASTER_OBJECTS = $(CLR_SCN).o $(CLR_REG).o $(PLT_PXL).o $(PLT_HOR).o $(PLT_VRT).o $(PLT_LIN).o $(PLT_REC).o $(PLT_SQR).o $(PLT_TRI).o $(BMAP_8).o $(BMAP_16).o $(BMAP_32).o $(PLT_CHR).o $(PLT_STR).o $(BOUNDS).o $(PLT_CLIP).o
 RENDER_OBJECTS = $(RENDER).o
 INPUT_OBJECTS  = $(INPUT).o
-TOS_OBJECTS    = $(MODEL_OBJECTS) $(RASTER_OBJECTS) $(RENDER_OBJECTS) $(EVENTS_OBJECTS) $(INPUT_OBJECTS) $(CLOCK_OBJECTS)
+TOS_OBJECTS    = $(MODEL_OBJECTS) $(RASTER_OBJECTS) $(RENDER_OBJECTS) $(EVENTS_OBJECTS) $(INPUT_OBJECTS) $(CLOCK_OBJECTS) $(PSG_OBJECTS)
 
 TOS_NAME       = dash.tos
 # TODO: Feels redundant
@@ -204,6 +211,9 @@ $(INPUT).o: $(INPUT_FOLDER)\$(INPUT).c $(INPUT_FOLDER)\$(INPUT).h $(SHARED_FOLDE
 $(PSG).o: $(PSG_FOLDER)\$(PSG).c $(PSG_FOLDER)\$(PSG).h $(SHARED_FOLDER)\dtypes.h
 	$(ATARI_CC) $(TOS_FLAGS) $(PSG_FOLDER)\$(PSG).c -o $(PSG).o
 
+$(MUSIC).o: $(PSG_FOLDER)\$(MUSIC).c $(PSG_FOLDER)\$(MUSIC).h $(SHARED_FOLDER)\dtypes.h
+	$(ATARI_CC) $(TOS_FLAGS) $(PSG_FOLDER)\$(MUSIC).c -o $(MUSIC).o
+
 $(RENDER).o: $(RENDER_FOLDER)\$(RENDER).c $(RENDER_FOLDER)\$(RENDER).h $(SHARED_FOLDER)\dtypes.h $(RASTER_FOLDER)\$(RASTER).h
 	$(ATARI_CC) $(TOS_FLAGS) $(RENDER_FOLDER)\$(RENDER).c -o $(RENDER).o
 
@@ -264,6 +274,9 @@ $(TINPUT): $(INPUT).o
 $(TPSG): $(PSG).o
 	$(ATARI_CC) $(MAIN_FLAGS) $(TESTS_PSG_FOLDER)\$(TPSG).c $(PSG).o -o $(TPSG).tos
 
+$(TSONG): $(PSG).o $(MUSIC).o
+	$(ATARI_CC) $(MAIN_FLAGS) $(TESTS_PSG_FOLDER)\$(TSONG).c $(PSG).o $(MUSIC).o -o $(TSONG).tos
+
 
 # TODO: For some of these, there is cascading dependencies on objects, eg chr
 # ----- Raster Test Builds ---------------------------------------------------
@@ -322,7 +335,7 @@ $(TCLOCK): $(CLOCK).o
 
 
 # ----- Test Execution -------------------------------------------------------
-test: $(TINPUT) $(TPSG) $(TBLOCK) $(TGEO) $(TLAVA) $(TLEVEL) $(TSPIKE) $(TWORLD) $(TMODEL) $(TCAMERA) $(TRENDER) $(TASYNC) $(TCOND) $(TSYNC) $(TCLR_SCN) $(TCLR_REG) $(TPLT_PXL) $(TPLT_HOR) $(TPLT_VRT) $(TPLT_LIN) $(TPLT_REC) $(TPLT_SQR) $(TPLT_TRI) $(TBMAP_8) $(TBMAP_16) $(TBMAP_32) $(TPLT_CHR) $(TPLT_STR) $(TBOUNDS) $(TPLT_CLIP)
+test: $(TINPUT) $(TPSG) $(TSONG) $(TBLOCK) $(TGEO) $(TLAVA) $(TLEVEL) $(TSPIKE) $(TWORLD) $(TMODEL) $(TCAMERA) $(TRENDER) $(TASYNC) $(TCOND) $(TSYNC) $(TCLR_SCN) $(TCLR_REG) $(TPLT_PXL) $(TPLT_HOR) $(TPLT_VRT) $(TPLT_LIN) $(TPLT_REC) $(TPLT_SQR) $(TPLT_TRI) $(TBMAP_8) $(TBMAP_16) $(TBMAP_32) $(TPLT_CHR) $(TPLT_STR) $(TBOUNDS) $(TPLT_CLIP)
 	$(TBLOCK).ut
 	$(TGEO).ut
 	$(TLAVA).ut
@@ -351,6 +364,7 @@ test: $(TINPUT) $(TPSG) $(TBLOCK) $(TGEO) $(TLAVA) $(TLEVEL) $(TSPIKE) $(TWORLD)
 	$(TPLT_STR).ut
 	$(TBOUNDS).ut
 	$(TPLT_CLIP).ut
+	$(TSONG).tos
 
 
 # ----- Raster Library Builds ------------------------------------------------
