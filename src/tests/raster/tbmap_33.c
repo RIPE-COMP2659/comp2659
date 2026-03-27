@@ -98,7 +98,7 @@ void test_plot_bitmap_33_top_left(void)
     UINT32 bitmap[BITMAP_33_WORD_COUNT];
 
     init_bitmap_33(bitmap);
-    plot_bitmap_33(mock_screen, 0, 0, bitmap);
+    plot_bitmap_33(0, 0, mock_screen, bitmap);
 
     verify_bitmap_33_pixels(mock_screen, 0, 0, bitmap);
 }
@@ -113,7 +113,7 @@ void test_plot_bitmap_33_center_non_byte_aligned(void)
     row = 101;
     col = 203;
 
-    plot_bitmap_33(mock_screen, row, col, bitmap);
+    plot_bitmap_33(row, col, mock_screen, bitmap);
     verify_bitmap_33_pixels(mock_screen, row, col, bitmap);
 }
 
@@ -127,7 +127,7 @@ void test_plot_bitmap_33_clipped_top_right(void)
     row = -7;
     col = SCREEN_WIDTH_PIXELS - 20;
 
-    plot_bitmap_33(mock_screen, row, col, bitmap);
+    plot_bitmap_33(row, col, mock_screen, bitmap);
     verify_bitmap_33_pixels(mock_screen, row, col, bitmap);
 }
 
