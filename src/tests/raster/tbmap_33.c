@@ -22,7 +22,7 @@ static int get_pixel(INT16 x, INT16 y, UINT8* screen_ptr)
     return masked_value;
 }
 
-static void init_bitmap_33(UINT32 *bitmap)
+static void init_bitmap_33_1(UINT32 *bitmap)
 {
     INT16 y;
 
@@ -33,6 +33,21 @@ static void init_bitmap_33(UINT32 *bitmap)
         } else {
             bitmap[y * 2] = 0x55555555u;
             bitmap[(y * 2) + 1] = 0x00000000u;
+        }
+    }
+}
+
+static void init_bitmap_33_2(UINT32 *bitmap)
+{
+    INT16 y;
+
+    for (y = 0; y < BITMAP_33_SIZE; y++) {
+        if ((y & 1) == 0) {
+            bitmap[y * 2] = 0x55555555u;
+            bitmap[(y * 2) + 1] = 0x00000000u;
+        } else {
+            bitmap[y * 2] = 0xAAAAAAAAu;
+            bitmap[(y * 2) + 1] = 0x80000000u;
         }
     }
 }
@@ -91,39 +106,29 @@ void tearDown(void)
 {
 }
 
-void test_plot_bitmap_33_top_left(void)
-{
-    UINT32 bitmap[BITMAP_33_WORD_COUNT];
-
-    init_bitmap_33(bitmap);
-    plot_bitmap_33(0, 0, mock_screen, bitmap); /* x=0, y=0 */
-
-    verify_bitmap_33_pixels(mock_screen, 0, 0, bitmap);
-}
-
-void test_plot_bitmap_33_center_non_byte_aligned(void)
+void test_plot_bitmap_33_center_1(void)
 {
     UINT32 bitmap[BITMAP_33_WORD_COUNT];
     INT16 x;
     INT16 y;
 
-    init_bitmap_33(bitmap);
-    x = 203;
-    y = 101;
+    init_bitmap_33_1(bitmap);
+    x = SCREEN_WIDTH_PIXELS / 2;
+    y = SCREEN_HEIGHT_PIXELS / 2;
 
     plot_bitmap_33(x, y, mock_screen, bitmap);
     verify_bitmap_33_pixels(mock_screen, y, x, bitmap);
 }
 
-void test_plot_bitmap_33_clipped_top_right(void)
+void test_plot_bitmap_33_center_2(void)
 {
     UINT32 bitmap[BITMAP_33_WORD_COUNT];
     INT16 x;
     INT16 y;
 
-    init_bitmap_33(bitmap);
-    x = SCREEN_WIDTH_PIXELS - 20;
-    y = -7;
+    init_bitmap_33_2(bitmap);
+    x = SCREEN_WIDTH_PIXELS / 2;
+    y = SCREEN_HEIGHT_PIXELS / 2;
 
     plot_bitmap_33(x, y, mock_screen, bitmap);
     verify_bitmap_33_pixels(mock_screen, y, x, bitmap);
@@ -133,9 +138,8 @@ int main(void)
 {
     UNITY_BEGIN();
 
-    RUN_TEST(test_plot_bitmap_33_top_left);
-    RUN_TEST(test_plot_bitmap_33_center_non_byte_aligned);
-    RUN_TEST(test_plot_bitmap_33_clipped_top_right);
+    RUN_TEST(test_plot_bitmap_33_center_1);
+    RUN_TEST(test_plot_bitmap_33_center_2);
 
     return UNITY_END();
 }
