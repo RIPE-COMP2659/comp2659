@@ -3,32 +3,30 @@
 #include <string.h>
 
 #define SCREEN_SIZE_BYTES 32000
-#define SCREEN_WIDTH_BYTES 80
 #define SCREEN_WIDTH_PIXELS 640
+#define SCREEN_WIDTH_BYTES (SCREEN_WIDTH_PIXELS / 8)
 #define SCREEN_HEIGHT_PIXELS 400
+#define BITMAP_33_SIZE 32
 
-#define BITMAP_33_WIDTH 33
-#define BITMAP_33_HEIGHT 32
-#define BITMAP_33_WORDS_PER_ROW 2
-#define BITMAP_33_WORD_COUNT (BITMAP_33_HEIGHT * BITMAP_33_WORDS_PER_ROW)
+#define BITMAP_33_WORD_COUNT (BITMAP_33_SIZE * 2)
 
 static UINT8 mock_screen[SCREEN_SIZE_BYTES];
 
-static int get_pixel(UINT8 *base, INT16 row, INT16 col)
+static int get_pixel(INT16 x, INT16 y, UINT8* screen_ptr)
 {
-    UINT8 *byte_ptr;
-    int bit_pos;
-
-    byte_ptr = base + (row * SCREEN_WIDTH_BYTES) + (col / 8);
-    bit_pos = 7 - (col % 8);
-    return (*byte_ptr >> bit_pos) & 1;
+    UINT16 offset = (y * SCREEN_WIDTH_BYTES + (x >> 3));
+    UINT8* byte_ptr = screen_ptr + offset;
+    UINT8 pxl_shift = 7 - (x & 7);
+    /* & 1 is required here to remove the upper bits */
+    UINT8 masked_value = (*byte_ptr >> pxl_shift) & 1;
+    return masked_value;
 }
 
 static void init_bitmap_33(UINT32 *bitmap)
 {
     INT16 row;
 
-    for (row = 0; row < BITMAP_33_HEIGHT; row++) {
+    for (row = 0; row < BITMAP_33_SIZE; row++) {
         if ((row & 1) == 0) {
             bitmap[row * 2] = 0xAAAAAAAAu;
             bitmap[(row * 2) + 1] = 0x80000000u;
@@ -61,7 +59,7 @@ static void verify_bitmap_33_pixels(
 {
     INT16 src_row;
 
-    for (src_row = 0; src_row < BITMAP_33_HEIGHT; src_row++) {
+    for (src_row = 0; src_row < BITMAP_33_SIZE; src_row++) {
         const INT16 dst_row = start_row + src_row;
         INT16 src_col;
 
@@ -69,14 +67,14 @@ static void verify_bitmap_33_pixels(
             continue;
         }
 
-        for (src_col = 0; src_col < BITMAP_33_WIDTH; src_col++) {
+        for (src_col = 0; src_col < BITMAP_33_SIZE; src_col++) {
             const INT16 dst_col = start_col + src_col;
 
             if (dst_col >= 0 && dst_col < SCREEN_WIDTH_PIXELS) {
                 const int expected = get_bitmap_33_pixel(bitmap, src_row, src_col);
                 TEST_ASSERT_EQUAL_INT_MESSAGE(
                     expected,
-                    get_pixel(base, dst_row, dst_col),
+                    get_pixel(dst_col, dst_row, base),
                     "Bitmap pixel mismatch"
                 );
             }
