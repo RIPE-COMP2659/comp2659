@@ -21,15 +21,15 @@ int main_game(void)
     signed int current_event;
     unsigned long timeThen, timeNow, timeElapsed;
 
-    UINT8 init = splash_screen();
-
-    /* Initialize render buffers */
-    init_render_buffers();
+    UINT8 init = splash_screen(); /* Await user input */
 
     if (init == 0)
     {
-        return 0;
+       quit = TRUE; /* Early exit if exit selected */
     }
+
+    /* Initialize render buffers */
+    init_render_buffers();
 
     /* Initial render */
     render(&model, 0);
