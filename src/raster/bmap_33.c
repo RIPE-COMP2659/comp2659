@@ -36,26 +36,34 @@ static void plotPixel(INT16 x, INT16 y, UINT8* screen_ptr)
 
 void plot_bitmap_33(INT16 x, INT16 y, UINT8* base, UINT32* bitmap)
 {
-    INT16 x_bitmap;
-    INT16 y_bitmap;
+    INT16 x_map_i;
+    INT16 y_map_i;
+    INT16 y_map_min = 0;
+    INT16 y_map_max = BITMAP_32_SIZE - 1;
+    INT16 x_map_min = 0;
+    INT16 x_map_max = BITMAP_32_SIZE - 1;
 
-    for (y_bitmap = 0; y_bitmap < BITMAP_32_SIZE; y_bitmap++) {
-        const INT16 y_screen = y + y_bitmap;
+    if (y < 0) { /* If y is negative, that's the offset index */
+        y_map_min = -y;
+    } else if (y + BITMAP_32_SIZE > SCREEN_HEIGHT_PIXELS) { /* y can't be off bottom if off top */
+        y_map_max = SCREEN_HEIGHT_PIXELS - 1 - y;
+    }
 
-        if (y_screen >= 0 && y_screen < SCREEN_HEIGHT_PIXELS) {
-            const UINT32 row_bits = bitmap[y_bitmap];
+    if (x < 0) { /* If x is negative, that's the offset index */
+        x_map_min = -x;
+    } else if (x + BITMAP_32_SIZE > SCREEN_WIDTH_PIXELS) { /* x can't be off the right if off the left */
+        x_map_max = SCREEN_WIDTH_PIXELS - 1 - x;
+    }
 
-            for (x_bitmap = 0; x_bitmap < BITMAP_32_SIZE; x_bitmap++) {
-                const INT16 x_screen = x + x_bitmap;
+    for (y_map_i = y_map_min; y_map_i <= y_map_max; y_map_i++) {
+        const INT16 y_screen = y + y_map_i;
+        const UINT32 row_bits = bitmap[y_map_i];
 
-                if (x_screen >= 0 && x_screen < SCREEN_WIDTH_PIXELS) {
-                    const UINT8 value = (UINT8)((row_bits >> (31 - x_bitmap)) & 1u);
+        for (x_map_i = x_map_min; x_map_i <= x_map_max; x_map_i++) {
+            const UINT8 value = (UINT8)((row_bits >> (31 - x_map_i)) & 1u);
 
-                    /* Assume the area is already white */
-                    if (value != 0u) {
-                        plotPixel(x_screen, y_screen, base);
-                    }
-                }
+            if (value != 0u) {
+                plotPixel(x + x_map_i, y_screen, base);
             }
         }
     }
