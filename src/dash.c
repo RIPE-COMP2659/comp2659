@@ -27,7 +27,7 @@ int main_game(void)
     render(&model, 0);
 
     /* Disable keyboard sound */
-    stop_keyboard_sound();
+    toggle_keyboard_sound();
 
     /* Start background music (driven by update_music from the main loop) */
     start_music(SONG_TETRIS);
@@ -69,6 +69,9 @@ int main_game(void)
 
         timeThen = timeNow;
     }
+
+    /* Renable the keyboard */
+    toggle_keyboard_sound();
 
     /* Clean up music */
     stop_music();
