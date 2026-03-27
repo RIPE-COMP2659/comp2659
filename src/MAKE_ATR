@@ -48,6 +48,7 @@ PSG_OBJECTS = $(PSG).o $(MUSIC).o
 
 # File Names, Tests - PSG (song integration)
 TSONG = tsong
+TMUSIC = tmusic
 
 # File Names, Base - Model
 BLOCK  = block
@@ -276,6 +277,13 @@ $(TPSG): $(PSG).o
 
 $(TSONG): $(PSG).o $(MUSIC).o
 	$(ATARI_CC) $(MAIN_FLAGS) $(TESTS_PSG_FOLDER)\$(TSONG).c $(PSG).o $(MUSIC).o -o $(TSONG).tos
+
+$(TMUSIC).tos: $(PSG).o $(MUSIC).o $(CLOCK).o
+	$(ATARI_CC) $(MAIN_FLAGS) $(TESTS_PSG_FOLDER)\$(TMUSIC).c $(PSG).o $(MUSIC).o $(CLOCK).o -o $(TMUSIC).tos
+
+# Convenience target: build and show how to run tmusic from terminal
+.PHONY: tmusic
+tmusic: $(TMUSIC).tos
 
 
 # TODO: For some of these, there is cascading dependencies on objects, eg chr
