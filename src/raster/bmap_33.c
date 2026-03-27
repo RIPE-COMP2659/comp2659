@@ -18,10 +18,11 @@
 #define SCREEN_WIDTH_PIXELS 640
 #define SCREEN_WIDTH_BYTES (SCREEN_WIDTH_PIXELS / 8)
 #define SCREEN_HEIGHT_PIXELS 400
-#define BITMAP_33_SIZE 32
+#define BITMAP_32_SIZE 32
 
 /* Assume that the pixel is on the screen */
 /* TODO: Might do a row lookup table, remove the computation completely */
+/* Assume the area is already white */
 static void plotPixel(INT16 x, INT16 y, UINT8* screen_ptr)
 {
     /* offset = y * screen_width_bytes + x / 8 */
@@ -35,23 +36,26 @@ static void plotPixel(INT16 x, INT16 y, UINT8* screen_ptr)
 
 void plot_bitmap_33(INT16 x, INT16 y, UINT8* base, UINT32* bitmap)
 {
-    INT16 src_row;
+    INT16 x_bitmap;
+    INT16 y_bitmap;
 
-    for (src_row = 0; src_row < BITMAP_33_SIZE; src_row++) {
-        const INT16 dst_row = (INT16)(y + src_row);
-        const UINT32 row_bits = bitmap[src_row];
-        INT16 src_col;
+    for (y_bitmap = 0; y_bitmap < BITMAP_32_SIZE; y_bitmap++) {
+        const INT16 y_screen = y + y_bitmap;
 
-        if (dst_row < 0 || dst_row >= SCREEN_HEIGHT_PIXELS) {
-            continue;
-        }
+        if (y_screen >= 0 && y_screen < SCREEN_HEIGHT_PIXELS) {
+            const UINT32 row_bits = bitmap[y_bitmap];
 
-        for (src_col = 0; src_col < 32; src_col++) {
-            const INT16 dst_col = (INT16)(x + src_col);
-            const UINT8 value = (UINT8)((row_bits >> (31 - src_col)) & 1u);
+            for (x_bitmap = 0; x_bitmap < BITMAP_32_SIZE; x_bitmap++) {
+                const INT16 x_screen = x + x_bitmap;
 
-            if (value != 0u && dst_col >= 0 && dst_col < SCREEN_WIDTH_PIXELS) {
-                plotPixel(dst_col, dst_row, base);
+                if (x_screen >= 0 && x_screen < SCREEN_WIDTH_PIXELS) {
+                    const UINT8 value = (UINT8)((row_bits >> (31 - x_bitmap)) & 1u);
+
+                    /* Assume the area is already white */
+                    if (value != 0u) {
+                        plotPixel(x_screen, y_screen, base);
+                    }
+                }
             }
         }
     }
