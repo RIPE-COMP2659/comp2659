@@ -24,57 +24,57 @@ static int get_pixel(INT16 x, INT16 y, UINT8* screen_ptr)
 
 static void init_bitmap_33(UINT32 *bitmap)
 {
-    INT16 row;
+    INT16 y;
 
-    for (row = 0; row < BITMAP_33_SIZE; row++) {
-        if ((row & 1) == 0) {
-            bitmap[row * 2] = 0xAAAAAAAAu;
-            bitmap[(row * 2) + 1] = 0x80000000u;
+    for (y = 0; y < BITMAP_33_SIZE; y++) {
+        if ((y & 1) == 0) {
+            bitmap[y * 2] = 0xAAAAAAAAu;
+            bitmap[(y * 2) + 1] = 0x80000000u;
         } else {
-            bitmap[row * 2] = 0x55555555u;
-            bitmap[(row * 2) + 1] = 0x00000000u;
+            bitmap[y * 2] = 0x55555555u;
+            bitmap[(y * 2) + 1] = 0x00000000u;
         }
     }
 }
 
-static int get_bitmap_33_pixel(const UINT32 *bitmap, INT16 row, INT16 col)
+static int get_bitmap_33_pixel(const UINT32 *bitmap, INT16 y, INT16 x)
 {
     UINT32 value;
 
-    if (col < 32) {
-        value = bitmap[row * 2];
-        return (int)((value >> (31 - col)) & 1u);
+    if (x < 32) {
+        value = bitmap[y * 2];
+        return (int)((value >> (31 - x)) & 1u);
     }
 
-    value = bitmap[(row * 2) + 1];
+    value = bitmap[(y * 2) + 1];
     return (int)((value >> 31) & 1u);
 }
 
 static void verify_bitmap_33_pixels(
     UINT8 *base,
-    INT16 start_row,
-    INT16 start_col,
+    INT16 start_y,
+    INT16 start_x,
     const UINT32 *bitmap
 )
 {
-    INT16 src_row;
+    INT16 src_y;
 
-    for (src_row = 0; src_row < BITMAP_33_SIZE; src_row++) {
-        const INT16 dst_row = start_row + src_row;
-        INT16 src_col;
+    for (src_y = 0; src_y < BITMAP_33_SIZE; src_y++) {
+        const INT16 dst_y = start_y + src_y;
+        INT16 src_x;
 
-        if (dst_row < 0 || dst_row >= SCREEN_HEIGHT_PIXELS) {
+        if (dst_y < 0 || dst_y >= SCREEN_HEIGHT_PIXELS) {
             continue;
         }
 
-        for (src_col = 0; src_col < BITMAP_33_SIZE; src_col++) {
-            const INT16 dst_col = start_col + src_col;
+        for (src_x = 0; src_x < BITMAP_33_SIZE; src_x++) {
+            const INT16 dst_x = start_x + src_x;
 
-            if (dst_col >= 0 && dst_col < SCREEN_WIDTH_PIXELS) {
-                const int expected = get_bitmap_33_pixel(bitmap, src_row, src_col);
+            if (dst_x >= 0 && dst_x < SCREEN_WIDTH_PIXELS) {
+                const int expected = get_bitmap_33_pixel(bitmap, src_y, src_x);
                 TEST_ASSERT_EQUAL_INT_MESSAGE(
                     expected,
-                    get_pixel(dst_col, dst_row, base),
+                    get_pixel(dst_x, dst_y, base),
                     "Bitmap pixel mismatch"
                 );
             }
@@ -96,7 +96,7 @@ void test_plot_bitmap_33_top_left(void)
     UINT32 bitmap[BITMAP_33_WORD_COUNT];
 
     init_bitmap_33(bitmap);
-    plot_bitmap_33(0, 0, mock_screen, bitmap); /* x=col=0, y=row=0 */
+    plot_bitmap_33(0, 0, mock_screen, bitmap); /* x=0, y=0 */
 
     verify_bitmap_33_pixels(mock_screen, 0, 0, bitmap);
 }
@@ -104,29 +104,29 @@ void test_plot_bitmap_33_top_left(void)
 void test_plot_bitmap_33_center_non_byte_aligned(void)
 {
     UINT32 bitmap[BITMAP_33_WORD_COUNT];
-    INT16 row;
-    INT16 col;
+    INT16 x;
+    INT16 y;
 
     init_bitmap_33(bitmap);
-    row = 101;
-    col = 203;
+    x = 203;
+    y = 101;
 
-    plot_bitmap_33(col, row, mock_screen, bitmap); /* x=col, y=row */
-    verify_bitmap_33_pixels(mock_screen, row, col, bitmap);
+    plot_bitmap_33(x, y, mock_screen, bitmap);
+    verify_bitmap_33_pixels(mock_screen, y, x, bitmap);
 }
 
 void test_plot_bitmap_33_clipped_top_right(void)
 {
     UINT32 bitmap[BITMAP_33_WORD_COUNT];
-    INT16 row;
-    INT16 col;
+    INT16 x;
+    INT16 y;
 
     init_bitmap_33(bitmap);
-    row = -7;
-    col = SCREEN_WIDTH_PIXELS - 20;
+    x = SCREEN_WIDTH_PIXELS - 20;
+    y = -7;
 
-    plot_bitmap_33(col, row, mock_screen, bitmap); /* x=col, y=row */
-    verify_bitmap_33_pixels(mock_screen, row, col, bitmap);
+    plot_bitmap_33(x, y, mock_screen, bitmap);
+    verify_bitmap_33_pixels(mock_screen, y, x, bitmap);
 }
 
 int main(void)
