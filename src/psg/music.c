@@ -132,10 +132,10 @@ void update_music(UINT32 time_elapsed) {
 }
 
 void stop_music(void) {
+    long old_ssp;
     is_playing = 0;
-    {
-        long old_ssp = Super(0);
-        set_volume_q(CHANNEL_A, 0);
-        Super(old_ssp);
-    }
+
+    old_ssp = Super(0);
+    set_volume_q(CHANNEL_A, 0);
+    Super(old_ssp);
 }
