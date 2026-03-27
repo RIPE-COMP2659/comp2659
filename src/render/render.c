@@ -273,7 +273,7 @@ void render_block(const Block *block, const Camera *camera, UINT8 *base)
 {
     int rel_x = camera_get_relative_x(camera, block->x);
     int rel_y = camera_get_relative_y(camera, block->y);
-    plot_bitmap_32(base, rel_y, rel_x, block->sprite, block->size);
+    plot_bitmap_33(rel_x, rel_y, base, (UINT32 *)block->sprite);
 }
 
 /* See render.h for documentation */
@@ -281,7 +281,7 @@ void render_spike(const Spike *spike, const Camera *camera, UINT8 *base)
 {
     int rel_x = camera_get_relative_x(camera, spike->x);
     int rel_y = camera_get_relative_y(camera, spike->y);
-    plot_bitmap_32(base, rel_y, rel_x, spike->sprite, spike->size);
+    plot_bitmap_33(rel_x, rel_y, base, (UINT32 *)spike->sprite);
 }
 
 /* See render.h for documentation */
@@ -289,7 +289,7 @@ void render_lava(const Lava *lava, const Camera *camera, UINT8 *base)
 {
     int rel_x = camera_get_relative_x(camera, lava->x);
     int rel_y = camera_get_relative_y(camera, lava->y);
-    plot_bitmap_32(base, rel_y, rel_x, lava->sprite, lava->size);
+    plot_bitmap_33(rel_x, rel_y, base, (UINT32 *)lava->sprite);
 }
 
 /* See render.h for documentation */
@@ -297,5 +297,5 @@ void render_geo(const Geo *geo, const Camera *camera, UINT8 *base)
 {
     int rel_x = camera_get_relative_x(camera, geo->x);
     int rel_y = camera_get_relative_y(camera, geo->y);
-    plot_bitmap_32(base, rel_y, rel_x, geo->sprite, geo->size);
+    plot_bitmap_33(rel_x, rel_y, base, (UINT32 *)geo->sprite);
 }

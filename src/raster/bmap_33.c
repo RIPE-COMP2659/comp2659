@@ -36,35 +36,68 @@ static void plotPixel(INT16 x, INT16 y, UINT8* screen_ptr)
 
 void plot_bitmap_33(INT16 x, INT16 y, UINT8* base, UINT32* bitmap)
 {
-    INT16 x_map_i;
     INT16 y_map_i;
     INT16 y_map_min = 0;
     INT16 y_map_max = BITMAP_32_SIZE - 1;
     INT16 x_map_min = 0;
     INT16 x_map_max = BITMAP_32_SIZE - 1;
+    UINT8* dst;
+    INT16 x_screen;
+    INT16 x_byte;
+    INT16 bit_offset;
+    INT16 num_bytes;
+    UINT8 left_mask;
+    UINT8 right_mask;
 
-    if (y < 0) { /* If y is negative, that's the offset index */
+    if (y < 0) {
         y_map_min = -y;
-    } else if (y + BITMAP_32_SIZE > SCREEN_HEIGHT_PIXELS) { /* y can't be off bottom if off top */
+    } else if (y + BITMAP_32_SIZE > SCREEN_HEIGHT_PIXELS) {
         y_map_max = SCREEN_HEIGHT_PIXELS - 1 - y;
     }
 
-    if (x < 0) { /* If x is negative, that's the offset index */
+    if (x < 0) {
         x_map_min = -x;
-    } else if (x + BITMAP_32_SIZE > SCREEN_WIDTH_PIXELS) { /* x can't be off the right if off the left */
+    } else if (x + BITMAP_32_SIZE > SCREEN_WIDTH_PIXELS) {
         x_map_max = SCREEN_WIDTH_PIXELS - 1 - x;
     }
 
+    if (x_map_min > x_map_max) {
+        y_map_max = y_map_min - 1;
+    }
+
+    x_screen  = x + x_map_min;
+    x_byte    = x_screen >> 3;
+    bit_offset = x_screen & 7;
+    num_bytes  = ((x + x_map_max) >> 3) - x_byte + 1;
+    left_mask  = 0xFF >> bit_offset;
+    right_mask = 0xFF << (8 - bit_offset);
+
+    dst = base + (y + y_map_min) * SCREEN_WIDTH_BYTES + x_byte;
+
     for (y_map_i = y_map_min; y_map_i <= y_map_max; y_map_i++) {
-        const INT16 y_screen = y + y_map_i;
-        const UINT32 row_bits = bitmap[y_map_i];
+        const UINT32 row_bits = bitmap[y_map_i] << x_map_min;
+        const UINT8 b0 = (UINT8)(row_bits >> 24);
+        const UINT8 b1 = (UINT8)(row_bits >> 16);
+        const UINT8 b2 = (UINT8)(row_bits >> 8);
+        const UINT8 b3 = (UINT8)(row_bits);
 
-        for (x_map_i = x_map_min; x_map_i <= x_map_max; x_map_i++) {
-            const UINT8 value = (UINT8)((row_bits >> (31 - x_map_i)) & 1u);
-
-            if (value != 0u) {
-                plotPixel(x + x_map_i, y_screen, base);
+        if (bit_offset == 0) {
+            switch (num_bytes) {
+                case 4: dst[3] = b3;
+                case 3: dst[2] = b2;
+                case 2: dst[1] = b1;
+                case 1: dst[0] = b0;
+            }
+        } else {
+            switch (num_bytes) {
+                case 5: dst[4] = (dst[4] & ~right_mask) | (b3 << (8-bit_offset));
+                case 4: dst[3] = (b2 << (8-bit_offset)) | (b3 >> bit_offset);
+                case 3: dst[2] = (b1 << (8-bit_offset)) | (b2 >> bit_offset);
+                case 2: dst[1] = (b0 << (8-bit_offset)) | (b1 >> bit_offset);
+                case 1: dst[0] = (dst[0] & ~left_mask)  | (b0 >> bit_offset);
             }
         }
+
+        dst += SCREEN_WIDTH_BYTES;
     }
 }
