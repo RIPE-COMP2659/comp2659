@@ -15,34 +15,32 @@
 #include "raster.h"
 #include <osbind.h>
 
-#define SCREEN_WIDTH_BYTES 80
 #define SCREEN_WIDTH_PIXELS 640
+#define SCREEN_WIDTH_BYTES (SCREEN_WIDTH_PIXELS / 8)
 #define SCREEN_HEIGHT_PIXELS 400
-#define BITMAP_33_SIZE 33
+#define BITMAP_33_SIZE 32
 
-static void write_pixel(UINT8 *base, INT16 row, INT16 col, UINT8 value)
+/* Assume that the pixel is on the screen */
+/* TODO: Might do a row lookup table, remove the computation completely */
+static void plotPixel(INT16 x, INT16 y, UINT8* screen_ptr)
 {
-    UINT8 *byte_ptr;
-    UINT8 mask;
-
-    byte_ptr = base + (row * SCREEN_WIDTH_BYTES) + (col >> 3);
-    mask = (UINT8)(1u << (7 - (col & 7)));
-
-    if (value != 0u) {
-        *byte_ptr |= mask;
-    } else {
-        *byte_ptr &= (UINT8)(~mask);
-    }
+    /* offset = y * screen_width_bytes + x / 8 */
+    UINT16 offset = (y * SCREEN_WIDTH_BYTES + (x >> 3));
+    UINT8* byte_ptr = screen_ptr + offset;
+    UINT8 byte_value = *byte_ptr;
+    UINT8 pixel_in_byte = 1 << (7 - (x & 7));
+    UINT8 new_value = byte_value | pixel_in_byte;
+    *byte_ptr = new_value;
 }
 
-void plot_bitmap_33(INT16 x, INT16 y, UINT8 *base, UINT32 *bitmap)
+void plot_bitmap_33(INT16 x, INT16 y, UINT8* base, UINT32* bitmap)
 {
     INT16 src_row;
 
     Cconws("Called bmap_33...\r\n");
 
     for (src_row = 0; src_row < BITMAP_33_SIZE; src_row++) {
-        const INT16 dst_row = (INT16)(x + src_row);
+        const INT16 dst_row = (INT16)(y + src_row);
         const UINT32 left_32 = bitmap[src_row * 2];
         const UINT32 right_1 = bitmap[(src_row * 2) + 1];
         INT16 src_col;
@@ -52,20 +50,20 @@ void plot_bitmap_33(INT16 x, INT16 y, UINT8 *base, UINT32 *bitmap)
         }
 
         for (src_col = 0; src_col < 32; src_col++) {
-            const INT16 dst_col = (INT16)(y + src_col);
+            const INT16 dst_col = (INT16)(x + src_col);
             const UINT8 value = (UINT8)((left_32 >> (31 - src_col)) & 1u);
 
-            if (dst_col >= 0 && dst_col < SCREEN_WIDTH_PIXELS) {
-                write_pixel(base, dst_row, dst_col, value);
+            if (value != 0u && dst_col >= 0 && dst_col < SCREEN_WIDTH_PIXELS) {
+                plotPixel(dst_col, dst_row, base);
             }
         }
 
         {
-            const INT16 dst_col = (INT16)(y + 32);
+            const INT16 dst_col = (INT16)(x + 32);
             const UINT8 value = (UINT8)((right_1 >> 31) & 1u);
 
-            if (dst_col >= 0 && dst_col < SCREEN_WIDTH_PIXELS) {
-                write_pixel(base, dst_row, dst_col, value);
+            if (value != 0u && dst_col >= 0 && dst_col < SCREEN_WIDTH_PIXELS) {
+                plotPixel(dst_col, dst_row, base);
             }
         }
     }

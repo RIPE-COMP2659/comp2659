@@ -8,7 +8,7 @@
 #define SCREEN_HEIGHT_PIXELS 400
 
 #define BITMAP_33_WIDTH 33
-#define BITMAP_33_HEIGHT 33
+#define BITMAP_33_HEIGHT 32
 #define BITMAP_33_WORDS_PER_ROW 2
 #define BITMAP_33_WORD_COUNT (BITMAP_33_HEIGHT * BITMAP_33_WORDS_PER_ROW)
 
@@ -98,7 +98,7 @@ void test_plot_bitmap_33_top_left(void)
     UINT32 bitmap[BITMAP_33_WORD_COUNT];
 
     init_bitmap_33(bitmap);
-    plot_bitmap_33(0, 0, mock_screen, bitmap);
+    plot_bitmap_33(0, 0, mock_screen, bitmap); /* x=col=0, y=row=0 */
 
     verify_bitmap_33_pixels(mock_screen, 0, 0, bitmap);
 }
@@ -113,7 +113,7 @@ void test_plot_bitmap_33_center_non_byte_aligned(void)
     row = 101;
     col = 203;
 
-    plot_bitmap_33(row, col, mock_screen, bitmap);
+    plot_bitmap_33(col, row, mock_screen, bitmap); /* x=col, y=row */
     verify_bitmap_33_pixels(mock_screen, row, col, bitmap);
 }
 
@@ -127,7 +127,7 @@ void test_plot_bitmap_33_clipped_top_right(void)
     row = -7;
     col = SCREEN_WIDTH_PIXELS - 20;
 
-    plot_bitmap_33(row, col, mock_screen, bitmap);
+    plot_bitmap_33(col, row, mock_screen, bitmap); /* x=col, y=row */
     verify_bitmap_33_pixels(mock_screen, row, col, bitmap);
 }
 
