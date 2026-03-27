@@ -183,6 +183,26 @@ void plot_bitmap_16(UINT8 *base, INT16 row, INT16 col, const UINT16 *bitmap, UIN
 */
 void plot_bitmap_32(UINT8 *base, INT16 row, INT16 col, const UINT32 *bitmap, UINT16 height);
 
+/**
+ * Plots a fixed 32x32 bitmap to the screen given by the top left pixel of the
+ * bitmap. It's an interation on bmap_32
+ *
+ * Params:
+ *     INT16 x:
+ *         The x coordinate of the top left pixel of the bitmap. If offscreen,
+ *         the bitmap will be clipped accordingly. Relative to 0,0 of the top
+ *         left of the screen where x increases rightwards
+ *     INT16 y:
+ *         The y coordinate of the top left pixel of the bitmap. If offscreen,
+ *         the bitmap will be clipped accordingly. Relative to 0,0 of the top
+ *         left of the screen where y increases downwards
+ *     UINT8 *base:
+ *         The address to the start of the screen
+ *     UINT32 *bitmap:
+ *         Pointer to 32x32 bitmap data
+ */
+void plot_bitmap_33(INT16 x, INT16 y, UINT8 *base, UINT32 *bitmap);
+
 /*----- Function: plot_character -----
 
  PURPOSE: Plots a single character, as a bitmap from a font table, to the screen.
