@@ -26,6 +26,9 @@ int main_game(void)
     /* Initial render */
     render(&model, 0);
 
+    /* Disable keyboard sound */
+    stop_keyboard_sound();
+
     /* Start background music (driven by update_music from the main loop) */
     start_music(SONG_TETRIS);
 

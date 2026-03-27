@@ -128,3 +128,4 @@ void enable_channel_q(
     unsigned int noise_on
 );
 void stop_sound_q();
+void stop_keyboard_sound();
