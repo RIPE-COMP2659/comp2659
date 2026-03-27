@@ -21,54 +21,56 @@ int main_game(void)
     signed int current_event;
     unsigned long timeThen, timeNow, timeElapsed;
 
-    UINT8 init = splash_screen(); /* Await user input */
+    UINT8 init = splash_screen(); /* Prints splash screen and awaits user input */
 
     if (init == 0)
     {
        quit = TRUE; /* Early exit if exit selected */
     }
-
-    /* Initialize render buffers */
-    init_render_buffers();
-
-    /* Initial render */
-    render(&model, 0);
-
-    timeThen = get_time();
-    while (quit != TRUE && game_won != TRUE)
+    else
     {
-        switch (get_input())
-        {
-        case JUMP:
-            on_jump_request(&model);
-            break;
-        case QUIT:
-            quit = TRUE;
-            break;
-        default:
-            break;
-        }
+        /* Initialize render buffers */
+        init_render_buffers();
 
-        timeNow = get_time();
-        timeElapsed = timeNow - timeThen;
-
-        died_this_frame = on_clock_tick(&model);
-
-        if (died_this_frame == TRUE)
-        {
-            clear_render_buffers();
-        }
-
-        current_event = check_level_complete(&model);
-        if (current_event == EVENT_LEVEL_DONE)
-        {
-            printf("Level Complete!\n"); /* TODO: Level complete handling gracefully */
-        }
-
+        /* Initial render */
         render(&model, 0);
 
-        timeThen = timeNow;
+        timeThen = get_time();
+        while (quit != TRUE && game_won != TRUE)
+        {
+            switch (get_input())
+            {
+            case JUMP:
+                on_jump_request(&model);
+                break;
+            case QUIT:
+                quit = TRUE;
+                break;
+            default:
+                break;
+            }
+
+            timeNow = get_time();
+            timeElapsed = timeNow - timeThen;
+
+            died_this_frame = on_clock_tick(&model);
+
+            if (died_this_frame == TRUE)
+            {
+                clear_render_buffers();
+            }
+
+            current_event = check_level_complete(&model);
+            if (current_event == EVENT_LEVEL_DONE)
+            {
+                printf("Level Complete!\n"); /* TODO: Level complete handling gracefully */
+            }
+
+            render(&model, 0);
+            timeThen = timeNow;
+        }
     }
+   
     return 0;
 }
 

@@ -29,95 +29,103 @@ L2:
 	bne	L3
 	;line	28
 	moveq	#0,d3
+	bra	L4
 L3:
-	;line	32
+	;line	33
 	jsr	_init_render_buffers
-	;line	35
+	;line	36
+	jsr	_clear_render_buffers
+	;line	39
+	move.l	d4,-(a7)
+	jsr	_model_update_camera
+	addq.l	#4,a7
+	;line	42
 	pea	0
 	move.l	d4,-(a7)
 	jsr	_render
 	addq.l	#8,a7
-	;line	37
+	;line	44
 	jsr	_get_time
 	move.l	d0,d6
-	;line	38
-	bra	L5
-L4:
-	;line	40
+	;line	45
+	bra	L6
+L5:
+	;line	47
 	jsr	_get_input
 	sub.b	#32,d0
-	beq	L9
-	sub.b	#81,d0
 	beq	L10
-	bra	L8
-L9:
-	;line	43
+	sub.b	#81,d0
+	beq	L11
+	bra	L9
+L10:
+	;line	50
 	move.l	d4,-(a7)
 	jsr	_on_jump_request
 	addq.l	#4,a7
-	;line	44
-	bra	L7
-L10:
-	;line	46
+	;line	51
+	bra	L8
+L11:
+	;line	53
 	moveq	#0,d3
+L9:
 L8:
-L7:
-	;line	52
+	;line	59
 	jsr	_get_time
 	move.l	d0,d5
-	;line	53
+	;line	60
 	move.l	d5,d0
 	sub.l	d6,d0
 	move.l	d0,-134(a6)
-	;line	55
+	;line	62
 	move.l	d4,-(a7)
 	jsr	_on_clock_tick
 	addq.l	#4,a7
 	move.w	d0,-118(a6)
-	;line	57
+	;line	64
 	tst.w	-118(a6)
-	bne	L11
-	;line	59
+	bne	L12
+	;line	66
 	jsr	_clear_render_buffers
-L11:
-	;line	62
+L12:
+	;line	69
 	move.l	d4,-(a7)
 	jsr	_check_level_complete
 	addq.l	#4,a7
 	move.w	d0,-122(a6)
-	;line	63
+	;line	70
 	cmp.w	#2,-122(a6)
-	bne	L12
-	;line	65
+	bne	L13
+	;line	72
 	pea	L1
 	jsr	_printf
 	addq.l	#4,a7
-L12:
-	;line	68
+L13:
+	;line	75
 	pea	0
 	move.l	d4,-(a7)
 	jsr	_render
 	addq.l	#8,a7
-	;line	70
+	;line	76
 	move.l	d5,d6
-L5:
-	tst.b	d3
-	beq	L13
-	tst.b	-116(a6)
-	bne	L4
-L13:
 L6:
-	;line	72
-	moveq	#0,d0
+	tst.b	d3
+	beq	L14
+	tst.b	-116(a6)
+	bne	L5
 L14:
+L7:
+L4:
+	;line	80
+	moveq	#0,d0
+L15:
 	movem.l	-266(a6),d3/d4/d5/d6
 	unlk	a6
 	rts
 _main:
 	link	a6,#0
-	;line	75
+	;line	83
 	jsr	_main_game
-L15:
+L16:
 	unlk	a6
 	rts
 	globl	_main_game
