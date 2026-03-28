@@ -49,9 +49,14 @@ void plot_bitmap_33(INT16 x, INT16 y, UINT8* base, UINT32* bitmap)
 
     /* Almost all only relevant if partially off screen, otherwise much simpler */
     x_screen  = x + x_map_min; /* The first x value of the bitmap */
+    /* Throwaway value above*/
     x_byte    = x_screen >> 3; /* X / 8 */
+    /* Throwaway value above once after variables */
     bit_offset = x_screen & 7;
+    /* Important above */
     num_bytes  = ((x + x_map_max) >> 3) - x_byte + 1;
+    /* Important above */
+
     left_mask  = 0xFF >> bit_offset;
     right_mask = 0xFF << (8 - bit_offset);
 
