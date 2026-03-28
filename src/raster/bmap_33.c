@@ -36,6 +36,8 @@ void plot_bitmap_33(INT16 x, INT16 y, UINT8* base, UINT32* bitmap)
     UINT8 right_mask;
 
     /* Only relevant if the bitmap is partially off-screen */
+    /* If this code is fixed first, then the assembly can be
+       updated */
     if (y < 0) {
         y_map_min = -y;
     } else if (y + BITMAP_32_SIZE > SCREEN_HEIGHT_PIXELS) {
@@ -47,6 +49,9 @@ void plot_bitmap_33(INT16 x, INT16 y, UINT8* base, UINT32* bitmap)
         x_map_max = SCREEN_WIDTH_PIXELS - 1 - x;
     }
 
+    /* This part onwards needs a revisit, specifically it has to do with values
+       that will use all the bytes, and are byte aligned, but right now isn't
+       the time */
     /* Almost all only relevant if partially off screen, otherwise much simpler */
     x_screen  = x + x_map_min; /* The first x value of the bitmap */
     /* Throwaway value above*/
