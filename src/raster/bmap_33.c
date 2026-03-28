@@ -20,20 +20,6 @@
 #define SCREEN_HEIGHT_PIXELS 400
 #define BITMAP_32_SIZE 32
 
-/* Assume that the pixel is on the screen */
-/* TODO: Might do a row lookup table, remove the computation completely */
-/* Assume the area is already white */
-static void plotPixel(INT16 x, INT16 y, UINT8* screen_ptr)
-{
-    /* offset = y * screen_width_bytes + x / 8 */
-    UINT16 offset = (y * SCREEN_WIDTH_BYTES + (x >> 3));
-    UINT8* byte_ptr = screen_ptr + offset;
-    UINT8 byte_value = *byte_ptr;
-    UINT8 pixel_in_byte = 1 << (7 - (x & 7));
-    UINT8 new_value = byte_value | pixel_in_byte;
-    *byte_ptr = new_value;
-}
-
 void plot_bitmap_33(INT16 x, INT16 y, UINT8* base, UINT32* bitmap)
 {
     INT16 y_map_i;
@@ -49,20 +35,21 @@ void plot_bitmap_33(INT16 x, INT16 y, UINT8* base, UINT32* bitmap)
     UINT8 left_mask;
     UINT8 right_mask;
 
+    /* Only relevant if the bitmap is partially off-screen */
     if (y < 0) {
         y_map_min = -y;
     } else if (y + BITMAP_32_SIZE > SCREEN_HEIGHT_PIXELS) {
         y_map_max = SCREEN_HEIGHT_PIXELS - 1 - y;
     }
-
     if (x < 0) {
         x_map_min = -x;
     } else if (x + BITMAP_32_SIZE > SCREEN_WIDTH_PIXELS) {
         x_map_max = SCREEN_WIDTH_PIXELS - 1 - x;
     }
 
-    x_screen  = x + x_map_min;
-    x_byte    = x_screen >> 3;
+    /* Almost all only relevant if partially off screen, otherwise much simpler */
+    x_screen  = x + x_map_min; /* The first x value of the bitmap */
+    x_byte    = x_screen >> 3; /* X / 8 */
     bit_offset = x_screen & 7;
     num_bytes  = ((x + x_map_max) >> 3) - x_byte + 1;
     left_mask  = 0xFF >> bit_offset;
