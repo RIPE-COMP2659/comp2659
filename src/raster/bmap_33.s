@@ -67,7 +67,7 @@ y_upper_check:
 ;     Lastly, we find how many bytes we're writing, the last byte minus the first, and + 1 because we're counting
 ;     the quantity of bytes. We're converting from indices to byte quantity. If there are 3 items in array, the last
 ;     index + 1 will give you size
-;     
+;     DOC THE Y STUFF
 init_offsets:
         move.w  d6,d5               ; d5 = x_screen = x
         add.w   d0,d5               ; x_screen = x + x_map_min
@@ -85,10 +85,11 @@ init_offsets:
         add.l   base(a6),d7         ; current_byte = (y + y_map_min) * SCREEN_WIDTH_BYTES + base
         add.w   d4,d7               ; current_byte = (y + y_map_min) * SCREEN_WIDTH_BYTES + base + x_byte
 
-        ; d1 is now free
-        ; d2 is free, but will probably be loop counter
+        ; d1 is now free, one of the bitmasks
+        ; d2 is going to be loop counter
         ; d3 could be free, maybe, upper limit of loop
         ; d4 is now free
+        ; We're a register shy, but left and right bitmasks are complimentary, so we only need one
 
         movem.l (sp)+,d3-d7/a3-a5
         unlk    a6
