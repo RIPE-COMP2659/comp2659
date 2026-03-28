@@ -90,223 +90,129 @@ init_offsets:
         lsr.w   d5,d1               ; bitmask = bitmask >> bit_offset
         move.w  d1,d4               ; `d4 = right_bitmask = bitmask >> bit_offset
         not.w   d4                  ; right_bitmask = ~(left_bitmask)
+        move.w  d0,-(sp)            ; push x_map_min
         bra     row_while
 
+; Everything below here needs a revisit, but time is not permitting right now
 row_loop:
+        move.l  bitmap(a6),a1      ; a1 = bitmap base pointer
+        move.w  d2,d7              ; d7 = y_map_i
+        ext.l   d7                 ; sign extend to 32-bit
+        asl.l   #2,d7              ; d7 = y_map_i * 4
+        move.l  0(a1,d7),d7      ; d7 = bitmap[y_map_i]
+        move.w  0(sp),d0           ; d0 = x_map_min
+        lsl.l   d0,d7              ; d7 = row_bits = bitmap[y_map_i] << x_map_min
+        move.l  d7,-(sp)           ; push row_bits
+                                   ; 0(sp) = b3, 1(sp) = b2, 2(sp) = b1, 3(sp) = b0
+                                   ; 4(sp) = x_map_min (word)
+        tst.w   d5
+        bne.s   unaligned_blit
 
+aligned_blit:
+        move.w  d6,d7              ; d7 = num_bytes scratch
+        subq.w  #4,d7
+        beq.s   aligned_4
+        addq.w  #1,d7
+        beq.s   aligned_3
+        addq.w  #1,d7
+        beq.s   aligned_2
+        addq.w  #1,d7
+        beq.s   aligned_1
+        bra     blit_done
 
-        lea     SCREEN_W_BYTE(a0),a0   ; a1 = &bitmap[y_map_min]
-        addq.w  #1,d2                  ; y_map_min++
+aligned_4:
+        move.b  3(sp),3(a0)         ; dst[3] = b3
+aligned_3:
+        move.b  2(sp),2(a0)         ; dst[2] = b2
+aligned_2:
+        move.b  1(sp),1(a0)         ; dst[1] = b1
+aligned_1:
+        move.b  0(sp),0(a0)         ; dst[0] = b0
+        bra     blit_done
 
-; Can probably make logic better for while
+unaligned_blit:
+        move.w  #8,d7
+        sub.w   d5,d7              ; d7 = 8 - bit_offset
+        move.w  d7,-(sp)           ; push 8 - bit_offset
+                                   ; 0(sp) = 8-bit_offset (word)
+                                   ; 2(sp) = b3, 3(sp) = b2, 4(sp) = b1, 5(sp) = b0
+                                   ; 6(sp) = x_map_min (word)
+        move.w  d6,d7              ; d7 = num_bytes scratch
+        subq.w  #5,d7
+        beq.s   unaligned_5
+        addq.w  #1,d7
+        beq.s   unaligned_4
+        addq.w  #1,d7
+        beq.s   unaligned_3
+        addq.w  #1,d7
+        beq.s   unaligned_2
+        addq.w  #1,d7
+        beq.s   unaligned_1
+        bra.s   unaligned_done
+
+unaligned_5:
+        clr.w   d7
+        move.b  5(sp),d7           ; d7 = b3
+        move.w  0(sp),d0           ; d0 = 8 - bit_offset
+        asl.w   d0,d7              ; d7 = b3 << (8 - bit_offset)
+        clr.w   d0
+        move.b  4(a0),d0           ; d0 = dst[4]
+        and.w   d1,d0              ; d0 = dst[4] & ~right_mask
+        or.w    d0,d7              ; d7 = result
+        move.b  d7,4(a0)
+unaligned_4:
+        clr.w   d7
+        move.b  4(sp),d7           ; d7 = b2
+        move.w  0(sp),d0           ; d0 = 8 - bit_offset
+        asl.w   d0,d7              ; d7 = b2 << (8 - bit_offset)
+        clr.w   d0
+        move.b  5(sp),d0           ; d0 = b3
+        lsr.w   d5,d0              ; d0 = b3 >> bit_offset
+        or.w    d0,d7              ; d7 = result
+        move.b  d7,3(a0)
+unaligned_3:
+        clr.w   d7
+        move.b  3(sp),d7           ; d7 = b1
+        move.w  0(sp),d0           ; d0 = 8 - bit_offset
+        asl.w   d0,d7              ; d7 = b1 << (8 - bit_offset)
+        clr.w   d0
+        move.b  4(sp),d0           ; d0 = b2
+        lsr.w   d5,d0              ; d0 = b2 >> bit_offset
+        or.w    d0,d7              ; d7 = result
+        move.b  d7,2(a0)
+unaligned_2:
+        clr.w   d7
+        move.b  2(sp),d7           ; d7 = b0
+        move.w  0(sp),d0           ; d0 = 8 - bit_offset
+        asl.w   d0,d7              ; d7 = b0 << (8 - bit_offset)
+        clr.w   d0
+        move.b  3(sp),d0           ; d0 = b1
+        lsr.w   d5,d0              ; d0 = b1 >> bit_offset
+        or.w    d0,d7              ; d7 = result
+        move.b  d7,1(a0)
+unaligned_1:
+        clr.w   d7
+        move.b  2(sp),d7           ; d7 = b0
+        lsr.w   d5,d7              ; d7 = b0 >> bit_offset
+        clr.w   d0
+        move.b  (a0),d0            ; d0 = dst[0]
+        and.w   d4,d0              ; d0 = dst[0] & ~left_mask
+        or.w    d0,d7              ; d7 = result
+        move.b  d7,(a0)
+
+unaligned_done:
+        addq.l  #2,sp              ; pop 8 - bit_offset
+
+blit_done:
+        addq.l  #4,sp              ; pop row_bits
+        lea     SCREEN_W_BYTE(a0),a0
+        addq.w  #1,d2              ; y_map_i++
+
 row_while:
-        cmp.w   d3,d2           ; while y_map_min <= y_map_max
-        ble     row_loop        ; do the row
+        cmp.w   d3,d2              ; while y_map_i <= y_map_max
+        ble     row_loop
 
-        ; d1 is now free, one of the bitmasks
-        ; d2 is going to be loop counter
-        ; d3 could be free, maybe, upper limit of loop
-        ; d4 is now free
-        ; d7 is now free
-        ; We're a register shy, but left and right bitmasks are complimentary, so we only need one
-
+        addq.l  #2,sp              ; pop x_map_min
         movem.l (sp)+,d3-d7/a3-a5
         unlk    a6
         rts
-
-; init
-
-
-
-;         move.w  #$1f,-6(a6)
-;         suba.l  a5,a5
-;         move.w  #$1f,-$a(a6)
-;         move.w  x(a6),d4
-;         move.w  y(a6),d6
-;         tst.w   d6
-;         bge.s   .lbl0
-;         move.w  d6,d0
-;         neg.w   d0
-;         move.w  d0,-4(a6)
-;         bra.s   .lbl1
-; .lbl0:
-;         moveq   #32,d0
-;         add.w   d6,d0
-;         cmp.w   #400,d0
-;         ble.s   .lbl1
-;         move.w  #399,d0
-;         sub.w   d6,d0
-;         move.w  d0,-6(a6)
-; .lbl1:
-;         tst.w   d4
-;         bge.s   .lbl2
-;         move.w  d4,d0
-;         neg.w   d0
-;         movea.w d0,a5
-;         bra.s   .lbl3
-; .lbl2:
-;         moveq   #32,d0
-;         add.w   d4,d0
-;         cmp.w   #640,d0
-;         ble.s   .lbl3
-;         move.w  #639,d0
-;         sub.w   d4,d0
-;         move.w  d0,-$a(a6)
-; .lbl3:
-;         move.w  d4,d0
-;         add.w   a5,d0
-;         move.w  d0,-$10(a6)
-;         move.w  -$10(a6),d0
-;         asr.w   #3,d0
-;         move.w  d0,-$12(a6)
-;         move.w  -$10(a6),d0
-;         and.w   #7,d0
-;         move.w  d0,d3
-;         move.w  -$a(a6),d0
-;         add.w   d4,d0
-;         asr.w   #3,d0
-;         sub.w   -$12(a6),d0
-;         addq.w  #1,d0
-;         move.w  d0,-$16(a6)
-;         move.w  #$ff,d0
-;         asr.w   d3,d0
-;         move.b  d0,-$17(a6)
-;         move.w  #$ff,d0
-;         moveq   #8,d1
-;         sub.w   d3,d1
-;         asl.w   d1,d0
-;         move.b  d0,-$18(a6)
-;         move.w  -4(a6),d0
-;         add.w   d6,d0
-;         muls.w  #80,d0
-;         ext.l   d0
-;         add.l   $c(a6),d0
-;         move.w  -$12(a6),d1
-;         ext.l   d1
-;         add.l   d1,d0
-;         movea.l d0,a3
-;         movea.w -4(a6),a4
-;         bra     .lbl17
-; .lbl4:
-;         move.w  a4,d0
-;         ext.l   d0
-;         asl.l   #2,d0
-;         movea.l d0,a0
-;         move.l  $10(a6),d0
-;         adda.l  d0,a0
-;         move.l  (a0),d0
-;         move.w  a5,d1
-;         asl.l   d1,d0
-;         move.l  d0,d5
-;         moveq   #24,d1
-;         lsr.l   d1,d0
-;         move.b  d0,-$1d(a6)
-;         move.l  d5,d0
-;         moveq   #16,d1
-;         lsr.l   d1,d0
-;         move.b  d0,-$1e(a6)
-;         move.l  d5,d0
-;         lsr.l   #8,d0
-;         move.b  d0,-$1f(a6)
-;         move.b  d5,d7
-;         tst.w   d3
-;         bne.s   .lbl10
-;         move.w  -$16(a6),d0
-;         subq.w  #4,d0
-;         beq.s   .lbl5
-;         addq.w  #1,d0
-;         beq.s   .lbl6
-;         addq.w  #1,d0
-;         beq.s   .lbl7
-;         addq.w  #1,d0
-;         beq.s   .lbl8
-;         bra.s   .lbl9
-; .lbl5:
-;         move.b  d7,3(a3)
-; .lbl6:
-;         move.b  -$1f(a6),2(a3)
-; .lbl7:
-;         move.b  -$1e(a6),1(a3)
-; .lbl8:
-;         move.b  -$1d(a6),(a3)
-; .lbl9:
-;         bra     .lbl16
-; .lbl10:
-;         move.w  -$16(a6),d0
-;         subq.w  #5,d0
-;         beq.s   .lbl11
-;         addq.w  #1,d0
-;         beq.s   .lbl12
-;         addq.w  #1,d0
-;         beq.s   .lbl13
-;         addq.w  #1,d0
-;         beq.s   .lbl14
-;         addq.w  #1,d0
-;         beq.s   .lbl15
-;         bra     .lbl16
-; .lbl11:
-;         clr.w   d0
-;         move.b  4(a3),d0
-;         clr.w   d1
-;         move.b  -$18(a6),d1
-;         not.w   d1
-;         and.w   d1,d0
-;         clr.w   d1
-;         move.b  d7,d1
-;         moveq   #8,d2
-;         sub.w   d3,d2
-;         asl.w   d2,d1
-;         or.w    d1,d0
-;         move.b  d0,4(a3)
-; .lbl12:
-;         clr.w   d0
-;         move.b  -$1f(a6),d0
-;         moveq   #8,d1
-;         sub.w   d3,d1
-;         asl.w   d1,d0
-;         clr.w   d1
-;         move.b  d7,d1
-;         asr.w   d3,d1
-;         or.w    d1,d0
-;         move.b  d0,3(a3)
-; .lbl13:
-;         clr.w   d0
-;         move.b  -$1e(a6),d0
-;         moveq   #8,d1
-;         sub.w   d3,d1
-;         asl.w   d1,d0
-;         clr.w   d1
-;         move.b  -$1f(a6),d1
-;         asr.w   d3,d1
-;         or.w    d1,d0
-;         move.b  d0,2(a3)
-; .lbl14:
-;         clr.w   d0
-;         move.b  -$1d(a6),d0
-;         moveq   #8,d1
-;         sub.w   d3,d1
-;         asl.w   d1,d0
-;         clr.w   d1
-;         move.b  -$1e(a6),d1
-;         asr.w   d3,d1
-;         or.w    d1,d0
-;         move.b  d0,1(a3)
-; .lbl15:
-;         clr.w   d0
-;         move.b  -$17(a6),d0
-;         not.w   d0
-;         clr.w   d1
-;         move.b  (a3),d1
-;         and.w   d1,d0
-;         clr.w   d1
-;         move.b  -$1d(a6),d1
-;         asr.w   d3,d1
-;         or.w    d1,d0
-;         move.b  d0,(a3)
-; .lbl16:
-;         lea     80(a3),a3
-;         addq.w  #1,a4
-; .lbl17:
-;         cmpa.w  -6(a6),a4
-;         ble     .lbl4
-
