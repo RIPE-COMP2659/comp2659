@@ -68,6 +68,7 @@ y_upper_check:
 ;     the quantity of bytes. We're converting from indices to byte quantity. If there are 3 items in array, the last
 ;     index + 1 will give you size
 ;     DOC THE Y STUFF
+;     DOC THE BITMASK STUFF
 init_offsets:
         move.w  d6,d5               ; d5 = x_screen = x
         add.w   d0,d5               ; x_screen = x + x_map_min
@@ -84,11 +85,29 @@ init_offsets:
         ext.l   d7                  ; sign extend to 32-bit, likely too large for 16 bits
         add.l   base(a6),d7         ; current_byte = (y + y_map_min) * SCREEN_WIDTH_BYTES + base
         add.w   d4,d7               ; current_byte = (y + y_map_min) * SCREEN_WIDTH_BYTES + base + x_byte
+        move.l  d7,a0               ; a0 = current_byte address
+        move.w  #$00FF,d1           ; `d1 = bitmask = 1111 1111 1111 1111
+        lsr.w   d5,d1               ; bitmask = bitmask >> bit_offset
+        move.w  d1,d4               ; `d4 = right_bitmask = bitmask >> bit_offset
+        not.w   d4                  ; right_bitmask = ~(left_bitmask)
+        bra     row_while
+
+row_loop:
+
+
+        lea     SCREEN_W_BYTE(a0),a0   ; a1 = &bitmap[y_map_min]
+        addq.w  #1,d2                  ; y_map_min++
+
+; Can probably make logic better for while
+row_while:
+        cmp.w   d3,d2           ; while y_map_min <= y_map_max
+        ble     row_loop        ; do the row
 
         ; d1 is now free, one of the bitmasks
         ; d2 is going to be loop counter
         ; d3 could be free, maybe, upper limit of loop
         ; d4 is now free
+        ; d7 is now free
         ; We're a register shy, but left and right bitmasks are complimentary, so we only need one
 
         movem.l (sp)+,d3-d7/a3-a5
