@@ -161,9 +161,9 @@ void stop_sound_q() {
     */
 }
 
-void stop_keyboard_sound() {
+void toggle_keyboard_sound() {
     long old_ssp = Super(0);
-    UINT8 console_byte = *CONSOLE_PTR & 0xFE; /* Clear bit 0 to disable keyboard sound */
+    UINT8 console_byte = *CONSOLE_PTR ^ 0x01; /* Invert bit 0 to flip keyboard sound */
     *CONSOLE_PTR = console_byte;
     Super(old_ssp);
 }

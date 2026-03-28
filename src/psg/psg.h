@@ -113,6 +113,9 @@ void enable_channel(
  */
 void stop_sound();
 
+/** TODO: Documentation */
+void toggle_keyboard_sound();
+
 /**
  * The following functions are the same as the above, without input validation
  * or super calls. The above functions all wrap their quick counterpart. So if
@@ -128,4 +131,3 @@ void enable_channel_q(
     unsigned int noise_on
 );
 void stop_sound_q();
-void stop_keyboard_sound();
