@@ -61,10 +61,6 @@ void plot_bitmap_33(INT16 x, INT16 y, UINT8* base, UINT32* bitmap)
         x_map_max = SCREEN_WIDTH_PIXELS - 1 - x;
     }
 
-    if (x_map_min > x_map_max) {
-        y_map_max = y_map_min - 1;
-    }
-
     x_screen  = x + x_map_min;
     x_byte    = x_screen >> 3;
     bit_offset = x_screen & 7;
