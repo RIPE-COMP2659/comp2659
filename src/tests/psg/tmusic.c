@@ -68,7 +68,13 @@ int main(void) {
 
     /* Test Track 2: Bach's Bourree */
     test_song(SONG_BOURREE, "Bach's Bourree in E minor");
-
+    
+    /* Test Track 3: Hot Cross Buns */
+    test_song(SONG_HOT_CROSS_BUNS, "Hot Cross Buns");
+    
+    /* Test Track 4: Gloria */
+    test_song(SONG_GLORIA, "Gloria");
+    
     Cconws("All music tests complete.\r\n");
     Cconws("Press any key to exit to DOS...\r\n");
     Cnecin();

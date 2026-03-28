@@ -17,6 +17,8 @@ typedef struct {
 typedef enum {
     SONG_BOURREE,
     SONG_TETRIS
+    , SONG_HOT_CROSS_BUNS
+    , SONG_GLORIA
 } SongChoice;
 
 /* Updated to take a SongChoice enum */

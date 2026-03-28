@@ -93,3 +93,6 @@
 #define A7    89  /* A  3520.00Hz */
 #define A7S   84  /* A# 3729.31Hz */
 #define B7    79  /* B  3951.07Hz */
+
+/* Special note value for a rest (silence) */
+#define REST 0
