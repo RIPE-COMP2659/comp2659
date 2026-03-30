@@ -161,6 +161,7 @@ void stop_sound_q() {
     */
 }
 
+/* TODO: Function documentation */
 void toggle_keyboard_sound() {
     long old_ssp = Super(0);
     UINT8 console_byte = *CONSOLE_PTR ^ 0x01; /* Invert bit 0 to flip keyboard sound */
