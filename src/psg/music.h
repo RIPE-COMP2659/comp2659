@@ -16,10 +16,6 @@
 #include "psg.h"
 #include <osbind.h>
 
-#define CHANNEL_A 0
-#define CHANNEL_B 1
-#define CHANNEL_C 2
-
 typedef struct {
     unsigned int pitch;    /* Note frequency divider (0 = Rest) */
     unsigned int duration; /* Duration in 70Hz VBL ticks */
