@@ -108,7 +108,7 @@ Level get_level1(void)
         current_block,
         0,
         2,
-        30000
+        6000
     );
 }
 

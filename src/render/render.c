@@ -150,30 +150,31 @@ static void clear_sprite_region(UINT8 *base, int rel_y, int rel_x, unsigned int 
     }
 }
 
-/* TODO: Logic around stale rendering doesn't feel right. Shouldn't need to N-2 frame clear */
+/* Render double-buffered frame:
+ * 1. Assume F' (stale buffer) is blank
+ * 2. Draw N (current state) to F'
+ * 3. Swap to F' (now displayed)
+ * 4. Clear F (now stale) using N-1 (prev_cam, prev_geo)
+ */
 /* See render.h for documentation */
 void render(const Model *model, UINT8 *base)
 {
     unsigned int i;
     const Camera *cam = &model->world.camera;
-    const Camera *stale_cam = &model->stale_cam;
+    const Camera *prev_cam = &model->prev_cam;
     int level_i = model->world.level_index;
     Level level = model->world.levels[level_i];
     int input;
     UINT8 *render_buf;
+    UINT8 *clear_buf;
 
     /* TODO: Refactor function contract to remove base */
     (void)base;
 
-    /* Get the back buffer to render to */
+    /* Get the back buffer to render to (F') */
     render_buf = buffers[stale_buffer];
 
-    clear_ground(render_buf, stale_cam, model->world.ground_y);
-    clear_blocks(render_buf, stale_cam, level.blocks, model->cam_min_bi, model->cam_max_bi);
-    clear_spikes(render_buf, stale_cam, level.spikes, model->cam_min_si, model->cam_max_si);
-    clear_lava(render_buf, stale_cam, level.lava, model->cam_min_li, model->cam_max_li);
-    clear_geo(render_buf, stale_cam, &model->stale_geo);
-
+    /* Step 2: Draw N (current state) to F' */
     render_ground(model, render_buf);
 
     for (i = model->cam_min_bi; i <= model->cam_max_bi; i++)
@@ -193,7 +194,23 @@ void render(const Model *model, UINT8 *base)
 
     render_geo(&model->world.geo, cam, render_buf);
 
+    /* Step 3: Swap buffers so F' becomes the display buffer */
     swap_buffers();
+
+    Vsync();
+
+    /* Step 4: Clear F (now stale) using N-1 (prev_cam, prev_geo) */
+    clear_buf = buffers[stale_buffer];
+    clear_ground(clear_buf, prev_cam, model->world.ground_y);
+    clear_blocks(clear_buf, prev_cam, level.blocks,
+                 model->cam_min_bi_prev, model->cam_max_bi_prev);
+    clear_spikes(clear_buf, prev_cam, level.spikes,
+                 model->cam_min_si_prev, model->cam_max_si_prev);
+    clear_lava(clear_buf, prev_cam, level.lava,
+               model->cam_min_li_prev, model->cam_max_li_prev);
+    clear_geo(clear_buf, prev_cam, &model->prev_geo);
+
+
 }
 
 void clear_geo(UINT8 *base, const Camera *camera, const Geo *geo)

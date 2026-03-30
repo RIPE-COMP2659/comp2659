@@ -26,10 +26,11 @@ COVERAGE_FLAGS = -fprofile-arcs -ftest-coverage -O0
 # -I. means include from current directory (for helloworld.h)
 # -Itests/unity means include from tests/unity subdirectory (for unity.h)
 # -Imodel means include from model subdirectory (for entity headers)
+# -Ishared means include from shared subdirectory (for shared constants)
 # -Ievents means include from events subdirectory (for event headers)
 # -Ios_wrap means include from os_wrap subdirectory (for oswrap headers)
 OSWRAP_FOLDER = os_wrap
-INCLUDES = -I. -Itests/unity -Imodel -Ievents -I$(OSWRAP_FOLDER)
+INCLUDES = -I. -Itests/unity -Imodel -Ishared -Ievents -I$(OSWRAP_FOLDER)
 
 # Source files - automatically discover all .c files in src directory (excluding tests/)
 SRC = $(filter-out tests/%, $(wildcard *.c model/*.c events/*.c))

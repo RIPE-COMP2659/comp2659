@@ -8,12 +8,19 @@
  * Course: COMP 2659-001, Computing Machinery II, Winter 2026
  * Instructor: Nolan Shaw
  *
- * PURPOSE: Shared data type and constant definitions used throughout
- *          the model and rendering subsystems (booleans, sizes,
- *          screen dimensions and collision codes).
+ * Shared data type and constant definitions used throughout the game.
  */
 #ifndef DTYPES_H
 #define DTYPES_H
+
+/* Fixed-width integer aliases */
+typedef char INT8;
+typedef short INT16;
+typedef long INT32;
+
+typedef unsigned char UINT8;
+typedef unsigned short UINT16;
+typedef unsigned long UINT32;
 
 /* Data sizes */
 #define WORD 16
