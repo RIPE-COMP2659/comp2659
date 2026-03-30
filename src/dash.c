@@ -5,9 +5,7 @@
 #include "input/input.h"
 #include "splash/splash.h"
 #include "psg/effects.h"
-#include <osbind.h>
 #include "psg/music.h"
-#include <stdio.h>
 
 #define JUMP 32
 #define QUIT 113
@@ -59,6 +57,13 @@ int main_game(void)
 
             timeNow = get_time();
             timeElapsed = timeNow - timeThen;
+            timeThen = timeNow; /* update here, before on_clock_tick's death wait */
+
+            /* NOTE: This keeps the game from crashing, no clue why, something in music timing */
+            if (timeElapsed == 0)
+            {
+                timeElapsed = 1;
+            }
 
             /* Update music with elapsed VBL ticks */
             update_music(timeElapsed);
@@ -76,47 +81,11 @@ int main_game(void)
             {
                 stop_music();
                 play_level_complete_effect();
-                printf("Level Complete!\n");
                 game_won = TRUE;
             }
 
             /* Initial render */
             render(&model, 0);
-
-            timeThen = get_time();
-            while (quit != TRUE && game_won != TRUE)
-            {
-                switch (get_input())
-                {
-                case JUMP:
-                    on_jump_request(&model);
-                    break;
-                case QUIT:
-                    quit = TRUE;
-                    break;
-                default:
-                    break;
-                }
-
-                timeNow = get_time();
-                timeElapsed = timeNow - timeThen;
-
-                died_this_frame = on_clock_tick(&model);
-
-                if (died_this_frame == TRUE)
-                {
-                    clear_render_buffers();
-                }
-
-                current_event = check_level_complete(&model);
-                if (current_event == EVENT_LEVEL_DONE)
-                {
-                    printf("Level Complete!\n"); /* TODO: Level complete handling gracefully */
-                }
-
-                render(&model, 0);
-                timeThen = timeNow;
-            }
         }
 
         /* Renable the keyboard */
@@ -127,6 +96,8 @@ int main_game(void)
 
         return 0;
     }
+
+    return 0;
 }
 
 int main(void) { return main_game(); }
