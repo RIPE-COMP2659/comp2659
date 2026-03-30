@@ -59,10 +59,12 @@ int main_game(void)
         if (died_this_frame == TRUE)
         {
             clear_render_buffers();
+            start_music(SONG_GLORIA);
         }
 
         current_event = check_level_complete(&model);
         if (current_event == EVENT_LEVEL_DONE) {
+            stop_music();
             play_level_complete_effect();
             printf("Level Complete!\n");
             game_won = TRUE;

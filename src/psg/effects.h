@@ -14,5 +14,6 @@ void play_death_effect(void);
  * Plays the level complete sound effect using the PSG envelope generator.
  */
 void play_level_complete_effect(void);
+void play_jump_effect(void);
 
 #endif

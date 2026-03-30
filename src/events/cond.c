@@ -19,6 +19,7 @@
  */
 #include "cond.h"
 #include "../clock/clock.h"
+#include "../psg/music.h"
 
 int check_level_complete(Model *model)
 {
@@ -35,6 +36,7 @@ int check_level_complete(Model *model)
 void on_geo_death(Model *model)
 {
     unsigned long wait_until;
+    stop_music();
     play_death_effect();
     
     /* Wait for ~1.5s while showing the crash point */
