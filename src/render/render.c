@@ -161,20 +161,19 @@ void render(const Model *model, UINT8 *base)
 {
     unsigned int i;
     const Camera *cam = &model->world.camera;
-    const Camera *prev_cam = &model->prev_cam;
     int level_i = model->world.level_index;
     Level level = model->world.levels[level_i];
-    int input;
     UINT8 *render_buf;
-    UINT8 *clear_buf;
 
-    /* TODO: Refactor function contract to remove base */
     (void)base;
 
-    /* Get the back buffer to render to (F') */
+    /* Get the back buffer to render to */
     render_buf = buffers[stale_buffer];
 
-    /* Step 2: Draw N (current state) to F' */
+    /* FULL CLEAR: Ensures no ghosting/smearing during frame skipping */
+    clear_screen((UINT32 *)render_buf);
+
+    /* Draw the current state */
     render_ground(model, render_buf);
 
     for (i = model->cam_min_bi; i <= model->cam_max_bi; i++)
@@ -194,23 +193,11 @@ void render(const Model *model, UINT8 *base)
 
     render_geo(&model->world.geo, cam, render_buf);
 
-    /* Step 3: Swap buffers so F' becomes the display buffer */
+    /* Swap buffers so the newly drawn frame becomes visible */
     swap_buffers();
 
+    /* Sync with the Vertical Blank for steady 35 FPS heartrate */
     Vsync();
-
-    /* Step 4: Clear F (now stale) using N-1 (prev_cam, prev_geo) */
-    clear_buf = buffers[stale_buffer];
-    clear_ground(clear_buf, prev_cam, model->world.ground_y);
-    clear_blocks(clear_buf, prev_cam, level.blocks,
-                 model->cam_min_bi_prev, model->cam_max_bi_prev);
-    clear_spikes(clear_buf, prev_cam, level.spikes,
-                 model->cam_min_si_prev, model->cam_max_si_prev);
-    clear_lava(clear_buf, prev_cam, level.lava,
-               model->cam_min_li_prev, model->cam_max_li_prev);
-    clear_geo(clear_buf, prev_cam, &model->prev_geo);
-
-
 }
 
 void clear_geo(UINT8 *base, const Camera *camera, const Geo *geo)

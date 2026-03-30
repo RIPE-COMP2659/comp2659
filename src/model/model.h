@@ -11,27 +11,27 @@
  *     collision-related indices
  */
 typedef struct {
-    World world;
-    unsigned int cam_min_bi; /* block index, camera */
-    unsigned int cam_max_bi; /* block index, camera */
-    unsigned int cam_min_si; /* spike index, camera */
-    unsigned int cam_max_si; /* spike index, camera */
-    unsigned int cam_min_li; /* lava index, camera */
-    unsigned int cam_max_li; /* lava index, camera */
-    unsigned int cam_min_bi_prev; /* block index, camera, previous update */
-    unsigned int cam_max_bi_prev; /* block index, camera, previous update */
-    unsigned int cam_min_si_prev; /* spike index, camera, previous update */
-    unsigned int cam_max_si_prev; /* spike index, camera, previous update */
-    unsigned int cam_min_li_prev; /* lava index, camera, previous update */
-    unsigned int cam_max_li_prev; /* lava index, camera, previous update */
-    unsigned int col_min_bi; /* block index, collision */
-    unsigned int col_max_bi; /* block index, collision */
-    unsigned int col_min_si; /* spike index, collision */
-    unsigned int col_max_si; /* spike index, collision */
-    unsigned int col_min_li; /* lava index, collision */
-    unsigned int col_max_li; /* lava index, collision */
-    Camera prev_cam;  /* camera from 2 updates ago (intermediate shift) */
-    Geo prev_geo;     /* geo from 2 updates ago (intermediate shift) */
+  World world;
+  unsigned int cam_min_bi;      /* block index, camera */
+  unsigned int cam_max_bi;      /* block index, camera */
+  unsigned int cam_min_si;      /* spike index, camera */
+  unsigned int cam_max_si;      /* spike index, camera */
+  unsigned int cam_min_li;      /* lava index, camera */
+  unsigned int cam_max_li;      /* lava index, camera */
+  unsigned int cam_min_bi_prev; /* block index, camera, previous update */
+  unsigned int cam_max_bi_prev; /* block index, camera, previous update */
+  unsigned int cam_min_si_prev; /* spike index, camera, previous update */
+  unsigned int cam_max_si_prev; /* spike index, camera, previous update */
+  unsigned int cam_min_li_prev; /* lava index, camera, previous update */
+  unsigned int cam_max_li_prev; /* lava index, camera, previous update */
+  unsigned int col_min_bi;      /* block index, collision */
+  unsigned int col_max_bi;      /* block index, collision */
+  unsigned int col_min_si;      /* spike index, collision */
+  unsigned int col_max_si;      /* spike index, collision */
+  unsigned int col_min_li;      /* lava index, collision */
+  unsigned int col_max_li;      /* lava index, collision */
+  Camera prev_cam; /* camera from 2 updates ago (intermediate shift) */
+  Geo prev_geo;    /* geo from 2 updates ago (intermediate shift) */
 } Model;
 
 /**
@@ -77,7 +77,7 @@ void model_update_camera(Model *model);
  * Updates the camera indices within the model, for blocks, cam_min_bi and
  * cam_max_bi, keeps tracks of the minimum and maximum indices to be
  * incremented as geo moves through the level
- * 
+ *
  * Params:
  *     Model *model:
  *         Pointer to the model to update
@@ -88,7 +88,7 @@ void model_update_camera_bi(Model *model);
  * Updates the camera indices within the model, for spikes, cam_min_si and
  * cam_max_si, keeps tracks of the minimum and maximum indices to be
  * incremented as geo moves through the level
- * 
+ *
  * Params:
  *     Model *model:
  *         Pointer to the model to update
@@ -99,7 +99,7 @@ void model_update_camera_si(Model *model);
  * Updates the camera indices within the model, for lava, cam_min_li and
  * cam_max_li, keeps tracks of the minimum and maximum indices to be
  * incremented as geo moves through the level
- * 
+ *
  * Params:
  *     Model *model:
  *         Pointer to the model to update
@@ -120,7 +120,7 @@ void model_update_collision(Model *model);
  * Updates the collision indices within the model, for blocks, col_min_bi and
  * col_max_bi, keeps tracks of the minimum and maximum indices to be
  * incremented as geo moves through the level
- * 
+ *
  * Params:
  *     Model *model:
  *         Pointer to the model to update
@@ -131,7 +131,7 @@ void model_update_collision_bi(Model *model);
  * Updates the collision indices within the model, for spikes, col_min_si and
  * col_max_si, keeps tracks of the minimum and maximum indices to be
  * incremented as geo moves through the level
- * 
+ *
  * Params:
  *     Model *model:
  *         Pointer to the model to update
@@ -142,11 +142,20 @@ void model_update_collision_si(Model *model);
  * Updates the collision indices within the model, for lava, col_min_li and
  * col_max_li, keeps tracks of the minimum and maximum indices to be
  * incremented as geo moves through the level
- * 
+ *
  * Params:
  *     Model *model:
  *         Pointer to the model to update
  */
 void model_update_collision_li(Model *model);
+
+/**
+ *
+ * Params:
+ *     Model *model:
+ *         Pointer to the model to update
+ */
+void model_reset_indices(Model *model);
+Model create_model(void);
 
 #endif
