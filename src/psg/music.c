@@ -1,14 +1,6 @@
 /* See file header for music.h */
 
 #include "music.h"
-#include "notes.h"
-#include "psg.h"
-#include <osbind.h>
-
-/* FIX: D2 is missing from notes.h! Adding it here so gloria_bass compiles. */
-#ifndef D2
-#define D2 4252 
-#endif
 
 #define EIGHTH 20
 #define QUARTER 40

@@ -12,8 +12,9 @@
  * timing
  */
 
-/* Use project-wide fixed-width types */
 #include "../shared/dtypes.h"
+#include "psg.h"
+#include <osbind.h>
 
 #define CHANNEL_A 0
 #define CHANNEL_B 1
