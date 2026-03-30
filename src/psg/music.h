@@ -12,9 +12,6 @@
  * timing
  */
 
-#ifndef MUSIC_H
-#define MUSIC_H
-
 /* Use project-wide fixed-width types */
 #include "../shared/dtypes.h"
 
@@ -43,5 +40,3 @@ void update_music(UINT32 time_elapsed);
 
 /* Halts the PSG output */
 void stop_music(void);
-
-#endif
