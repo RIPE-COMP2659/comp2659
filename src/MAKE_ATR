@@ -49,6 +49,7 @@ PSG_OBJECTS = $(PSG).o $(MUSIC).o
 # File Names, Tests - PSG (song integration)
 TSONG = tsong
 TMUSIC = tmusic
+EFFECTS = effects
 
 # File Names, Base - Model
 BLOCK  = block
@@ -95,6 +96,7 @@ CLOCK_OBJECTS = $(CLOCK).o
 RASTER_OBJECTS = $(CLR_SCN).o $(CLR_REG).o $(PLT_PXL).o $(PLT_HOR).o $(PLT_VRT).o $(PLT_LIN).o $(PLT_REC).o $(PLT_SQR).o $(PLT_TRI).o $(BMAP_8).o $(BMAP_16).o $(BMAP_32).o $(PLT_CHR).o $(PLT_STR).o $(BOUNDS).o $(PLT_CLIP).o
 RENDER_OBJECTS = $(RENDER).o
 INPUT_OBJECTS  = $(INPUT).o
+PSG_OBJECTS    = $(PSG).o $(EFFECTS).o $(MUSIC).o
 TOS_OBJECTS    = $(MODEL_OBJECTS) $(RASTER_OBJECTS) $(RENDER_OBJECTS) $(EVENTS_OBJECTS) $(INPUT_OBJECTS) $(CLOCK_OBJECTS) $(PSG_OBJECTS)
 
 TOS_NAME       = dash.tos
@@ -194,7 +196,7 @@ $(WORLD).o: $(MODEL_FOLDER)\$(WORLD).c $(MODEL_FOLDER)\$(WORLD).h $(SHARED_FOLDE
 $(MODEL).o: $(MODEL_FOLDER)\$(MODEL).c $(MODEL_FOLDER)\$(MODEL).h $(SHARED_FOLDER)\dtypes.h
 	$(ATARI_CC) $(TOS_FLAGS) $(MODEL_FOLDER)\$(MODEL).c -o $(MODEL).o
 
-$(MAIN).o: $(MAIN).c $(MODEL_FOLDER)\$(MODEL).h $(SHARED_FOLDER)\dtypes.h $(RASTER_FOLDER)\$(RASTER).h $(CLOCK_FOLDER)\$(CLOCK).h $(INPUT_FOLDER)\$(INPUT).h
+$(MAIN).o: $(MAIN).c $(MODEL_FOLDER)\$(MODEL).h $(SHARED_FOLDER)\dtypes.h $(RASTER_FOLDER)\$(RASTER).h $(CLOCK_FOLDER)\$(CLOCK).h $(INPUT_FOLDER)\$(INPUT).h $(PSG_FOLDER)\$(EFFECTS).h
 	$(ATARI_CC) $(TOS_FLAGS) $(MAIN).c -o $(MAIN).o
 
 $(ASYNC).o: $(EVENTS_FOLDER)\$(ASYNC).c $(EVENTS_FOLDER)\$(ASYNC).h $(SHARED_FOLDER)\dtypes.h
@@ -214,6 +216,9 @@ $(PSG).o: $(PSG_FOLDER)\$(PSG).c $(PSG_FOLDER)\$(PSG).h $(SHARED_FOLDER)\dtypes.
 
 $(MUSIC).o: $(PSG_FOLDER)\$(MUSIC).c $(PSG_FOLDER)\$(MUSIC).h $(SHARED_FOLDER)\dtypes.h
 	$(ATARI_CC) $(TOS_FLAGS) $(PSG_FOLDER)\$(MUSIC).c -o $(MUSIC).o
+
+$(EFFECTS).o: $(PSG_FOLDER)\$(EFFECTS).c $(PSG_FOLDER)\$(EFFECTS).h $(SHARED_FOLDER)\dtypes.h
+	$(ATARI_CC) $(TOS_FLAGS) $(PSG_FOLDER)\$(EFFECTS).c -o $(EFFECTS).o
 
 $(RENDER).o: $(RENDER_FOLDER)\$(RENDER).c $(RENDER_FOLDER)\$(RENDER).h $(SHARED_FOLDER)\dtypes.h $(RASTER_FOLDER)\$(RASTER).h
 	$(ATARI_CC) $(TOS_FLAGS) $(RENDER_FOLDER)\$(RENDER).c -o $(RENDER).o
@@ -272,8 +277,8 @@ $(TINPUT): $(INPUT).o
 	$(ATARI_CC) $(MAIN_FLAGS) $(TESTS_INPUT_FOLDER)\$(TINPUT).c $(INPUT).o -o $(TINPUT).tos
 
 # ----- PSG Test Builds ------------------------------------------------------
-$(TPSG): $(PSG).o
-	$(ATARI_CC) $(MAIN_FLAGS) $(TESTS_PSG_FOLDER)\$(TPSG).c $(PSG).o -o $(TPSG).tos
+$(TPSG): $(PSG).o $(CLOCK).o
+	$(ATARI_CC) $(MAIN_FLAGS) $(TESTS_PSG_FOLDER)\$(TPSG).c $(PSG).o $(CLOCK).o -o $(TPSG).tos
 
 $(TSONG): $(PSG).o $(MUSIC).o
 	$(ATARI_CC) $(MAIN_FLAGS) $(TESTS_PSG_FOLDER)\$(TSONG).c $(PSG).o $(MUSIC).o -o $(TSONG).tos

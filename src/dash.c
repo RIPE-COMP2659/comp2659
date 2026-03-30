@@ -3,6 +3,7 @@
 #include "model/model.h"
 #include "render/render.h"
 #include "input/input.h"
+#include "psg/effects.h"
 #include <osbind.h>
 #include "psg/music.h"
 
@@ -58,11 +59,15 @@ int main_game(void)
         if (died_this_frame == TRUE)
         {
             clear_render_buffers();
+            start_music(SONG_GLORIA);
         }
 
         current_event = check_level_complete(&model);
         if (current_event == EVENT_LEVEL_DONE) {
-            printf("Level Complete!\n"); /* TODO: Level complete handling gracefully */
+            stop_music();
+            play_level_complete_effect();
+            printf("Level Complete!\n");
+            game_won = TRUE;
         }
 
         render(&model, 0);

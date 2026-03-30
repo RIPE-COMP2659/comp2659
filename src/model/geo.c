@@ -1,4 +1,5 @@
 #include "geo.h"
+#include "../psg/effects.h"
 
 #define VO_TOLERANCE ((-1 * GEO_TERMINAL_DY_SCALED) >> 6)
 
@@ -176,6 +177,7 @@ void geo_update(Geo *geo) {
             geo->dy = GEO_JUMP_DY_SCALED;
             geo->is_landed = FALSE;
             geo->jump_buffer = 0;
+            play_jump_effect();
         } else {
             geo->jump_buffer--;
         }

@@ -13,6 +13,7 @@
  *          and `model_update` used by the synchronous event handlers.
  */
 #include "model.h"
+#include "../events/cond.h"
 
 Model get_model(void)
 {
@@ -96,6 +97,7 @@ signed int model_check_death(Model *model)
 
     if (model->world.geo.is_dead == TRUE)
     {
+        on_geo_death(model);
         world_reset_level(&model->world);
         model_reset_indices(model);
         return_value = TRUE;
