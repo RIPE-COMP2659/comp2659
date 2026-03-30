@@ -1,3 +1,5 @@
+/* See file header for music.h */
+
 #include "music.h"
 #include "notes.h"
 #include "psg.h"
