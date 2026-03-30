@@ -3,8 +3,8 @@
 #include "model/model.h"
 #include "render/render.h"
 #include "input/input.h"
+#include "splash/splash.h"
 #include "psg/effects.h"
-#include <osbind.h>
 #include "psg/music.h"
 
 #define JUMP 32
@@ -21,65 +21,81 @@ int main_game(void)
     signed int current_event;
     unsigned long timeThen, timeNow, timeElapsed;
 
-    /* Initialize render buffers */
-    init_render_buffers();
+    UINT8 init = splash_screen(); /* Prints splash screen and awaits user input */
 
-    /* Initial render */
-    render(&model, 0);
-
-    /* Disable keyboard sound */
-    toggle_keyboard_sound();
-
-    /* Start background music (driven by update_music from the main loop) */
-    start_music(SONG_GLORIA);
-
-    timeThen = get_time();
-    while (quit != TRUE && game_won != TRUE)
+    if (init == 0)
     {
-        switch (get_input())
-        {
-        case JUMP:
-            on_jump_request(&model);
-            break;
-        case QUIT:
-            quit = TRUE;
-            break;
-        default:
-            break;
-        }
-
-        timeNow = get_time();
-        timeElapsed = timeNow - timeThen;
-
-        /* Update music with elapsed VBL ticks */
-        update_music(timeElapsed);
-
-        died_this_frame = on_clock_tick(&model);
-
-        if (died_this_frame == TRUE)
-        {
-            clear_render_buffers();
-            start_music(SONG_GLORIA);
-        }
-
-        current_event = check_level_complete(&model);
-        if (current_event == EVENT_LEVEL_DONE) {
-            stop_music();
-            play_level_complete_effect();
-            printf("Level Complete!\n");
-            game_won = TRUE;
-        }
-
+        quit = TRUE; /* Early exit if exit selected */
+    }
+    else
+    {
+        /* Initialize render buffers */
+        init_render_buffers();
+        /* Initial render */
         render(&model, 0);
 
-        timeThen = timeNow;
+        /* Disable keyboard sound */
+        toggle_keyboard_sound();
+
+        /* Start background music (driven by update_music from the main loop) */
+        start_music(SONG_GLORIA);
+
+        timeThen = get_time();
+        while (quit != TRUE && game_won != TRUE)
+        {
+            switch (get_input())
+            {
+            case JUMP:
+                on_jump_request(&model);
+                break;
+            case QUIT:
+                quit = TRUE;
+                break;
+            default:
+                break;
+            }
+
+            timeNow = get_time();
+            timeElapsed = timeNow - timeThen;
+            timeThen = timeNow; /* update here, before on_clock_tick's death wait */
+
+            /* NOTE: This keeps the game from crashing, no clue why, something in music timing */
+            if (timeElapsed == 0)
+            {
+                timeElapsed = 1;
+            }
+
+            /* Update music with elapsed VBL ticks */
+            update_music(timeElapsed);
+
+            died_this_frame = on_clock_tick(&model);
+
+            if (died_this_frame == TRUE)
+            {
+                clear_render_buffers();
+                start_music(SONG_GLORIA);
+            }
+
+            current_event = check_level_complete(&model);
+            if (current_event == EVENT_LEVEL_DONE)
+            {
+                stop_music();
+                play_level_complete_effect();
+                game_won = TRUE;
+            }
+
+            /* Initial render */
+            render(&model, 0);
+        }
+
+        /* Renable the keyboard */
+        toggle_keyboard_sound();
+
+        /* Clean up music */
+        stop_music();
+
+        return 0;
     }
-
-    /* Renable the keyboard */
-    toggle_keyboard_sound();
-
-    /* Clean up music */
-    stop_music();
 
     return 0;
 }
