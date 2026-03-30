@@ -14,6 +14,10 @@
 #include "../../psg/psg.h"
 #include "../../shared/dtypes.h"
 
+/* Forward declarations for tests added later in the file */
+/* TODO: Likely not necessary for forward dec */
+void test_dual_channel(void);
+
 static void print_uint(unsigned int value) {
     char digits[10];
     int i;
@@ -58,8 +62,8 @@ void test_crash(void) {
     write_psg_q(NOISE_FREQ, 0x1F);
     write_psg_q(LEVEL_A,    0x10);
     /* TODO: Tune the timing */
-    write_psg_q(ENV_FINE,   0xFF);
-    write_psg_q(ENV_COARSE, 0xFF);
+    write_psg_q(ENV_FINE,   0x60);
+    write_psg_q(ENV_COARSE, 0x60);
     write_psg_q(ENV_SHAPE,  0x00);
 
     Super(old_ssp);
@@ -297,6 +301,108 @@ void test_song_of_storms(void) {
     Super(old_ssp);
 }
 
+/** Play Bourree in E minor (Right hand melody, Half Tempo) */
+void test_bourree(void) {
+    long old_ssp;
+    
+    /* Doubled U from 2000 to 4000 to exactly halve the playback speed */
+    unsigned int U = 4000; 
+
+    Cconws("test_bourree: Prepared, press any key to continue...\r\n");
+    Cnecin();
+    wait(30000);
+
+    old_ssp = Super(0);
+
+    /* Volumes */
+    set_volume_q(CHANNEL_A, 10);
+    set_volume_q(CHANNEL_B, 0);
+    set_volume_q(CHANNEL_C, 0);
+
+    /* Channels: only use A for this test */
+    enable_channel_q(CHANNEL_A, 1, 0);
+    enable_channel_q(CHANNEL_B, 0, 0);
+    enable_channel_q(CHANNEL_C, 0, 0);
+
+    /* Pickup (8th notes) */
+    set_tone_q(CHANNEL_A, E5);  set_volume_q(CHANNEL_A, 10); wait(8 * U);
+    set_tone_q(CHANNEL_A, F5S); set_volume_q(CHANNEL_A, 10); wait(8 * U);
+
+    /* Bar 1 */
+    set_tone_q(CHANNEL_A, G5);  set_volume_q(CHANNEL_A, 10); wait(8 * U);
+    set_tone_q(CHANNEL_A, F5S); set_volume_q(CHANNEL_A, 10); wait(8 * U);
+    set_tone_q(CHANNEL_A, G5);  set_volume_q(CHANNEL_A, 10); wait(8 * U);
+    set_tone_q(CHANNEL_A, A5);  set_volume_q(CHANNEL_A, 10); wait(8 * U);
+    /* The "Pauses" (Quarter notes) */
+    set_tone_q(CHANNEL_A, B5);  set_volume_q(CHANNEL_A, 10); wait(16 * U); 
+    set_tone_q(CHANNEL_A, E5);  set_volume_q(CHANNEL_A, 10); wait(16 * U); 
+
+    /* Bar 2 (All 8th notes) */
+    set_tone_q(CHANNEL_A, F5S); set_volume_q(CHANNEL_A, 10); wait(8 * U);
+    set_tone_q(CHANNEL_A, G5);  set_volume_q(CHANNEL_A, 10); wait(8 * U);
+    set_tone_q(CHANNEL_A, A5);  set_volume_q(CHANNEL_A, 10); wait(8 * U);
+    set_tone_q(CHANNEL_A, B5);  set_volume_q(CHANNEL_A, 10); wait(8 * U);
+    set_tone_q(CHANNEL_A, C6);  set_volume_q(CHANNEL_A, 10); wait(8 * U);
+    set_tone_q(CHANNEL_A, B5);  set_volume_q(CHANNEL_A, 10); wait(8 * U);
+    set_tone_q(CHANNEL_A, C6);  set_volume_q(CHANNEL_A, 10); wait(8 * U);
+    set_tone_q(CHANNEL_A, D6);  set_volume_q(CHANNEL_A, 10); wait(8 * U);
+
+    /* Bar 3 (Descending scale, all 8th notes) */
+    set_tone_q(CHANNEL_A, E6);  set_volume_q(CHANNEL_A, 10); wait(8 * U);
+    set_tone_q(CHANNEL_A, D6);  set_volume_q(CHANNEL_A, 10); wait(8 * U);
+    set_tone_q(CHANNEL_A, C6);  set_volume_q(CHANNEL_A, 10); wait(8 * U);
+    set_tone_q(CHANNEL_A, B5);  set_volume_q(CHANNEL_A, 10); wait(8 * U);
+    set_tone_q(CHANNEL_A, A5);  set_volume_q(CHANNEL_A, 10); wait(8 * U);
+    set_tone_q(CHANNEL_A, G5);  set_volume_q(CHANNEL_A, 10); wait(8 * U);
+    set_tone_q(CHANNEL_A, F5S); set_volume_q(CHANNEL_A, 10); wait(8 * U);
+    set_tone_q(CHANNEL_A, E5);  set_volume_q(CHANNEL_A, 10); wait(8 * U);
+
+    /* Bar 4 (Quarter notes and a Half note for a long pause) */
+    set_tone_q(CHANNEL_A, D5S); set_volume_q(CHANNEL_A, 10); wait(16 * U); 
+    set_tone_q(CHANNEL_A, F5S); set_volume_q(CHANNEL_A, 10); wait(16 * U); 
+    set_tone_q(CHANNEL_A, B4);  set_volume_q(CHANNEL_A, 10); wait(32 * U); 
+
+    /* Bar 5 (Repeat of Pickup & Bar 1) */
+    set_tone_q(CHANNEL_A, E5);  set_volume_q(CHANNEL_A, 10); wait(8 * U);
+    set_tone_q(CHANNEL_A, F5S); set_volume_q(CHANNEL_A, 10); wait(8 * U);
+    set_tone_q(CHANNEL_A, G5);  set_volume_q(CHANNEL_A, 10); wait(8 * U);
+    set_tone_q(CHANNEL_A, F5S); set_volume_q(CHANNEL_A, 10); wait(8 * U);
+    set_tone_q(CHANNEL_A, G5);  set_volume_q(CHANNEL_A, 10); wait(8 * U);
+    set_tone_q(CHANNEL_A, A5);  set_volume_q(CHANNEL_A, 10); wait(8 * U);
+    set_tone_q(CHANNEL_A, B5);  set_volume_q(CHANNEL_A, 10); wait(16 * U); 
+    set_tone_q(CHANNEL_A, E5);  set_volume_q(CHANNEL_A, 10); wait(16 * U); 
+
+    /* Bar 6 (Repeat of Bar 2) */
+    set_tone_q(CHANNEL_A, F5S); set_volume_q(CHANNEL_A, 10); wait(8 * U);
+    set_tone_q(CHANNEL_A, G5);  set_volume_q(CHANNEL_A, 10); wait(8 * U);
+    set_tone_q(CHANNEL_A, A5);  set_volume_q(CHANNEL_A, 10); wait(8 * U);
+    set_tone_q(CHANNEL_A, B5);  set_volume_q(CHANNEL_A, 10); wait(8 * U);
+    set_tone_q(CHANNEL_A, C6);  set_volume_q(CHANNEL_A, 10); wait(8 * U);
+    set_tone_q(CHANNEL_A, B5);  set_volume_q(CHANNEL_A, 10); wait(8 * U);
+    set_tone_q(CHANNEL_A, C6);  set_volume_q(CHANNEL_A, 10); wait(8 * U);
+    set_tone_q(CHANNEL_A, D6);  set_volume_q(CHANNEL_A, 10); wait(8 * U);
+
+    /* Bar 7 */
+    set_tone_q(CHANNEL_A, G5);  set_volume_q(CHANNEL_A, 10); wait(8 * U);
+    set_tone_q(CHANNEL_A, A5);  set_volume_q(CHANNEL_A, 10); wait(8 * U);
+    set_tone_q(CHANNEL_A, B5);  set_volume_q(CHANNEL_A, 10); wait(8 * U);
+    set_tone_q(CHANNEL_A, A5);  set_volume_q(CHANNEL_A, 10); wait(8 * U);
+    set_tone_q(CHANNEL_A, G5);  set_volume_q(CHANNEL_A, 10); wait(8 * U);
+    set_tone_q(CHANNEL_A, F5S); set_volume_q(CHANNEL_A, 10); wait(8 * U);
+    set_tone_q(CHANNEL_A, E5);  set_volume_q(CHANNEL_A, 10); wait(8 * U);
+    set_tone_q(CHANNEL_A, D5S); set_volume_q(CHANNEL_A, 10); wait(8 * U);
+
+    /* Bar 8 final */
+    set_tone_q(CHANNEL_A, E5);  set_volume_q(CHANNEL_A, 10); wait(48 * U);
+    
+    set_volume_q(CHANNEL_A, 0); 
+    wait(16 * U);
+
+    stop_sound_q();
+
+    Super(old_ssp);
+}
+
 int main() {
     Cconws("PSG test started...\r\n");
 
@@ -308,6 +414,41 @@ int main() {
     test_enable_channel();
     test_stop_sound();
     test_song_of_storms();
+    test_dual_channel();
+    test_bourree();
 
     return 0;
 }
+
+    /** Simple test that plays tones on both channel A and B simultaneously */
+    void test_dual_channel(void) {
+        long old_ssp;
+
+        Cconws("test_dual_channel: Prepared, press any key to start...\r\n");
+        Cnecin();
+        wait(10000);
+
+        old_ssp = Super(0);
+
+        /* Enable A and B, silence C */
+        set_volume_q(CHANNEL_A, 12);
+        set_volume_q(CHANNEL_B, 10);
+        set_volume_q(CHANNEL_C, 0);
+
+        enable_channel_q(CHANNEL_A, 1, 0);
+        enable_channel_q(CHANNEL_B, 1, 0);
+        enable_channel_q(CHANNEL_C, 0, 0);
+
+        /* Play a sustained interval for a short time */
+        set_tone_q(CHANNEL_A, E4); /* melody-ish */
+        set_tone_q(CHANNEL_B, E2); /* bass-ish */
+        wait(24000);
+
+        /* Change the bass to ensure B updates */
+        set_tone_q(CHANNEL_B, B2);
+        wait(24000);
+
+        stop_sound_q();
+        Super(old_ssp);
+    }
+
