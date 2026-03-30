@@ -217,6 +217,7 @@ static int current_song_b_len = 0;
  */
 static int advance_index(int idx, int len) {
     idx++;
+    /* TODO: Remove early returns */
     if ((len & (len - 1)) == 0) {
         return idx & (len - 1);
     }
@@ -301,6 +302,7 @@ void start_music(SongChoice song) {
 
 void update_music(UINT32 time_elapsed) {
     long old_ssp;
+    /* TODO: Remove early return */
     if (!is_playing || time_elapsed == 0 || current_song_len == 0) return;
 
     /* --- UPDATE CHANNEL A (MELODY) --- */
