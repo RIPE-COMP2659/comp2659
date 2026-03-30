@@ -15,6 +15,7 @@
 #include "../../shared/dtypes.h"
 
 /* Forward declarations for tests added later in the file */
+/* TODO: Likely not necessary for forward dec */
 void test_dual_channel(void);
 
 static void print_uint(unsigned int value) {
@@ -61,8 +62,8 @@ void test_crash(void) {
     write_psg_q(NOISE_FREQ, 0x1F);
     write_psg_q(LEVEL_A,    0x10);
     /* TODO: Tune the timing */
-    write_psg_q(ENV_FINE,   0xFF);
-    write_psg_q(ENV_COARSE, 0xFF);
+    write_psg_q(ENV_FINE,   0x60);
+    write_psg_q(ENV_COARSE, 0x60);
     write_psg_q(ENV_SHAPE,  0x00);
 
     Super(old_ssp);
@@ -405,15 +406,14 @@ void test_bourree(void) {
 int main() {
     Cconws("PSG test started...\r\n");
 
-    /* test_crash(); */
-    /* test_write_psg(); */
-    /* test_read_psg(); */
-    /* test_set_tone(); */
-    /* test_set_volume(); */
-    /* test_enable_channel(); */
-    /* test_stop_sound(); */
-    /* test_song_of_storms(); */
-    
+    test_crash();
+    test_write_psg();
+    test_read_psg();
+    test_set_tone();
+    test_set_volume();
+    test_enable_channel();
+    test_stop_sound();
+    test_song_of_storms();
     test_dual_channel();
     test_bourree();
 
