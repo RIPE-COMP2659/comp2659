@@ -3,6 +3,7 @@
 #include "model/model.h"
 #include "render/render.h"
 #include "input/input.h"
+#include "psg/effects.h"
 #include <osbind.h>
 
 #define JUMP 32
@@ -53,7 +54,9 @@ int main_game(void)
 
         current_event = check_level_complete(&model);
         if (current_event == EVENT_LEVEL_DONE) {
-            printf("Level Complete!\n"); /* TODO: Level complete handling gracefully */
+            play_level_complete_effect();
+            printf("Level Complete!\n");
+            game_won = TRUE;
         }
 
         render(&model, 0);

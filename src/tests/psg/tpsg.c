@@ -13,6 +13,7 @@
 
 #include "../../psg/psg.h"
 #include "../../shared/dtypes.h"
+#include "../../clock/clock.h"
 
 static void print_uint(unsigned int value) {
     char digits[10];
@@ -48,27 +49,31 @@ void test_crash(void) {
 
     wait(30000); /* Make sure keyboard sound stopped */
 
-    Cconws("test_crash: Playing crash, "
-           "press any key to continue...\r\n");
+    Cconws("test_crash (Playing Level Complete): press key to start...\r\n");
+    Cnecin();
 
-    enable_channel_q(CHANNEL_A, 0, 1);
-    enable_channel_q(CHANNEL_B, 0, 0);
-    enable_channel_q(CHANNEL_C, 0, 0);
-    set_volume_q(CHANNEL_A, 15);
-    write_psg_q(NOISE_FREQ, 0x1F);
-    write_psg_q(LEVEL_A,    0x10);
-    /* TODO: Tune the timing */
-    write_psg_q(ENV_FINE,   0xFF);
-    write_psg_q(ENV_COARSE, 0xFF);
-    write_psg_q(ENV_SHAPE,  0x00);
+    /* Rising arpeggio: C5 -> E5 -> G5 -> C6 */
+    enable_channel_q(CHANNEL_C, 1, 0);
+    
+    set_tone_q(CHANNEL_C, C5);
+    set_volume_q(CHANNEL_C, 14);
+    wait(50000);
+    
+    set_tone_q(CHANNEL_C, E5);
+    wait(50000);
+    
+    set_tone_q(CHANNEL_C, G5);
+    wait(50000);
+    
+    set_tone_q(CHANNEL_C, C6);
+    set_volume_q(CHANNEL_C, 0x10);
+    set_envelope_q(0x00, 0x7FFF);
 
     Super(old_ssp);
 
+    Cconws("Done, press any key to stop...\r\n");
     Cnecin();
     stop_sound();
-    Cconws("test_crash: Sound stopped, "
-           "press any key to continue...\r\n");
-    Cnecin();
 }
 
 void test_write_psg(void) {
@@ -301,6 +306,7 @@ int main() {
     Cconws("PSG test started...\r\n");
 
     test_crash();
+    /*
     test_write_psg();
     test_read_psg();
     test_set_tone();
@@ -308,6 +314,7 @@ int main() {
     test_enable_channel();
     test_stop_sound();
     test_song_of_storms();
+    */
 
     return 0;
 }

@@ -18,6 +18,7 @@
  *    helpers; this module maps those checks to events.
  */
 #include "cond.h"
+#include "../clock/clock.h"
 
 int check_level_complete(Model *model)
 {
@@ -29,6 +30,16 @@ int check_level_complete(Model *model)
     }
 
     return event;
+}
+
+void on_geo_death(Model *model)
+{
+    unsigned long wait_until;
+    play_death_effect();
+    
+    /* Wait for ~1.5s while showing the crash point */
+    wait_until = get_time() + 105;
+    while(get_time() < wait_until);
 }
 
 /* FUTURE TODO/Nice to haves (State Transitions/Triggers):
