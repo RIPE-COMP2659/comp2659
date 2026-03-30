@@ -5,6 +5,7 @@
 #include "input/input.h"
 #include "psg/effects.h"
 #include <osbind.h>
+#include "psg/music.h"
 
 #define JUMP 32
 #define QUIT 113
@@ -12,7 +13,6 @@
 /* TODO: Death is a little bit out of sync */
 int main_game(void)
 {
-
     Model model = get_model();
     UINT8 quit = FALSE;
     UINT8 game_won = FALSE;
@@ -26,6 +26,12 @@ int main_game(void)
 
     /* Initial render */
     render(&model, 0);
+
+    /* Disable keyboard sound */
+    toggle_keyboard_sound();
+
+    /* Start background music (driven by update_music from the main loop) */
+    start_music(SONG_GLORIA);
 
     timeThen = get_time();
     while (quit != TRUE && game_won != TRUE)
@@ -45,6 +51,9 @@ int main_game(void)
         timeNow = get_time();
         timeElapsed = timeNow - timeThen;
 
+        /* Update music with elapsed VBL ticks */
+        update_music(timeElapsed);
+
         died_this_frame = on_clock_tick(&model);
 
         if (died_this_frame == TRUE)
@@ -63,6 +72,13 @@ int main_game(void)
 
         timeThen = timeNow;
     }
+
+    /* Renable the keyboard */
+    toggle_keyboard_sound();
+
+    /* Clean up music */
+    stop_music();
+
     return 0;
 }
 

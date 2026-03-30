@@ -14,6 +14,7 @@
  */
 
 /* Octave 2 */
+#define D2 4252   /* D  73.42Hz  */
 #define D2S 4011  /* D# 77.78Hz  */
 #define E2  3787  /* E  82.41Hz  */
 #define F2  3574  /* F  87.31Hz  */
@@ -93,3 +94,6 @@
 #define A7    89  /* A  3520.00Hz */
 #define A7S   84  /* A# 3729.31Hz */
 #define B7    79  /* B  3951.07Hz */
+
+/* Special note value for a rest (silence) */
+#define REST 0

@@ -6,6 +6,7 @@
 #define REG_SELECT_PTR  ((volatile char *)0xFF8800)
 #define REG_READ_PTR    ((volatile char *)0xFF8800)
 #define REG_WRITE_PTR   ((volatile char *)0xFF8802)
+#define CONSOLE_PTR    ((volatile char *)0x000484)
 
 /* TODO: Non-super and non-error handling variations */
 
@@ -192,4 +193,12 @@ void stop_sound_q() {
            4. We write the new value to the mixer, already by *REG_SELECT_PTR
                 - We can do this because MIXER is already set
     */
+}
+
+/* TODO: Function documentation */
+void toggle_keyboard_sound() {
+    long old_ssp = Super(0);
+    UINT8 console_byte = *CONSOLE_PTR ^ 0x01; /* Invert bit 0 to flip keyboard sound */
+    *CONSOLE_PTR = console_byte;
+    Super(old_ssp);
 }
