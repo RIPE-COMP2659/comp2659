@@ -12,6 +12,8 @@
  * timing
  */
 
+/* TODO: Function definition template */
+
 #include "../shared/dtypes.h"
 #include "psg.h"
 #include <osbind.h>
