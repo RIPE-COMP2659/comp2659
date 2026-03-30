@@ -1,7 +1,7 @@
 #ifndef GEO_H
 #define GEO_H
 
-#include "dtypes.h"
+#include "../shared/dtypes.h"
 
 /* The length and width of geo in pixels */
 #define GEO_SIZE 32

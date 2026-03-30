@@ -1,4 +1,7 @@
 #include "geo.h"
+#include "../psg/effects.h"
+
+#define VO_TOLERANCE ((-1 * GEO_TERMINAL_DY_SCALED) >> 6)
 
 /* NOTE: This is only useful if we have different sprites for multiplayer */
 /* The global sprite for geo */
@@ -57,8 +60,6 @@ Geo create_geo(unsigned int x, unsigned int y, unsigned int ground_y) {
     return geo;
 }
 
-/* TODO: This will take some fine tuning on what feels right, but can't
-   really be done until gameplay */
 /** See header file for documentation */
 signed int geo_check_square_collision(
     Geo *geo,
@@ -80,32 +81,32 @@ signed int geo_check_square_collision(
 
     /* TODO: Optimize logic after determining desired behaviour based on
        gameplay */
-    /* TODO: This is busted on positive dy and there's some funny business 
-       on being below a block */
     if (geo_right < object_left || geo_left > object_right ||
-        geo_top < object_bottom || geo_bottom > object_top) {
+        geo_top <= object_bottom || geo_bottom > object_top) {
         collision_result = COLLISION_NONE;
-    } else {
-        /* penetration_depth: how many pixels Geo is 'sunken' into the block vertically.
-           We use the 'Half-Block Rule' (16px) to decide between landing and crashing. */
-        signed int penetration_depth = object_top - geo_bottom;
+    } else { /* A collision has occured */
+        unsigned int vertical_overlap = 0;
 
-        if (geo->dy <= 0) {
-            /* FALLING or STANDING: If we are in the top half of the block, prioritize landing.
-               This allows sliding off edges safely and 'soft' corner landings. */
-            if (penetration_depth <= 16) {
-                collision_result = COLLISION_TOP;
-            } else {
-                collision_result = COLLISION_LEFT;
-            }
-        } else {
-            /* JUMPING: Only trigger a death (BOTTOM collision) if our feet are physically 
-               below the block's bottom. This prevents 'phantom ceiling' deaths. */
-            if (geo_bottom < object_bottom) {
-                collision_result = COLLISION_BOTTOM;
-            } else {
-                collision_result = COLLISION_NONE;
-            }
+        /* NOTE: There's some better math that can likely be done with vertical overlap as signed
+                 For example, assume that two objects are overlapping and the same height, and
+                 we calculate the overlap using geo's bottom - object's top, but the value is
+                 negative, then we know that the vertical overlap is size + vertical overlap.
+                 Something like this can probably speed up logic. */
+        /* NOTE: There's probably also one little bit with the NONE and left/right */
+        /* Geo's top is inside the object, assume a bottom collision */
+        if (geo_top < object_top) {
+            vertical_overlap = geo_top - object_bottom;
+            collision_result = COLLISION_BOTTOM;
+        /* Geo's bottom is inside the object */
+        } else if (geo_bottom >= object_bottom) {
+            vertical_overlap = object_top - geo_bottom;
+            collision_result = COLLISION_TOP;
+        }
+
+        /* We can only have a left collision before geo is passed
+           and we only care if it is significant, otherwise unforgiving */
+        if (geo_left < object_left && vertical_overlap > VO_TOLERANCE) {
+            collision_result = COLLISION_LEFT;
         }
     }
 
@@ -176,6 +177,7 @@ void geo_update(Geo *geo) {
             geo->dy = GEO_JUMP_DY_SCALED;
             geo->is_landed = FALSE;
             geo->jump_buffer = 0;
+            play_jump_effect();
         } else {
             geo->jump_buffer--;
         }

@@ -18,18 +18,20 @@ typedef struct {
     unsigned int cam_max_si; /* spike index, camera */
     unsigned int cam_min_li; /* lava index, camera */
     unsigned int cam_max_li; /* lava index, camera */
+    unsigned int cam_min_bi_prev; /* block index, camera, previous update */
+    unsigned int cam_max_bi_prev; /* block index, camera, previous update */
+    unsigned int cam_min_si_prev; /* spike index, camera, previous update */
+    unsigned int cam_max_si_prev; /* spike index, camera, previous update */
+    unsigned int cam_min_li_prev; /* lava index, camera, previous update */
+    unsigned int cam_max_li_prev; /* lava index, camera, previous update */
     unsigned int col_min_bi; /* block index, collision */
     unsigned int col_max_bi; /* block index, collision */
     unsigned int col_min_si; /* spike index, collision */
     unsigned int col_max_si; /* spike index, collision */
     unsigned int col_min_li; /* lava index, collision */
     unsigned int col_max_li; /* lava index, collision */
-    Camera old_cam;   /* camera from last model_update, for computing camera deltas */
     Camera prev_cam;  /* camera from 2 updates ago (intermediate shift) */
-    Camera stale_cam; /* camera from 2 updates ago used to clear the stale buffer */
-    Geo old_geo;      /* geo from last model_update */
     Geo prev_geo;     /* geo from 2 updates ago (intermediate shift) */
-    Geo stale_geo;    /* geo from 2 updates ago used to clear the stale buffer */
 } Model;
 
 /**

@@ -1,11 +1,8 @@
-/*
- * cond.h
- *
- * PURPOSE: Prototypes for conditional (collision/state-triggered)
- *          event handlers. These check object interactions
- *          each frame and return event codes.
- */
+#ifndef COND_H
+#define COND_H
+
 #include "../model/model.h"
+#include "../psg/effects.h"
 
 #define EVENT_ERROR -1
 #define EVENT_NONE 0
@@ -24,3 +21,10 @@
  *         EVENT_LEVEL_DONE if Geo's x >= level.end_x, or EVENT_NONE otherwise
  */
 signed int check_level_complete(Model *model);
+
+/**
+ * Triggered when Geo dies. Plays the death sound effect.
+ */
+void on_geo_death(Model *model);
+
+#endif

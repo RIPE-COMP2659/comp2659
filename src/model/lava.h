@@ -1,7 +1,7 @@
 #ifndef LAVA_H
 #define LAVA_H
 
-#include "dtypes.h"
+#include "../shared/dtypes.h"
 
 /* TODO: Lava is an individual block and should be a big object to optimize
    space */

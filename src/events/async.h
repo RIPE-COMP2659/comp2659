@@ -1,9 +1,6 @@
-/*
- * async.h
- *
- * PURPOSE: Prototypes for asynchronous (user input-triggered)
- *          event handlers.
- */
+#ifndef ASYNC_H
+#define ASYNC_H
+
 #include "../model/model.h"
 
 /**
@@ -16,3 +13,5 @@
  *         be non-null
  */
 void on_jump_request(Model *model);
+
+#endif

@@ -14,7 +14,7 @@
  * logic.
  */
 #include <osbind.h>
-#include "../model/dtypes.h"
+#include "../shared/dtypes.h"
 
 /**
  * Checks if there is pending input to be processed.

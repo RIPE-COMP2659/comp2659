@@ -1,7 +1,7 @@
 #ifndef SPIKE_H
 #define SPIKE_H
 
-#include "dtypes.h"
+#include "../shared/dtypes.h"
 
 /* The size of a spike, length and width, in pixels */
 #define SPIKE_SIZE 32
