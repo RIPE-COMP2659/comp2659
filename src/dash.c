@@ -30,7 +30,7 @@ int main_game(void)
     toggle_keyboard_sound();
 
     /* Start background music (driven by update_music from the main loop) */
-    start_music(SONG_MEGALO);
+    start_music(SONG_HIGH_GLORIA);
 
     timeThen = get_time();
     while (quit != TRUE && game_won != TRUE)

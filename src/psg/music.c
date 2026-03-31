@@ -214,6 +214,117 @@ static const Note gloria_bass[] = {
 };
 static const int GLORIA_BASS_LEN = sizeof(gloria_bass) / sizeof(Note);
 
+/* --- HIGH GLORIA TRACK DATA --- */
+static const Note high_gloria_melody[] = {
+    {D5, SIXTEENTH }, {REST, SIXTEENTH }, {F5, SIXTEENTH }, {REST, SIXTEENTH }, {A5, SIXTEENTH }, {REST, SIXTEENTH }, {F5, SIXTEENTH }, {REST, SIXTEENTH },
+    {E5, SIXTEENTH }, {F5, SIXTEENTH }, {G5, SIXTEENTH }, {E5, SIXTEENTH }, {F5, SIXTEENTH }, {E5, SIXTEENTH }, {D5, SIXTEENTH }, {REST, SIXTEENTH },
+    {A5, SIXTEENTH }, {REST, SIXTEENTH }, {D6, SIXTEENTH }, {REST, SIXTEENTH }, {C6S, SIXTEENTH }, {REST, SIXTEENTH }, {A5, SIXTEENTH }, {REST, SIXTEENTH },
+    {A5S, SIXTEENTH }, {A5, SIXTEENTH }, {G5, SIXTEENTH }, {F5, SIXTEENTH }, {E5, SIXTEENTH }, {F5, SIXTEENTH }, {G5, SIXTEENTH }, {A5, SIXTEENTH },
+    {F5, SIXTEENTH }, {E5, SIXTEENTH }, {D5, SIXTEENTH }, {E5, SIXTEENTH }, {F5, SIXTEENTH }, {G5, SIXTEENTH }, {A5, SIXTEENTH }, {F5, SIXTEENTH },
+    {G5, SIXTEENTH }, {F5, SIXTEENTH }, {E5, SIXTEENTH }, {F5, SIXTEENTH }, {G5, SIXTEENTH }, {A5, SIXTEENTH }, {A5S, SIXTEENTH }, {G5, SIXTEENTH },
+    {A5, SIXTEENTH }, {G5, SIXTEENTH }, {F5, SIXTEENTH }, {G5, SIXTEENTH }, {A5, SIXTEENTH }, {A5S, SIXTEENTH }, {C6, SIXTEENTH }, {A5, SIXTEENTH },
+    {A5S, SIXTEENTH }, {A5, SIXTEENTH }, {G5, SIXTEENTH }, {F5, SIXTEENTH }, {E5, SIXTEENTH }, {D5, SIXTEENTH }, {C5S, SIXTEENTH }, {A4, SIXTEENTH },
+    {D5, SIXTEENTH }, {E5, SIXTEENTH }, {F5, SIXTEENTH }, {D5, SIXTEENTH }, {E5, SIXTEENTH }, {F5, SIXTEENTH }, {G5, SIXTEENTH }, {E5, SIXTEENTH },
+    {F5, SIXTEENTH }, {G5, SIXTEENTH }, {A5, SIXTEENTH }, {F5, SIXTEENTH }, {G5, SIXTEENTH }, {A5, SIXTEENTH }, {A5S, SIXTEENTH }, {G5, SIXTEENTH },
+    {A5, SIXTEENTH }, {G5, SIXTEENTH }, {F5, SIXTEENTH }, {E5, SIXTEENTH }, {D5, SIXTEENTH }, {C5, SIXTEENTH }, {A4, SIXTEENTH }, {A4, SIXTEENTH },
+    {G4, SIXTEENTH }, {A4, SIXTEENTH }, {A4S, SIXTEENTH }, {C5, SIXTEENTH }, {D5, SIXTEENTH }, {E5, SIXTEENTH }, {F5, SIXTEENTH }, {G5, SIXTEENTH },
+    {F5, SIXTEENTH }, {E5, SIXTEENTH }, {D5, SIXTEENTH }, {E5, SIXTEENTH }, {F5, SIXTEENTH }, {G5, SIXTEENTH }, {A5, SIXTEENTH }, {F5, SIXTEENTH },
+    {G5, SIXTEENTH }, {F5, SIXTEENTH }, {E5, SIXTEENTH }, {F5, SIXTEENTH }, {G5, SIXTEENTH }, {A5, SIXTEENTH }, {A5S, SIXTEENTH }, {G5, SIXTEENTH },
+    {A5, SIXTEENTH }, {G5, SIXTEENTH }, {F5, SIXTEENTH }, {G5, SIXTEENTH }, {A5, SIXTEENTH }, {A5S, SIXTEENTH }, {C6, SIXTEENTH }, {A5, SIXTEENTH },
+    {A5S, SIXTEENTH }, {A5, SIXTEENTH }, {G5, SIXTEENTH }, {F5, SIXTEENTH }, {E5, SIXTEENTH }, {D5, SIXTEENTH }, {C5S, SIXTEENTH }, {A4, SIXTEENTH },
+    {D5, SIXTEENTH }, {REST, SIXTEENTH }, {F5, SIXTEENTH }, {REST, SIXTEENTH }, {A5, SIXTEENTH }, {REST, SIXTEENTH }, {F5, SIXTEENTH }, {REST, SIXTEENTH },
+    {E5, SIXTEENTH }, {F5, SIXTEENTH }, {G5, SIXTEENTH }, {E5, SIXTEENTH }, {F5, SIXTEENTH }, {E5, SIXTEENTH }, {D5, SIXTEENTH }, {REST, SIXTEENTH },
+    {A5, SIXTEENTH }, {REST, SIXTEENTH }, {D6, SIXTEENTH }, {REST, SIXTEENTH }, {C6S, SIXTEENTH }, {REST, SIXTEENTH }, {A5, SIXTEENTH }, {REST, SIXTEENTH },
+    {A5S, SIXTEENTH }, {A5, SIXTEENTH }, {G5, SIXTEENTH }, {F5, SIXTEENTH }, {E5, SIXTEENTH }, {F5, SIXTEENTH }, {G5, SIXTEENTH }, {A5, SIXTEENTH },
+    {A5, SIXTEENTH }, {D6, SIXTEENTH }, {C6S, SIXTEENTH }, {D6, SIXTEENTH }, {A5, SIXTEENTH }, {D6, SIXTEENTH }, {C6S, SIXTEENTH }, {D6, SIXTEENTH },
+    {G5, SIXTEENTH }, {C6S, SIXTEENTH }, {B5, SIXTEENTH }, {C6S, SIXTEENTH }, {G5, SIXTEENTH }, {C6S, SIXTEENTH }, {B5, SIXTEENTH }, {C6S, SIXTEENTH },
+    {A5, SIXTEENTH }, {D6, SIXTEENTH }, {C6S, SIXTEENTH }, {D6, SIXTEENTH }, {A5, SIXTEENTH }, {D6, SIXTEENTH }, {C6S, SIXTEENTH }, {D6, SIXTEENTH },
+    {G5, SIXTEENTH }, {C6S, SIXTEENTH }, {B5, SIXTEENTH }, {C6S, SIXTEENTH }, {G5, SIXTEENTH }, {C6S, SIXTEENTH }, {B5, SIXTEENTH }, {C6S, SIXTEENTH },
+    {F5, SIXTEENTH }, {D6, SIXTEENTH }, {C6S, SIXTEENTH }, {D6, SIXTEENTH }, {E5, SIXTEENTH }, {D6, SIXTEENTH }, {C6S, SIXTEENTH }, {D6, SIXTEENTH },
+    {D5, SIXTEENTH }, {C5S, SIXTEENTH }, {D5, SIXTEENTH }, {E5, SIXTEENTH }, {F5, SIXTEENTH }, {G5, SIXTEENTH }, {A5, SIXTEENTH }, {A5S, SIXTEENTH },
+    {F5, SIXTEENTH }, {D6, SIXTEENTH }, {C6S, SIXTEENTH }, {D6, SIXTEENTH }, {E5, SIXTEENTH }, {D6, SIXTEENTH }, {C6S, SIXTEENTH }, {D6, SIXTEENTH },
+    {D5, SIXTEENTH }, {C5S, SIXTEENTH }, {D5, SIXTEENTH }, {E5, SIXTEENTH }, {F5, SIXTEENTH }, {G5, SIXTEENTH }, {A5, SIXTEENTH }, {A5S, SIXTEENTH },
+    {A5, SIXTEENTH }, {D6, SIXTEENTH }, {C6S, SIXTEENTH }, {D6, SIXTEENTH }, {A5, SIXTEENTH }, {D6, SIXTEENTH }, {C6S, SIXTEENTH }, {D6, SIXTEENTH },
+    {G5, SIXTEENTH }, {C6S, SIXTEENTH }, {B5, SIXTEENTH }, {C6S, SIXTEENTH }, {G5, SIXTEENTH }, {C6S, SIXTEENTH }, {B5, SIXTEENTH }, {C6S, SIXTEENTH },
+    {A5, SIXTEENTH }, {D6, SIXTEENTH }, {C6S, SIXTEENTH }, {D6, SIXTEENTH }, {A5, SIXTEENTH }, {D6, SIXTEENTH }, {C6S, SIXTEENTH }, {D6, SIXTEENTH },
+    {G5, SIXTEENTH }, {C6S, SIXTEENTH }, {B5, SIXTEENTH }, {C6S, SIXTEENTH }, {G5, SIXTEENTH }, {C6S, SIXTEENTH }, {B5, SIXTEENTH }, {C6S, SIXTEENTH },
+    {F5, SIXTEENTH }, {D6, SIXTEENTH }, {C6S, SIXTEENTH }, {D6, SIXTEENTH }, {E5, SIXTEENTH }, {D6, SIXTEENTH }, {C6S, SIXTEENTH }, {D6, SIXTEENTH },
+    {D5, SIXTEENTH }, {C5S, SIXTEENTH }, {D5, SIXTEENTH }, {E5, SIXTEENTH }, {F5, SIXTEENTH }, {G5, SIXTEENTH }, {A5, SIXTEENTH }, {A5S, SIXTEENTH },
+    {F5, SIXTEENTH }, {D6, SIXTEENTH }, {C6S, SIXTEENTH }, {D6, SIXTEENTH }, {E5, SIXTEENTH }, {D6, SIXTEENTH }, {C6S, SIXTEENTH }, {D6, SIXTEENTH },
+    {D5, SIXTEENTH }, {C5S, SIXTEENTH }, {D5, SIXTEENTH }, {E5, SIXTEENTH }, {F5, SIXTEENTH }, {G5, SIXTEENTH }, {A5, SIXTEENTH }, {A5S, SIXTEENTH },
+    {D5, SIXTEENTH }, {REST, SIXTEENTH }, {F5, SIXTEENTH }, {REST, SIXTEENTH }, {A5, SIXTEENTH }, {REST, SIXTEENTH }, {F5, SIXTEENTH }, {REST, SIXTEENTH },
+    {E5, SIXTEENTH }, {F5, SIXTEENTH }, {G5, SIXTEENTH }, {E5, SIXTEENTH }, {F5, SIXTEENTH }, {E5, SIXTEENTH }, {D5, SIXTEENTH }, {REST, SIXTEENTH },
+    {A5, SIXTEENTH }, {REST, SIXTEENTH }, {D6, SIXTEENTH }, {REST, SIXTEENTH }, {C6S, SIXTEENTH }, {REST, SIXTEENTH }, {A5, SIXTEENTH }, {REST, SIXTEENTH },
+    {A5S, SIXTEENTH }, {A5, SIXTEENTH }, {G5, SIXTEENTH }, {F5, SIXTEENTH }, {E5, SIXTEENTH }, {F5, SIXTEENTH }, {G5, SIXTEENTH }, {A5, SIXTEENTH },
+    {F5, SIXTEENTH }, {E5, SIXTEENTH }, {D5, SIXTEENTH }, {E5, SIXTEENTH }, {F5, SIXTEENTH }, {G5, SIXTEENTH }, {A5, SIXTEENTH }, {F5, SIXTEENTH },
+    {G5, SIXTEENTH }, {F5, SIXTEENTH }, {E5, SIXTEENTH }, {F5, SIXTEENTH }, {G5, SIXTEENTH }, {A5, SIXTEENTH }, {A5S, SIXTEENTH }, {G5, SIXTEENTH },
+    {A5, SIXTEENTH }, {G5, SIXTEENTH }, {F5, SIXTEENTH }, {G5, SIXTEENTH }, {A5, SIXTEENTH }, {A5S, SIXTEENTH }, {C6, SIXTEENTH }, {A5, SIXTEENTH },
+    {A5S, SIXTEENTH }, {A5, SIXTEENTH }, {G5, SIXTEENTH }, {F5, SIXTEENTH }, {E5, SIXTEENTH }, {D5, SIXTEENTH }, {C5S, SIXTEENTH }, {A4, SIXTEENTH },
+    {D5, SIXTEENTH }, {E5, SIXTEENTH }, {F5, SIXTEENTH }, {D5, SIXTEENTH }, {E5, SIXTEENTH }, {F5, SIXTEENTH }, {G5, SIXTEENTH }, {E5, SIXTEENTH },
+    {F5, SIXTEENTH }, {G5, SIXTEENTH }, {A5, SIXTEENTH }, {F5, SIXTEENTH }, {G5, SIXTEENTH }, {A5, SIXTEENTH }, {A5S, SIXTEENTH }, {G5, SIXTEENTH },
+    {A5, SIXTEENTH }, {G5, SIXTEENTH }, {F5, SIXTEENTH }, {E5, SIXTEENTH }, {D5, SIXTEENTH }, {C5, SIXTEENTH }, {A4, SIXTEENTH }, {A4, SIXTEENTH },
+    {G4, SIXTEENTH }, {A4, SIXTEENTH }, {A4S, SIXTEENTH }, {C5, SIXTEENTH }, {D5, SIXTEENTH }, {E5, SIXTEENTH }, {F5, SIXTEENTH }, {G5, SIXTEENTH },
+    {A5, SIXTEENTH }, {G5, SIXTEENTH }, {F5, SIXTEENTH }, {G5, SIXTEENTH }, {A5, SIXTEENTH }, {A5S, SIXTEENTH }, {C6, SIXTEENTH }, {A5, SIXTEENTH },
+    {A5S, SIXTEENTH }, {A5, SIXTEENTH }, {G5, SIXTEENTH }, {F5, SIXTEENTH }, {E5, SIXTEENTH }, {D5, SIXTEENTH }, {C5S, SIXTEENTH }, {A4, SIXTEENTH }
+};
+static const int HIGH_GLORIA_LEN = sizeof(high_gloria_melody) / sizeof(Note);
+
+static const Note high_gloria_bass[] = {
+    {D4, SIXTEENTH }, {REST, SIXTEENTH }, {A3, SIXTEENTH }, {REST, SIXTEENTH }, {F3, SIXTEENTH }, {REST, SIXTEENTH }, {D3, SIXTEENTH }, {REST, SIXTEENTH },
+    {A3, SIXTEENTH }, {REST, SIXTEENTH }, {C4S, SIXTEENTH }, {REST, SIXTEENTH }, {D4, SIXTEENTH }, {REST, SIXTEENTH }, {F3, SIXTEENTH }, {REST, SIXTEENTH },
+    {F4, SIXTEENTH }, {REST, SIXTEENTH }, {D4, SIXTEENTH }, {REST, SIXTEENTH }, {A3, SIXTEENTH }, {REST, SIXTEENTH }, {F3, SIXTEENTH }, {REST, SIXTEENTH },
+    {G3, SIXTEENTH }, {REST, SIXTEENTH }, {A3S, SIXTEENTH }, {REST, SIXTEENTH }, {C4, SIXTEENTH }, {REST, SIXTEENTH }, {A3, SIXTEENTH }, {REST, SIXTEENTH },
+    {D4, SIXTEENTH }, {REST, SIXTEENTH }, {C4, SIXTEENTH }, {REST, SIXTEENTH }, {A3S, SIXTEENTH }, {REST, SIXTEENTH }, {A3, SIXTEENTH }, {REST, SIXTEENTH },
+    {G3, SIXTEENTH }, {REST, SIXTEENTH }, {F3, SIXTEENTH }, {REST, SIXTEENTH }, {E3, SIXTEENTH }, {REST, SIXTEENTH }, {C4, SIXTEENTH }, {REST, SIXTEENTH },
+    {F3, SIXTEENTH }, {REST, SIXTEENTH }, {A3, SIXTEENTH }, {REST, SIXTEENTH }, {C4, SIXTEENTH }, {REST, SIXTEENTH }, {F4, SIXTEENTH }, {REST, SIXTEENTH },
+    {G3, SIXTEENTH }, {REST, SIXTEENTH }, {A3S, SIXTEENTH }, {REST, SIXTEENTH }, {A3, SIXTEENTH }, {REST, SIXTEENTH }, {A3, SIXTEENTH }, {REST, SIXTEENTH },
+    {A3S, SIXTEENTH }, {REST, SIXTEENTH }, {G3, SIXTEENTH }, {REST, SIXTEENTH }, {C4, SIXTEENTH }, {REST, SIXTEENTH }, {A3, SIXTEENTH }, {REST, SIXTEENTH },
+    {D4, SIXTEENTH }, {REST, SIXTEENTH }, {A3S, SIXTEENTH }, {REST, SIXTEENTH }, {E4, SIXTEENTH }, {REST, SIXTEENTH }, {C4, SIXTEENTH }, {REST, SIXTEENTH },
+    {F4, SIXTEENTH }, {REST, SIXTEENTH }, {A3, SIXTEENTH }, {REST, SIXTEENTH }, {A3S, SIXTEENTH }, {REST, SIXTEENTH }, {C4, SIXTEENTH }, {REST, SIXTEENTH },
+    {C4S, SIXTEENTH }, {REST, SIXTEENTH }, {A3, SIXTEENTH }, {REST, SIXTEENTH }, {D4, SIXTEENTH }, {REST, SIXTEENTH }, {A3S, SIXTEENTH }, {REST, SIXTEENTH },
+    {D4, SIXTEENTH }, {REST, SIXTEENTH }, {C4, SIXTEENTH }, {REST, SIXTEENTH }, {A3S, SIXTEENTH }, {REST, SIXTEENTH }, {A3, SIXTEENTH }, {REST, SIXTEENTH },
+    {G3, SIXTEENTH }, {REST, SIXTEENTH }, {F3, SIXTEENTH }, {REST, SIXTEENTH }, {E3, SIXTEENTH }, {REST, SIXTEENTH }, {C4, SIXTEENTH }, {REST, SIXTEENTH },
+    {F3, SIXTEENTH }, {REST, SIXTEENTH }, {A3, SIXTEENTH }, {REST, SIXTEENTH }, {C4, SIXTEENTH }, {REST, SIXTEENTH }, {F4, SIXTEENTH }, {REST, SIXTEENTH },
+    {G3, SIXTEENTH }, {REST, SIXTEENTH }, {A3S, SIXTEENTH }, {REST, SIXTEENTH }, {A3, SIXTEENTH }, {REST, SIXTEENTH }, {A3, SIXTEENTH }, {REST, SIXTEENTH },
+    {D4, SIXTEENTH }, {REST, SIXTEENTH }, {C4, SIXTEENTH }, {REST, SIXTEENTH }, {A3S, SIXTEENTH }, {REST, SIXTEENTH }, {A3, SIXTEENTH }, {REST, SIXTEENTH },
+    {G3, SIXTEENTH }, {REST, SIXTEENTH }, {F3, SIXTEENTH }, {REST, SIXTEENTH }, {E3, SIXTEENTH }, {REST, SIXTEENTH }, {C4, SIXTEENTH }, {REST, SIXTEENTH },
+    {D4, SIXTEENTH }, {REST, SIXTEENTH }, {C4, SIXTEENTH }, {REST, SIXTEENTH }, {A3S, SIXTEENTH }, {REST, SIXTEENTH }, {A3, SIXTEENTH }, {REST, SIXTEENTH },
+    {G3, SIXTEENTH }, {REST, SIXTEENTH }, {F3, SIXTEENTH }, {REST, SIXTEENTH }, {E3, SIXTEENTH }, {REST, SIXTEENTH }, {C4, SIXTEENTH }, {REST, SIXTEENTH },
+    {F3, SIXTEENTH }, {REST, SIXTEENTH }, {A3, SIXTEENTH }, {REST, SIXTEENTH }, {C4, SIXTEENTH }, {REST, SIXTEENTH }, {F4, SIXTEENTH }, {REST, SIXTEENTH },
+    {G3, SIXTEENTH }, {REST, SIXTEENTH }, {A3S, SIXTEENTH }, {REST, SIXTEENTH }, {A3, SIXTEENTH }, {REST, SIXTEENTH }, {A3, SIXTEENTH }, {REST, SIXTEENTH },
+    {A3, SIXTEENTH }, {REST, SIXTEENTH }, {REST, SIXTEENTH }, {REST, SIXTEENTH }, {A3, SIXTEENTH }, {REST, SIXTEENTH }, {REST, SIXTEENTH }, {REST, SIXTEENTH },
+    {A3, SIXTEENTH }, {REST, SIXTEENTH }, {REST, SIXTEENTH }, {REST, SIXTEENTH }, {A3, SIXTEENTH }, {REST, SIXTEENTH }, {REST, SIXTEENTH }, {REST, SIXTEENTH },
+    {A3, SIXTEENTH }, {REST, SIXTEENTH }, {REST, SIXTEENTH }, {REST, SIXTEENTH }, {A3, SIXTEENTH }, {REST, SIXTEENTH }, {REST, SIXTEENTH }, {REST, SIXTEENTH },
+    {D3, SIXTEENTH }, {REST, SIXTEENTH }, {F3, SIXTEENTH }, {REST, SIXTEENTH }, {G3, SIXTEENTH }, {REST, SIXTEENTH }, {A3, SIXTEENTH }, {REST, SIXTEENTH },
+    {A3S, SIXTEENTH }, {REST, SIXTEENTH }, {G3, SIXTEENTH }, {REST, SIXTEENTH }, {A3, SIXTEENTH }, {REST, SIXTEENTH }, {A3, SIXTEENTH }, {REST, SIXTEENTH },
+    {D3, SIXTEENTH }, {REST, SIXTEENTH }, {F3, SIXTEENTH }, {REST, SIXTEENTH }, {G3, SIXTEENTH }, {REST, SIXTEENTH }, {A3, SIXTEENTH }, {REST, SIXTEENTH },
+    {A3S, SIXTEENTH }, {REST, SIXTEENTH }, {G3, SIXTEENTH }, {REST, SIXTEENTH }, {A3, SIXTEENTH }, {REST, SIXTEENTH }, {A3, SIXTEENTH }, {REST, SIXTEENTH },
+    {A3, SIXTEENTH }, {REST, SIXTEENTH }, {REST, SIXTEENTH }, {REST, SIXTEENTH }, {A3, SIXTEENTH }, {REST, SIXTEENTH }, {REST, SIXTEENTH }, {REST, SIXTEENTH },
+    {A3, SIXTEENTH }, {REST, SIXTEENTH }, {REST, SIXTEENTH }, {REST, SIXTEENTH }, {A3, SIXTEENTH }, {REST, SIXTEENTH }, {REST, SIXTEENTH }, {REST, SIXTEENTH },
+    {A3, SIXTEENTH }, {REST, SIXTEENTH }, {REST, SIXTEENTH }, {REST, SIXTEENTH }, {A3, SIXTEENTH }, {REST, SIXTEENTH }, {REST, SIXTEENTH }, {REST, SIXTEENTH },
+    {D3, SIXTEENTH }, {REST, SIXTEENTH }, {F3, SIXTEENTH }, {REST, SIXTEENTH }, {G3, SIXTEENTH }, {REST, SIXTEENTH }, {A3, SIXTEENTH }, {REST, SIXTEENTH },
+    {A3S, SIXTEENTH }, {REST, SIXTEENTH }, {G3, SIXTEENTH }, {REST, SIXTEENTH }, {A3, SIXTEENTH }, {REST, SIXTEENTH }, {A3, SIXTEENTH }, {REST, SIXTEENTH },
+    {D3, SIXTEENTH }, {REST, SIXTEENTH }, {F3, SIXTEENTH }, {REST, SIXTEENTH }, {G3, SIXTEENTH }, {REST, SIXTEENTH }, {A3, SIXTEENTH }, {REST, SIXTEENTH },
+    {A3S, SIXTEENTH }, {REST, SIXTEENTH }, {G3, SIXTEENTH }, {REST, SIXTEENTH }, {A3, SIXTEENTH }, {REST, SIXTEENTH }, {A3, SIXTEENTH }, {REST, SIXTEENTH },
+    {D4, SIXTEENTH }, {REST, SIXTEENTH }, {A3, SIXTEENTH }, {REST, SIXTEENTH }, {F3, SIXTEENTH }, {REST, SIXTEENTH }, {D3, SIXTEENTH }, {REST, SIXTEENTH },
+    {A3, SIXTEENTH }, {REST, SIXTEENTH }, {C4S, SIXTEENTH }, {REST, SIXTEENTH }, {D4, SIXTEENTH }, {REST, SIXTEENTH }, {F3, SIXTEENTH }, {REST, SIXTEENTH },
+    {F4, SIXTEENTH }, {REST, SIXTEENTH }, {D4, SIXTEENTH }, {REST, SIXTEENTH }, {A3, SIXTEENTH }, {REST, SIXTEENTH }, {F3, SIXTEENTH }, {REST, SIXTEENTH },
+    {G3, SIXTEENTH }, {REST, SIXTEENTH }, {A3S, SIXTEENTH }, {REST, SIXTEENTH }, {C4, SIXTEENTH }, {REST, SIXTEENTH }, {A3, SIXTEENTH }, {REST, SIXTEENTH },
+    {D4, SIXTEENTH }, {REST, SIXTEENTH }, {C4, SIXTEENTH }, {REST, SIXTEENTH }, {A3S, SIXTEENTH }, {REST, SIXTEENTH }, {A3, SIXTEENTH }, {REST, SIXTEENTH },
+    {G3, SIXTEENTH }, {REST, SIXTEENTH }, {F3, SIXTEENTH }, {REST, SIXTEENTH }, {E3, SIXTEENTH }, {REST, SIXTEENTH }, {C4, SIXTEENTH }, {REST, SIXTEENTH },
+    {F3, SIXTEENTH }, {REST, SIXTEENTH }, {A3, SIXTEENTH }, {REST, SIXTEENTH }, {C4, SIXTEENTH }, {REST, SIXTEENTH }, {F4, SIXTEENTH }, {REST, SIXTEENTH },
+    {G3, SIXTEENTH }, {REST, SIXTEENTH }, {A3S, SIXTEENTH }, {REST, SIXTEENTH }, {A3, SIXTEENTH }, {REST, SIXTEENTH }, {A3, SIXTEENTH }, {REST, SIXTEENTH },
+    {A3S, SIXTEENTH }, {REST, SIXTEENTH }, {G3, SIXTEENTH }, {REST, SIXTEENTH }, {C4, SIXTEENTH }, {REST, SIXTEENTH }, {A3, SIXTEENTH }, {REST, SIXTEENTH },
+    {D4, SIXTEENTH }, {REST, SIXTEENTH }, {A3S, SIXTEENTH }, {REST, SIXTEENTH }, {E4, SIXTEENTH }, {REST, SIXTEENTH }, {C4, SIXTEENTH }, {REST, SIXTEENTH },
+    {F4, SIXTEENTH }, {REST, SIXTEENTH }, {A3, SIXTEENTH }, {REST, SIXTEENTH }, {A3S, SIXTEENTH }, {REST, SIXTEENTH }, {C4, SIXTEENTH }, {REST, SIXTEENTH },
+    {C4S, SIXTEENTH }, {REST, SIXTEENTH }, {A3, SIXTEENTH }, {REST, SIXTEENTH }, {D4, SIXTEENTH }, {REST, SIXTEENTH }, {A3S, SIXTEENTH }, {REST, SIXTEENTH },
+    {D3, SIXTEENTH }, {REST, SIXTEENTH }, {F3, SIXTEENTH }, {REST, SIXTEENTH }, {G3, SIXTEENTH }, {REST, SIXTEENTH }, {A3, SIXTEENTH }, {REST, SIXTEENTH },
+    {A3S, SIXTEENTH }, {REST, SIXTEENTH }, {G3, SIXTEENTH }, {REST, SIXTEENTH }, {A3, SIXTEENTH }, {REST, SIXTEENTH }, {A3, SIXTEENTH }, {REST, SIXTEENTH },
+    {D3, SIXTEENTH }, {REST, SIXTEENTH }, {A3, SIXTEENTH }, {REST, SIXTEENTH }, {D4, SIXTEENTH }, {REST, SIXTEENTH }, {A3, SIXTEENTH }, {REST, SIXTEENTH },
+    {D3, SIXTEENTH }, {REST, SIXTEENTH }, {REST, SIXTEENTH }, {REST, SIXTEENTH }, {REST, SIXTEENTH }, {REST, SIXTEENTH }, {REST, SIXTEENTH }, {REST, SIXTEENTH }
+};
+static const int HIGH_GLORIA_BASS_LEN = sizeof(high_gloria_bass) / sizeof(Note);
+
 /* --- IN THE HALL OF THE MOUNTAIN KING TRACK DATA --- */
 static const Note mountain_king_melody[] = {
     /* Bars 1-4: The Creeping Steps (B Minor) */
@@ -366,6 +477,7 @@ static const Note* current_song = 0;
 static int current_song_len = 0;
 static const Note* current_song_b = 0;
 static int current_song_b_len = 0;
+static int octave_up = 0;
 
 
 /* Helper to advance index without using modulus. Uses bitwise AND
@@ -380,6 +492,13 @@ static int advance_index(int idx, int len) {
     return idx;
 }
 
+static unsigned int apply_octave_shift(unsigned int pitch) {
+    if (!octave_up || pitch == REST) {
+        return pitch;
+    }
+    return pitch >> 1;
+}
+
 /* --- FUNCTIONS --- */
 
 void start_music(SongChoice song) {
@@ -391,36 +510,49 @@ void start_music(SongChoice song) {
             current_song_len = BOURREE_LEN;
             current_song_b = 0;
             current_song_b_len = 0;
+            octave_up = 0;
             break;
         case SONG_TETRIS:
             current_song = tetris_melody;
             current_song_len = TETRIS_LEN;
             current_song_b = 0;
             current_song_b_len = 0;
+            octave_up = 0;
             break;
         case SONG_HOT_CROSS_BUNS:
             current_song = hot_cross_buns_melody;
             current_song_len = HOT_CROSS_BUNS_LEN;
             current_song_b = hot_cross_buns_harmony;
             current_song_b_len = HOT_CROSS_BUNS_HARMONY_LEN;
+            octave_up = 0;
             break;
         case SONG_GLORIA:
             current_song = gloria_melody;
             current_song_len = GLORIA_LEN;
             current_song_b = gloria_bass;
             current_song_b_len = GLORIA_BASS_LEN;
+            octave_up = 0;
+            break;
+        case SONG_HIGH_GLORIA:
+            current_song = high_gloria_melody;
+            current_song_len = HIGH_GLORIA_LEN;
+            current_song_b = high_gloria_bass;
+            current_song_b_len = HIGH_GLORIA_BASS_LEN;
+            octave_up = 0;
             break;
         case SONG_MOUNTAIN_KING:
             current_song = mountain_king_melody;
             current_song_len = MOUNTAIN_KING_LEN;
             current_song_b = mountain_king_bass;
             current_song_b_len = MOUNTAIN_KING_BASS_LEN;
+            octave_up = 1;
             break;
         case SONG_MEGALO:
             current_song = megalo_melody;
             current_song_len = MEGALO_LEN;
             current_song_b = megalo_bass;
             current_song_b_len = MEGALO_BASS_LEN;
+            octave_up = 0;
             break;
         default:
             return; /* Invalid choice */
@@ -449,7 +581,7 @@ void start_music(SongChoice song) {
         if (current_song[0].pitch == REST) {
             set_volume_q(CHANNEL_A, 0);
         } else {
-            set_tone_q(CHANNEL_A, current_song[0].pitch);
+            set_tone_q(CHANNEL_A, apply_octave_shift(current_song[0].pitch));
         }
 
         /* Load first note for channel B, if present */
@@ -460,7 +592,7 @@ void start_music(SongChoice song) {
             if (current_song_b[0].pitch == REST) {
                 set_volume_q(CHANNEL_B, 0);
             } else {
-                set_tone_q(CHANNEL_B, current_song_b[0].pitch);
+                set_tone_q(CHANNEL_B, apply_octave_shift(current_song_b[0].pitch));
             }
         }
         Super(old_ssp);
@@ -490,7 +622,7 @@ void update_music(UINT32 time_elapsed) {
             old_ssp = Super(0);
             set_volume_q(CHANNEL_A, 0);
             set_volume_q(CHANNEL_A, 10);
-            set_tone_q(CHANNEL_A, current_song[chA_index].pitch);
+            set_tone_q(CHANNEL_A, apply_octave_shift(current_song[chA_index].pitch));
             Super(old_ssp);
         }
     }
@@ -511,7 +643,7 @@ void update_music(UINT32 time_elapsed) {
                 old_ssp = Super(0);
                 set_volume_q(CHANNEL_B, 0);
                 set_volume_q(CHANNEL_B, 8);
-                set_tone_q(CHANNEL_B, current_song_b[chB_index].pitch);
+                set_tone_q(CHANNEL_B, apply_octave_shift(current_song_b[chB_index].pitch));
                 Super(old_ssp);
             }
         }

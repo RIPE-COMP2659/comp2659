@@ -75,10 +75,13 @@ int main(void) {
     /* Test Track 4: Gloria */
     test_song(SONG_GLORIA, "Gloria");
 
-    /* Test Track 5: In the Hall of the Mountain King */
+    /* Test Track 5: High Gloria */
+    test_song(SONG_HIGH_GLORIA, "High Gloria");
+
+    /* Test Track 6: In the Hall of the Mountain King */
     test_song(SONG_MOUNTAIN_KING, "In the Hall of the Mountain King");
 
-    /* Test Track 6: Megalo */
+    /* Test Track 7: Megalo */
     test_song(SONG_MEGALO, "Megalo");
     
     Cconws("All music tests complete.\r\n");
