@@ -20,6 +20,7 @@ typedef enum {
     , SONG_HOT_CROSS_BUNS
     , SONG_GLORIA
     , SONG_MOUNTAIN_KING
+    , SONG_MEGALO
 } SongChoice;
 
 /* Updated to take a SongChoice enum */
