@@ -405,15 +405,14 @@ void test_bourree(void) {
 int main() {
     Cconws("PSG test started...\r\n");
 
-    /* test_crash(); */
-    /* test_write_psg(); */
-    /* test_read_psg(); */
-    /* test_set_tone(); */
-    /* test_set_volume(); */
-    /* test_enable_channel(); */
-    /* test_stop_sound(); */
-    /* test_song_of_storms(); */
-    
+    test_crash(); 
+    test_write_psg(); 
+    test_read_psg(); 
+    test_set_tone(); 
+    test_set_volume(); 
+    test_enable_channel(); 
+    test_stop_sound(); 
+    test_song_of_storms(); 
     test_dual_channel();
     test_bourree();
 
