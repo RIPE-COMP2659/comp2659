@@ -23,7 +23,21 @@ int main_game(void)
 
     UINT8 init = splash_screen(); /* Prints splash screen and awaits user input */
 
+<<<<<<< HEAD
     if (init == 0)
+=======
+    /* Initial render */
+    render(&model, 0);
+
+    /* Disable keyboard sound */
+    toggle_keyboard_sound();
+
+    /* Start background music (driven by update_music from the main loop) */
+    start_music(SONG_MEGALO);
+
+    timeThen = get_time();
+    while (quit != TRUE && game_won != TRUE)
+>>>>>>> 865e22f (add megalo tune)
     {
         quit = TRUE; /* Early exit if exit selected */
     }

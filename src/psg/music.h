@@ -26,9 +26,17 @@ typedef struct {
 /* Enum to easily swap songs in start_music() */
 typedef enum {
     SONG_BOURREE,
+<<<<<<< HEAD
     SONG_TETRIS,
     SONG_HOT_CROSS_BUNS,
     SONG_GLORIA
+=======
+    SONG_TETRIS
+    , SONG_HOT_CROSS_BUNS
+    , SONG_GLORIA
+    , SONG_MOUNTAIN_KING
+    , SONG_MEGALO
+>>>>>>> 865e22f (add megalo tune)
 } SongChoice;
 
 /* Updated to take a SongChoice enum */

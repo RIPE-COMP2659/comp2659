@@ -74,6 +74,15 @@ int main(void) {
     
     /* Test Track 4: Gloria */
     test_song(SONG_GLORIA, "Gloria");
+<<<<<<< HEAD
+=======
+
+    /* Test Track 5: In the Hall of the Mountain King */
+    test_song(SONG_MOUNTAIN_KING, "In the Hall of the Mountain King");
+
+    /* Test Track 6: Megalo */
+    test_song(SONG_MEGALO, "Megalo");
+>>>>>>> 865e22f (add megalo tune)
     
     Cconws("All music tests complete.\r\n");
     Cconws("Press any key to exit to DOS...\r\n");
