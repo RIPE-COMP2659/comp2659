@@ -73,7 +73,7 @@ int main_game(void)
             if (died_this_frame == TRUE)
             {
                 clear_render_buffers();
-                start_music(SONG_GLORIA);
+                start_music(SONG_MEGALO);
             }
 
             current_event = check_level_complete(&model);
