@@ -1,25 +1,6 @@
 #include "music.h"
-#include "notes.h"
-#include "psg.h"
-#include <osbind.h>
 
 /* FIX: Some lower notes used by tracks are missing from notes.h. */
-#ifndef A1S
-#define A1S 5357
-#endif
-
-#ifndef B1
-#define B1 5056
-#endif
-
-#ifndef C2
-#define C2 4772
-#endif
-
-#ifndef D2
-#define D2 4252 
-#endif
-
 #define EIGHTH 20
 #define QUARTER 40
 #define HALF 80
@@ -485,6 +466,7 @@ static int octave_up = 0;
  */
 static int advance_index(int idx, int len) {
     idx++;
+    /* TODO: Remove early returns */
     if ((len & (len - 1)) == 0) {
         return idx & (len - 1);
     }
@@ -492,6 +474,7 @@ static int advance_index(int idx, int len) {
     return idx;
 }
 
+/* TODO: Documentation, clarification on why this is even here? */
 static unsigned int apply_octave_shift(unsigned int pitch) {
     if (!octave_up || pitch == REST) {
         return pitch;
@@ -601,6 +584,7 @@ void start_music(SongChoice song) {
 
 void update_music(UINT32 time_elapsed) {
     long old_ssp;
+    /* TODO: Remove early return */
     if (!is_playing || time_elapsed == 0 || current_song_len == 0) return;
 
     /* --- UPDATE CHANNEL A (MELODY) --- */

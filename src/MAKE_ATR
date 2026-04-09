@@ -19,6 +19,7 @@ INPUT_FOLDER = input
 PSG_FOLDER = psg
 CLOCK_FOLDER = clock
 SHARED_FOLDER = shared
+SPLASH_SCREEN_FOLDER = splash
 TESTS_MODEL_FOLDER = $(TESTS_FOLDER)\$(MODEL_FOLDER)
 TESTS_RASTER_FOLDER = $(TESTS_FOLDER)\$(RASTER_FOLDER)
 TESTS_RENDER_FOLDER = $(TESTS_FOLDER)\$(RENDER_FOLDER)
@@ -46,9 +47,13 @@ MUSIC = music
 # PSG object group (PSG base object + music object)
 PSG_OBJECTS = $(PSG).o $(MUSIC).o
 
+# File Names, Base - Splash object group
+SPLASH_OBJECTS = $(SPLASH).o
+
 # File Names, Tests - PSG (song integration)
 TSONG = tsong
 TMUSIC = tmusic
+EFFECTS = effects
 
 # File Names, Base - Model
 BLOCK  = block
@@ -83,23 +88,27 @@ BOUNDS  = bounds
 PLT_CLIP = plt_clp
 RASTER = raster
 
+# File Names, Base - Splash Screen
+SPLASH = splash
+
 # Global Variables
 ATARI_CC     = cc68x
 SHARED_FLAGS = -g
 
 # Program Configuration
-TOS_FLAGS      = $(SHARED_FLAGS) -c -I. -I$(MODEL_FOLDER) -I$(SHARED_FOLDER) -I$(RASTER_FOLDER) -I$(RENDER_FOLDER) -I$(EVENTS_FOLDER) -I$(INPUT_FOLDER) -I$(CLOCK_FOLDER) -I$(PSG_FOLDER)
+TOS_FLAGS      = $(SHARED_FLAGS) -c -I. -I$(MODEL_FOLDER) -I$(SHARED_FOLDER) -I$(RASTER_FOLDER) -I$(RENDER_FOLDER) -I$(EVENTS_FOLDER) -I$(INPUT_FOLDER) -I$(CLOCK_FOLDER) -I$(PSG_FOLDER) -I$(SPLASH_SCREEN_FOLDER)
 MODEL_OBJECTS  = $(BLOCK).o $(SPIKE).o $(LAVA).o $(GEO).o $(LEVEL).o $(WORLD).o $(MODEL).o $(CAMERA).o $(MAIN).o
 EVENTS_OBJECTS = $(ASYNC).o $(COND).o $(SYNC).o
 CLOCK_OBJECTS = $(CLOCK).o
 RASTER_OBJECTS = $(CLR_SCN).o $(CLR_REG).o $(PLT_PXL).o $(PLT_HOR).o $(PLT_VRT).o $(PLT_LIN).o $(PLT_REC).o $(PLT_SQR).o $(PLT_TRI).o $(BMAP_8).o $(BMAP_16).o $(BMAP_32).o $(PLT_CHR).o $(PLT_STR).o $(BOUNDS).o $(PLT_CLIP).o
 RENDER_OBJECTS = $(RENDER).o
 INPUT_OBJECTS  = $(INPUT).o
-TOS_OBJECTS    = $(MODEL_OBJECTS) $(RASTER_OBJECTS) $(RENDER_OBJECTS) $(EVENTS_OBJECTS) $(INPUT_OBJECTS) $(CLOCK_OBJECTS) $(PSG_OBJECTS)
+PSG_OBJECTS    = $(PSG).o $(EFFECTS).o $(MUSIC).o
+TOS_OBJECTS    = $(MODEL_OBJECTS) $(RASTER_OBJECTS) $(RENDER_OBJECTS) $(EVENTS_OBJECTS) $(INPUT_OBJECTS) $(CLOCK_OBJECTS) $(PSG_OBJECTS) $(SPLASH_OBJECTS)
 
 TOS_NAME       = dash.tos
 # TODO: Feels redundant
-MAIN_FLAGS     = $(SHARED_FLAGS) -I. -I$(MODEL_FOLDER) -I$(SHARED_FOLDER) -I$(RASTER_FOLDER) -I$(RENDER_FOLDER) -I$(EVENTS_FOLDER) -I$(INPUT_FOLDER)
+MAIN_FLAGS     = $(SHARED_FLAGS) -I. -I$(MODEL_FOLDER) -I$(SHARED_FOLDER) -I$(RASTER_FOLDER) -I$(RENDER_FOLDER) -I$(EVENTS_FOLDER) -I$(INPUT_FOLDER) -I$(SPLASH_SCREEN_FOLDER)
 
 # Test Configuration
 # TODO: It's a bit silly, but pretty sure we're including all our .c files for each test.
@@ -194,7 +203,7 @@ $(WORLD).o: $(MODEL_FOLDER)\$(WORLD).c $(MODEL_FOLDER)\$(WORLD).h $(SHARED_FOLDE
 $(MODEL).o: $(MODEL_FOLDER)\$(MODEL).c $(MODEL_FOLDER)\$(MODEL).h $(SHARED_FOLDER)\dtypes.h
 	$(ATARI_CC) $(TOS_FLAGS) $(MODEL_FOLDER)\$(MODEL).c -o $(MODEL).o
 
-$(MAIN).o: $(MAIN).c $(MODEL_FOLDER)\$(MODEL).h $(SHARED_FOLDER)\dtypes.h $(RASTER_FOLDER)\$(RASTER).h $(CLOCK_FOLDER)\$(CLOCK).h $(INPUT_FOLDER)\$(INPUT).h
+$(MAIN).o: $(MAIN).c $(MODEL_FOLDER)\$(MODEL).h $(SHARED_FOLDER)\dtypes.h $(RASTER_FOLDER)\$(RASTER).h $(CLOCK_FOLDER)\$(CLOCK).h $(INPUT_FOLDER)\$(INPUT).h $(PSG_FOLDER)\$(EFFECTS).h
 	$(ATARI_CC) $(TOS_FLAGS) $(MAIN).c -o $(MAIN).o
 
 $(ASYNC).o: $(EVENTS_FOLDER)\$(ASYNC).c $(EVENTS_FOLDER)\$(ASYNC).h $(SHARED_FOLDER)\dtypes.h
@@ -215,11 +224,17 @@ $(PSG).o: $(PSG_FOLDER)\$(PSG).c $(PSG_FOLDER)\$(PSG).h $(SHARED_FOLDER)\dtypes.
 $(MUSIC).o: $(PSG_FOLDER)\$(MUSIC).c $(PSG_FOLDER)\$(MUSIC).h $(SHARED_FOLDER)\dtypes.h
 	$(ATARI_CC) $(TOS_FLAGS) $(PSG_FOLDER)\$(MUSIC).c -o $(MUSIC).o
 
+$(EFFECTS).o: $(PSG_FOLDER)\$(EFFECTS).c $(PSG_FOLDER)\$(EFFECTS).h $(SHARED_FOLDER)\dtypes.h
+	$(ATARI_CC) $(TOS_FLAGS) $(PSG_FOLDER)\$(EFFECTS).c -o $(EFFECTS).o
+
 $(RENDER).o: $(RENDER_FOLDER)\$(RENDER).c $(RENDER_FOLDER)\$(RENDER).h $(SHARED_FOLDER)\dtypes.h $(RASTER_FOLDER)\$(RASTER).h
 	$(ATARI_CC) $(TOS_FLAGS) $(RENDER_FOLDER)\$(RENDER).c -o $(RENDER).o
 
 $(CLOCK).o: $(CLOCK_FOLDER)\$(CLOCK).c $(CLOCK_FOLDER)\$(CLOCK).h
 	$(ATARI_CC) $(TOS_FLAGS) $(CLOCK_FOLDER)\$(CLOCK).c -o $(CLOCK).o
+
+$(SPLASH).o: $(SPLASH_SCREEN_FOLDER)\$(SPLASH).c $(SPLASH_SCREEN_FOLDER)\$(SPLASH).h $(SHARED_FOLDER)\dtypes.h
+	$(ATARI_CC) $(TOS_FLAGS) $(SPLASH_SCREEN_FOLDER)\$(SPLASH).c -o $(SPLASH).o
 
 $(CLR_SCN).o: $(RASTER_FOLDER)\$(CLR_SCN).s
 	$(ATARI_CC) $(SHARED_FLAGS) -c $(RASTER_FOLDER)\$(CLR_SCN).s -o $(CLR_SCN).o
@@ -272,8 +287,18 @@ $(TINPUT): $(INPUT).o
 	$(ATARI_CC) $(MAIN_FLAGS) $(TESTS_INPUT_FOLDER)\$(TINPUT).c $(INPUT).o -o $(TINPUT).tos
 
 # ----- PSG Test Builds ------------------------------------------------------
-$(TPSG): $(PSG).o
-	$(ATARI_CC) $(MAIN_FLAGS) $(TESTS_PSG_FOLDER)\$(TPSG).c $(PSG).o -o $(TPSG).tos
+$(TPSG): $(PSG).o $(CLOCK).o
+	$(ATARI_CC) $(MAIN_FLAGS) $(TESTS_PSG_FOLDER)\$(TPSG).c $(PSG).o $(CLOCK).o -o $(TPSG).tos
+
+$(TSONG): $(PSG).o $(MUSIC).o
+	$(ATARI_CC) $(MAIN_FLAGS) $(TESTS_PSG_FOLDER)\$(TSONG).c $(PSG).o $(MUSIC).o -o $(TSONG).tos
+
+$(TMUSIC).tos: $(PSG).o $(MUSIC).o $(CLOCK).o
+	$(ATARI_CC) $(MAIN_FLAGS) $(TESTS_PSG_FOLDER)\$(TMUSIC).c $(PSG).o $(MUSIC).o $(CLOCK).o -o $(TMUSIC).tos
+
+# Convenience target: build and show how to run tmusic from terminal
+.PHONY: tmusic
+tmusic: $(TMUSIC).tos
 
 $(TSONG): $(PSG).o $(MUSIC).o
 	$(ATARI_CC) $(MAIN_FLAGS) $(TESTS_PSG_FOLDER)\$(TSONG).c $(PSG).o $(MUSIC).o -o $(TSONG).tos

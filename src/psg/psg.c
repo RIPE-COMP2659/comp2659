@@ -1,5 +1,4 @@
 /* See psg.h for documentation */
-
 #include "psg.h"
 
 /* Hardware addresses */
@@ -79,7 +78,7 @@ void set_tone_q(unsigned int channel, unsigned int tuning) {
 
 /** See psg.h for documentation */
 void set_volume(unsigned int channel, unsigned int volume) {
-    if (channel <= 2 && volume <= 15) {
+    if (channel <= 2 && volume <= 0x10) {
         long old_ssp = Super(0);
 
         set_volume_q(channel, volume);
@@ -137,6 +136,40 @@ void enable_channel_q(
 }
 
 /** See psg.h for documentation */
+void set_noise(unsigned int tuning) {
+    if (tuning <= 0x1F) {
+        long old_ssp = Super(0);
+        set_noise_q(tuning);
+        Super(old_ssp);
+    }
+}
+
+/** See psg.h for documentation */
+void set_noise_q(unsigned int tuning) {
+    *REG_SELECT_PTR = NOISE_FREQ;
+    *REG_WRITE_PTR = (UINT8)(tuning & 0x1F);
+}
+
+/** See psg.h for documentation */
+void set_envelope(unsigned int shape, unsigned int sustain) {
+    if (shape <= 0x0F) {
+        long old_ssp = Super(0);
+        set_envelope_q(shape, sustain);
+        Super(old_ssp);
+    }
+}
+
+/** See psg.h for documentation */
+void set_envelope_q(unsigned int shape, unsigned int sustain) {
+    *REG_SELECT_PTR = ENV_FINE;
+    *REG_WRITE_PTR = (UINT8)(sustain & 0xFF);
+    *REG_SELECT_PTR = ENV_COARSE;
+    *REG_WRITE_PTR = (UINT8)((sustain >> 8) & 0xFF);
+    *REG_SELECT_PTR = ENV_SHAPE;
+    *REG_WRITE_PTR = (UINT8)(shape & 0x0F);
+}
+
+/** See psg.h for documentation */
 void stop_sound() {
     long old_ssp = Super(0);
 
@@ -161,6 +194,7 @@ void stop_sound_q() {
     */
 }
 
+/* TODO: Function documentation */
 void toggle_keyboard_sound() {
     long old_ssp = Super(0);
     UINT8 console_byte = *CONSOLE_PTR ^ 0x01; /* Invert bit 0 to flip keyboard sound */

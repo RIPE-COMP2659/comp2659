@@ -109,6 +109,27 @@ void enable_channel(
 );
 
 /**
+ * Loads the noise register with the given tuning (0-31)
+ *
+ * Params:
+ *     unsigned int tuning:
+ *         The tuning value to load into the noise register (0-31)
+ */
+void set_noise(unsigned int tuning);
+
+/**
+ * Loads the PSG envelope control registers with the given envelope shape (0-15)
+ * and 16-bit sustain
+ *
+ * Params:
+ *     unsigned int shape:
+ *         The envelope shape to load into the envelope shape register (0-15)
+ *     unsigned int sustain:
+ *         The 16-bit sustain value to load into the envelope tune registers
+ */
+void set_envelope(unsigned int shape, unsigned int sustain);
+
+/**
  * Silences all PSG sound production
  */
 void stop_sound();
@@ -130,4 +151,6 @@ void enable_channel_q(
     unsigned int tone_on,
     unsigned int noise_on
 );
+void set_noise_q(unsigned int tuning);
+void set_envelope_q(unsigned int shape, unsigned int sustain);
 void stop_sound_q();

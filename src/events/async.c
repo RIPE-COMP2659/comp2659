@@ -18,7 +18,9 @@
  */
 #include "async.h"
 
-void on_jump_request(Model *model) { geo_jump(&model->world.geo); }
+void on_jump_request(Model *model) { 
+    geo_jump(&model->world.geo); 
+}
 
 /* FUTURE TODO (User Actions):
  * void on_pause_request(World *world);

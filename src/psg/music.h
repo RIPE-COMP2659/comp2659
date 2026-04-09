@@ -1,8 +1,23 @@
-#ifndef MUSIC_H
-#define MUSIC_H
+/**
+ * music.h
+ * Authors:
+ *     Riley Gramlich, rgram060@mtroyal.ca, 201762060
+ *     Robert Parker Hutcheson, rhutc335@mtroyal.ca, 201762335
+ *     Isaac Klein, iklei977@mtroyal.ca, 201763977
+ *     Eduard Mykhailets, emykh268@mtroyal.ca, 201750268
+ * Course: COMP 2659-001, Computing Machinery II, Winter 2026
+ * Instructor: Nolan Shaw
+ *
+ * The music management for the game. Namely, the collection of notes and
+ * timing
+ */
 
-/* Use project-wide fixed-width types */
+/* TODO: Function definition template */
+
 #include "../shared/dtypes.h"
+#include "psg.h"
+#include "notes.h"
+#include <osbind.h>
 
 #define CHANNEL_A 0
 #define CHANNEL_B 1
@@ -16,12 +31,12 @@ typedef struct {
 /* Enum to easily swap songs in start_music() */
 typedef enum {
     SONG_BOURREE,
-    SONG_TETRIS
-    , SONG_HOT_CROSS_BUNS
-    , SONG_GLORIA
-    , SONG_HIGH_GLORIA
-    , SONG_MOUNTAIN_KING
-    , SONG_MEGALO
+    SONG_TETRIS,
+    SONG_HOT_CROSS_BUNS,
+    SONG_GLORIA,
+    SONG_HIGH_GLORIA,
+    SONG_MOUNTAIN_KING,
+    SONG_MEGALO
 } SongChoice;
 
 /* Updated to take a SongChoice enum */
@@ -32,5 +47,3 @@ void update_music(UINT32 time_elapsed);
 
 /* Halts the PSG output */
 void stop_music(void);
-
-#endif

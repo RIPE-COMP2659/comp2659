@@ -14,6 +14,8 @@
  */
 
 /* Octave 2 */
+/* NOTE: D2 is invalid because it's a 12 bit tone, but it doesn't break */
+#define D2  4252  /* D  73.42Hz  */
 #define D2S 4011  /* D# 77.78Hz  */
 #define E2  3787  /* E  82.41Hz  */
 #define F2  3574  /* F  87.31Hz  */
