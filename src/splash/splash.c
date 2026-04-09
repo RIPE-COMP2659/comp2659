@@ -2725,7 +2725,7 @@ print_exit_sel(UINT8 *base)
 
 UINT8 splash_screen(void)
 {
-    UINT8 *base = (UINT8 *)Physbase();
+    UINT8 *base = (UINT8 *)get_video_base();
     UINT8 selection = FALSE;
     UINT8 cursor = PLAY;
     int key;
