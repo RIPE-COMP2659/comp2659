@@ -1,5 +1,4 @@
 #include "geo.h"
-#include "../psg/effects.h"
 
 #define VO_TOLERANCE ((-1 * GEO_TERMINAL_DY_SCALED) >> 6)
 
