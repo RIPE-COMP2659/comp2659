@@ -15,6 +15,10 @@
  */
 #include "input.h"
 
+volatile UINT8 * const IKBD_control = IKBD_CTRL_ADDR;
+volatile const UINT8 * const IKBD_status = IKBD_STATUS_ADDR;
+volatile const SCANCODE * const IKBD_RDR = IKBD_RDR_ADDR;
+
 int has_input() {
   int result = FALSE;
 
@@ -33,4 +37,10 @@ char get_input() {
   }
 
   return result;
+}
+
+SCANCODE read_scancode(void) {
+    while ((*IKBD_status & IKBD_SR_RDRF) == 0)
+        ;
+    return *IKBD_RDR;
 }

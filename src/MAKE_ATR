@@ -39,6 +39,7 @@ CLOCK = clock
 
 # File Names, Base - Input
 INPUT = input
+IKBD = ikbd
 
 # File Names, Base - PSG
 PSG = psg
@@ -101,7 +102,7 @@ EVENTS_OBJECTS = $(ASYNC).o $(COND).o $(SYNC).o
 CLOCK_OBJECTS = $(CLOCK).o
 RASTER_OBJECTS = $(CLR_SCN).o $(CLR_REG).o $(PLT_PXL).o $(PLT_HOR).o $(PLT_VRT).o $(PLT_LIN).o $(PLT_REC).o $(PLT_SQR).o $(PLT_TRI).o $(BMAP_8).o $(BMAP_16).o $(BMAP_32).o $(PLT_CHR).o $(PLT_STR).o $(BOUNDS).o $(PLT_CLIP).o
 RENDER_OBJECTS = $(RENDER).o
-INPUT_OBJECTS  = $(INPUT).o
+INPUT_OBJECTS  = $(INPUT).o $(IKBD).o
 PSG_OBJECTS    = $(PSG).o $(EFFECTS).o $(MUSIC).o
 TOS_OBJECTS    = $(MODEL_OBJECTS) $(RASTER_OBJECTS) $(RENDER_OBJECTS) $(EVENTS_OBJECTS) $(INPUT_OBJECTS) $(CLOCK_OBJECTS) $(PSG_OBJECTS) $(SPLASH_OBJECTS)
 
@@ -136,6 +137,7 @@ TSYNC = t${SYNC}
 
 # File Names, Tests - Input
 TINPUT = t${INPUT}
+TIKBD = t${IKBD}
 
 # File Names, Tests - PSG
 TPSG = t${PSG}
@@ -214,8 +216,11 @@ $(COND).o: $(EVENTS_FOLDER)\$(COND).c $(EVENTS_FOLDER)\$(COND).h $(SHARED_FOLDER
 $(SYNC).o: $(EVENTS_FOLDER)\$(SYNC).c $(EVENTS_FOLDER)\$(SYNC).h $(SHARED_FOLDER)\dtypes.h
 	$(ATARI_CC) $(TOS_FLAGS) $(EVENTS_FOLDER)\$(SYNC).c -o $(SYNC).o
 
-$(INPUT).o: $(INPUT_FOLDER)\$(INPUT).c $(INPUT_FOLDER)\$(INPUT).h $(SHARED_FOLDER)\dtypes.h
+$(INPUT).o: $(INPUT_FOLDER)\$(INPUT).c $(INPUT_FOLDER)\$(INPUT).h $(INPUT_FOLDER)\$(IKBD).h $(SHARED_FOLDER)\dtypes.h
 	$(ATARI_CC) $(TOS_FLAGS) $(INPUT_FOLDER)\$(INPUT).c -o $(INPUT).o
+
+$(IKBD).o: $(INPUT_FOLDER)\$(IKBD).s
+	$(ATARI_CC) $(SHARED_FLAGS) -c $(INPUT_FOLDER)\$(IKBD).s -o $(IKBD).o
 
 $(PSG).o: $(PSG_FOLDER)\$(PSG).c $(PSG_FOLDER)\$(PSG).h $(SHARED_FOLDER)\dtypes.h
 	$(ATARI_CC) $(TOS_FLAGS) $(PSG_FOLDER)\$(PSG).c -o $(PSG).o
@@ -283,8 +288,11 @@ $(TSYNC): $(COND).o $(EFFECTS).o $(MUSIC).o $(PSG).o $(CLOCK).o
 
 
 # ----- Input Test Builds ----------------------------------------------------
-$(TINPUT): $(INPUT).o
-	$(ATARI_CC) $(MAIN_FLAGS) $(TESTS_INPUT_FOLDER)\$(TINPUT).c $(INPUT).o -o $(TINPUT).tos
+$(TINPUT): $(INPUT).o $(IKBD).o
+	$(ATARI_CC) $(MAIN_FLAGS) $(TESTS_INPUT_FOLDER)\$(TINPUT).c $(INPUT).o $(IKBD).o -o $(TINPUT).tos
+
+$(TIKBD): $(IKBD).o
+	$(ATARI_CC) $(MAIN_FLAGS) $(TESTS_INPUT_FOLDER)\$(TIKBD).c $(IKBD).o -o $(TIKBD).tos
 
 
 # ----- PSG Test Builds ------------------------------------------------------
@@ -352,7 +360,7 @@ $(TCLOCK): $(CLOCK).o
 
 
 # ----- Test Execution -------------------------------------------------------
-test: $(TINPUT) $(TPSG) $(TMUSIC) $(TBLOCK) $(TGEO) $(TLAVA) $(TLEVEL) $(TSPIKE) $(TWORLD) $(TMODEL) $(TCAMERA) $(TRENDER) $(TASYNC) $(TCOND) $(TSYNC) $(TCLR_SCN) $(TCLR_REG) $(TPLT_PXL) $(TPLT_HOR) $(TPLT_VRT) $(TPLT_LIN) $(TPLT_REC) $(TPLT_SQR) $(TPLT_TRI) $(TBMAP_8) $(TBMAP_16) $(TBMAP_32) $(TPLT_CHR) $(TPLT_STR) $(TBOUNDS) $(TPLT_CLIP)
+test: $(TINPUT) $(TIKBD) $(TPSG) $(TMUSIC) $(TBLOCK) $(TGEO) $(TLAVA) $(TLEVEL) $(TSPIKE) $(TWORLD) $(TMODEL) $(TCAMERA) $(TRENDER) $(TASYNC) $(TCOND) $(TSYNC) $(TCLR_SCN) $(TCLR_REG) $(TPLT_PXL) $(TPLT_HOR) $(TPLT_VRT) $(TPLT_LIN) $(TPLT_REC) $(TPLT_SQR) $(TPLT_TRI) $(TBMAP_8) $(TBMAP_16) $(TBMAP_32) $(TPLT_CHR) $(TPLT_STR) $(TBOUNDS) $(TPLT_CLIP)
 	$(TBLOCK).ut
 	$(TGEO).ut
 	$(TLAVA).ut
@@ -381,7 +389,6 @@ test: $(TINPUT) $(TPSG) $(TMUSIC) $(TBLOCK) $(TGEO) $(TLAVA) $(TLEVEL) $(TSPIKE)
 	$(TPLT_STR).ut
 	$(TBOUNDS).ut
 	$(TPLT_CLIP).ut
-	$(TMUSIC).tos
 
 
 # ----- Raster Library Builds ------------------------------------------------
@@ -432,4 +439,4 @@ $(PLT_CLIP).o: $(RASTER_FOLDER)\$(PLT_CLIP).s
 
 # ----- Output ---------------------------------------------------------------
 # Otherwise the Make can think that the commands are files.
-.PHONY: test $(TINPUT) $(TPSG) $(TBLOCK) $(TGEO) $(TLAVA) $(TLEVEL) $(TSPIKE) $(TWORLD) $(TMODEL) $(TCAMERA) $(TRENDER) $(TASYNC) $(TCOND) $(TSYNC) $(TCLR_SCN) $(TCLR_REG) $(TPLT_PXL) $(TPLT_HOR) $(TPLT_VRT) $(TPLT_LIN) $(TPLT_REC) $(TPLT_SQR) $(TPLT_TRI) $(TBMAP_8) $(TBMAP_16) $(TBMAP_32) $(TPLT_CHR) $(TPLT_STR) $(TBOUNDS) $(TPLT_CLIP) $(TMUSIC)
+.PHONY: test $(TINPUT) $(TIKBD) $(TPSG) $(TBLOCK) $(TGEO) $(TLAVA) $(TLEVEL) $(TSPIKE) $(TWORLD) $(TMODEL) $(TCAMERA) $(TRENDER) $(TASYNC) $(TCOND) $(TSYNC) $(TCLR_SCN) $(TCLR_REG) $(TPLT_PXL) $(TPLT_HOR) $(TPLT_VRT) $(TPLT_LIN) $(TPLT_REC) $(TPLT_SQR) $(TPLT_TRI) $(TBMAP_8) $(TBMAP_16) $(TBMAP_32) $(TPLT_CHR) $(TPLT_STR) $(TBOUNDS) $(TPLT_CLIP) $(TMUSIC)

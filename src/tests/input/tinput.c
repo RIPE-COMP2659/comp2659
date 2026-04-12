@@ -15,24 +15,70 @@
 #include "../../shared/dtypes.h"
 #include <osbind.h>
 
-int main() {
-  int done = FALSE;
-  char ch;
+void test_has_get_input(void)
+{
+    int done = FALSE;
+    char ch;
 
-  Cconws("Input test program started. Press 'q' to quit.\r\n");
+    Cconws("Input test program started. Press 'q' to quit.\r\n");
 
-  while (done == FALSE) {
-    if (has_input() == TRUE) {
-      ch = get_input();
+    while (done == FALSE)
+    {
+        if (has_input() == TRUE)
+        {
+            ch = get_input();
 
-      if (ch == 'q') {
-        done = TRUE;
-        Cconws("Exiting...\r\n");
-      } else {
-        Cconws("Key pressed\r\n");
-      }
+            if (ch == 'q')
+            {
+                done = TRUE;
+                Cconws("Exiting...\r\n");
+            }
+            else
+            {
+                Cconws("Key pressed\r\n");
+            }
+        }
     }
-  }
+}
 
-  return 0;
+void test_read_scancode(void)
+{
+    long old_ssp;
+    SCANCODE sc;
+    char ascii;
+    char *scancode_2_ascii;
+    int done = FALSE;
+
+    /* TODO: THIS IS TOS, REPLACE WITH CUSTOM TABLE OR SIMILAR, MAYBE MATH? */
+    scancode_2_ascii = (char *)((Keytbl(-1, -1, -1))->unshift);
+
+    Cconws("Press keys to echo. Press ESC to exit.\r\n");
+
+    old_ssp = Super(0);
+    *IKBD_control = IKBD_POLLING_MODE;
+
+    while (done == FALSE) {
+        sc = read_scancode();
+
+        if (sc == (ESC_SCANCODE | BREAK_BIT)) {
+            done = TRUE;
+        } else if ((sc & BREAK_BIT) == 0) {
+            ascii = scancode_2_ascii[sc];
+            if (ascii != '\0') {
+                Cconout(ascii);
+            }
+        }
+    }
+
+    *IKBD_control = IKBD_RESTORE_MODE;
+    Super(old_ssp);
+
+    Cconws("\r\nExiting...\r\n");
+}
+
+int main()
+{
+    test_read_scancode();
+    test_has_get_input();
+    return 0;
 }
