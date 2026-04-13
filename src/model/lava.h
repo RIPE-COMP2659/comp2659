@@ -25,7 +25,8 @@
 typedef struct {
     unsigned int x;
     unsigned int y;
-    unsigned int size;
+    unsigned int size;  /* This is height */
+    unsigned int width; /* This is horizontal width */
     const unsigned int (*sprite)[LAVA_SIZE / WORD];
 } Lava;
 
@@ -43,5 +44,6 @@ typedef struct {
  *     Lava: A lava tile with the given x and y values
  */
 Lava create_lava(unsigned int x, unsigned int y);
+Lava create_lava_rect(unsigned int x, unsigned int y, unsigned int width);
 
 #endif

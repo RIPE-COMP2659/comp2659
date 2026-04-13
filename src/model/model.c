@@ -161,7 +161,7 @@ static unsigned int get_block_x(void *blocks, unsigned int index)
 
 static unsigned int get_block_size(void *blocks, unsigned int index)
 {
-    return ((Block *)blocks)[index].size;
+    return ((Block *)blocks)[index].width;
 }
 
 /* Helper functions for spikes */
@@ -183,7 +183,7 @@ static unsigned int get_lava_x(void *lava, unsigned int index)
 
 static unsigned int get_lava_size(void *lava, unsigned int index)
 {
-    return ((Lava *)lava)[index].size;
+    return ((Lava *)lava)[index].width;
 }
 
 void model_update_camera_bi(Model *model)

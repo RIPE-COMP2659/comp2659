@@ -135,7 +135,8 @@ void world_collision_geo_block(World *world, Block *block)
         &world->geo,
         block->x,
         block->y,
-        block->size);
+        block->size,
+        block->width);
 
     if (collision == COLLISION_TOP)
     {
@@ -156,7 +157,7 @@ void world_collision_geo_block(World *world, Block *block)
 /* TODO: Implement proper spike collision detection */
 void world_collision_geo_spike(World *world, Spike *spike)
 {
-    signed int collision = geo_check_square_collision(
+    signed int collision = geo_check_spike_collision(
         &world->geo,
         spike->x,
         spike->y,
@@ -172,11 +173,12 @@ void world_collision_geo_spike(World *world, Spike *spike)
    lava objects */
 void world_collision_geo_lava(World *world, Lava *lava)
 {
-    signed int collision = geo_check_square_collision(
+    signed int collision = geo_check_lava_collision(
         &world->geo,
         lava->x,
         lava->y,
-        lava->size);
+        lava->size,
+        lava->width);
 
     if (collision != COLLISION_NONE && collision != COLLISION_ERROR)
     {

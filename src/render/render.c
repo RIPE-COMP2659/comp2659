@@ -126,7 +126,7 @@ static int floor_div8(int x)
     return result;
 }
 /* Clear the the bytes of the surrounding sprite region */
-static void clear_sprite_region(UINT8 *base, int rel_y, int rel_x, unsigned int size)
+static void clear_sprite_region(UINT8 *base, int rel_y, int rel_x, unsigned int h, unsigned int w)
 {
     int clear_x;
     int clear_right;
@@ -135,7 +135,7 @@ static void clear_sprite_region(UINT8 *base, int rel_y, int rel_x, unsigned int 
     int clear_width;
 
     clear_x = floor_div8(rel_x) << 3;
-    clear_right = (floor_div8(rel_x + (int)size - 1) << 3) + 7;
+    clear_right = (floor_div8(rel_x + (int)w - 1) << 3) + 7;
 
     /* Keep the clippings in bounds */
     clipped_left = (clear_x < 0) ? 0 : clear_x;
@@ -146,7 +146,7 @@ static void clear_sprite_region(UINT8 *base, int rel_y, int rel_x, unsigned int 
     if (clipped_right >= clipped_left)
     {
         clear_width = clipped_right - clipped_left + 1;
-        clear_region((UINT32 *)base, rel_y, clipped_left, size, clear_width);
+        clear_region((UINT32 *)base, rel_y, clipped_left, h, clear_width);
     }
 }
 
@@ -217,39 +217,85 @@ void clear_geo(UINT8 *base, const Camera *camera, const Geo *geo)
 {
     int rel_x = camera_get_relative_x(camera, geo->x);
     int rel_y = camera_get_relative_y(camera, geo->y);
-    clear_sprite_region(base, rel_y, rel_x, geo->size);
+    clear_sprite_region(base, rel_y, rel_x, geo->size, geo->size);
 }
 
 void clear_lava(UINT8 *base, const Camera *camera, const Lava *lava, unsigned int min_li, unsigned int max_li)
 {
-    unsigned int i;
+    unsigned int i, start_i;
+    int rel_x, rel_y;
+    unsigned int total_width;
+
     for (i = min_li; i <= max_li; i++)
     {
-        int rel_x = camera_get_relative_x(camera, lava[i].x);
-        int rel_y = camera_get_relative_y(camera, lava[i].y);
-        clear_sprite_region(base, rel_y, rel_x, lava[i].size);
+        start_i = i;
+        total_width = lava[i].width;
+
+        /* Group horizontally adjacent entities */
+        while (i + 1 <= max_li && 
+               lava[i+1].x == lava[i].x + lava[i].width && 
+               lava[i+1].y == lava[i].y)
+        {
+            i++;
+            total_width += lava[i].width;
+        }
+
+        rel_x = camera_get_relative_x(camera, lava[start_i].x);
+        rel_y = camera_get_relative_y(camera, lava[start_i].y);
+
+        clear_sprite_region(base, rel_y, rel_x, 8, total_width);
     }
 }
 
 void clear_spikes(UINT8 *base, const Camera *camera, const Spike *spikes, unsigned int min_si, unsigned int max_si)
 {
-    unsigned int i;
+    unsigned int i, start_i;
+    int rel_x, rel_y;
+    unsigned int total_width;
+
     for (i = min_si; i <= max_si; i++)
     {
-        int rel_x = camera_get_relative_x(camera, spikes[i].x);
-        int rel_y = camera_get_relative_y(camera, spikes[i].y);
-        clear_sprite_region(base, rel_y, rel_x, spikes[i].size);
+        start_i = i;
+        total_width = spikes[i].size; /* Spikes don't have width property, use size */
+
+        while (i + 1 <= max_si && 
+               spikes[i+1].x == spikes[i].x + spikes[i].size && 
+               spikes[i+1].y == spikes[i].y)
+        {
+            i++;
+            total_width += spikes[i].size;
+        }
+
+        rel_x = camera_get_relative_x(camera, spikes[start_i].x);
+        rel_y = camera_get_relative_y(camera, spikes[start_i].y);
+
+        clear_sprite_region(base, rel_y, rel_x, spikes[start_i].size, total_width);
     }
 }
 
 void clear_blocks(UINT8 *base, const Camera *camera, const Block *blocks, unsigned int min_bi, unsigned int max_bi)
 {
-    unsigned int i;
+    unsigned int i, start_i;
+    int rel_x, rel_y;
+    unsigned int total_width;
+
     for (i = min_bi; i <= max_bi; i++)
     {
-        int rel_x = camera_get_relative_x(camera, blocks[i].x);
-        int rel_y = camera_get_relative_y(camera, blocks[i].y);
-        clear_sprite_region(base, rel_y, rel_x, blocks[i].size);
+        start_i = i;
+        total_width = blocks[i].width;
+
+        while (i + 1 <= max_bi && 
+               blocks[i+1].x == blocks[i].x + blocks[i].width && 
+               blocks[i+1].y == blocks[i].y)
+        {
+            i++;
+            total_width += blocks[i].width;
+        }
+
+        rel_x = camera_get_relative_x(camera, blocks[start_i].x);
+        rel_y = camera_get_relative_y(camera, blocks[start_i].y);
+
+        clear_sprite_region(base, rel_y, rel_x, blocks[start_i].size, total_width);
     }
 }
 
@@ -271,9 +317,16 @@ void render_ground(const Model *model, UINT8 *base)
 /* See render.h for documentation */
 void render_block(const Block *block, const Camera *camera, UINT8 *base)
 {
-    int rel_x = camera_get_relative_x(camera, block->x);
-    int rel_y = camera_get_relative_y(camera, block->y);
-    plot_bitmap_32(base, rel_y, rel_x, block->sprite, block->size);
+    int rel_x, rel_y;
+    unsigned int j;
+    
+    rel_y = camera_get_relative_y(camera, block->y);
+
+    for (j = 0; j < block->width; j += block->size)
+    {
+        rel_x = camera_get_relative_x(camera, block->x + j);
+        plot_bitmap_32(base, rel_y, rel_x, block->sprite, block->size);
+    }
 }
 
 /* See render.h for documentation */
@@ -287,9 +340,16 @@ void render_spike(const Spike *spike, const Camera *camera, UINT8 *base)
 /* See render.h for documentation */
 void render_lava(const Lava *lava, const Camera *camera, UINT8 *base)
 {
-    int rel_x = camera_get_relative_x(camera, lava->x);
-    int rel_y = camera_get_relative_y(camera, lava->y);
-    plot_bitmap_32(base, rel_y, rel_x, lava->sprite, lava->size);
+    int rel_x, rel_y;
+    unsigned int j;
+
+    rel_y = camera_get_relative_y(camera, lava->y);
+
+    for (j = 0; j < lava->width; j += 32) /* LAVA_SIZE = 32 */
+    {
+        rel_x = camera_get_relative_x(camera, lava->x + j);
+        plot_bitmap_32(base, rel_y, rel_x, lava->sprite, 8);
+    }
 }
 
 /* See render.h for documentation */
