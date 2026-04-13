@@ -62,10 +62,16 @@ static const unsigned int BLOCK_SPRITE[BLOCK_SIZE][BLOCK_SIZE / WORD] = {
 
 Block create_block(unsigned int x, unsigned int y)
 {
+    return create_block_rect(x, y, BLOCK_SIZE);
+}
+
+Block create_block_rect(unsigned int x, unsigned int y, unsigned int width)
+{
     Block block;
     block.x = x;
     block.y = y;
     block.size = BLOCK_SIZE;
+    block.width = width;
     block.sprite = BLOCK_SPRITE;
     return block;
-};
+}

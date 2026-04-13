@@ -99,8 +99,8 @@ Geo create_geo(unsigned int x, unsigned int y, unsigned int ground_y);
  *        The world x value of the top left of the object
  *     unsigned int object_y:
  *        The world y value of the top of the object
- *     unsigned int object_size:
- *        The length and width of the object in pixels
+ *     unsigned int object_width:
+ *        The horizontal width of the object in pixels
  *
  * Returns:
  *     signed int:
@@ -109,7 +109,8 @@ Geo create_geo(unsigned int x, unsigned int y, unsigned int ground_y);
  */
 signed int geo_check_square_collision(Geo *geo, unsigned int object_x,
                                       unsigned int object_y,
-                                      unsigned int object_size);
+                                      unsigned int object_size,
+                                      unsigned int object_width);
 
 /**
  * Checks if Geo is colliding with a spike (triangle) object
@@ -132,7 +133,8 @@ signed int geo_check_lava_collision(
     Geo *geo,
     unsigned int lava_x,
     unsigned int lava_y,
-    unsigned int lava_size
+    unsigned int lava_size,
+    unsigned int lava_width
 );
 
 signed int geo_check_spike_collision(Geo *geo, unsigned int spike_x,

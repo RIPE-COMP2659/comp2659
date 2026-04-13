@@ -64,7 +64,8 @@ signed int geo_check_square_collision(
     Geo *geo,
     unsigned int object_x,
     unsigned int object_y,
-    unsigned int object_size
+    unsigned int object_size,
+    unsigned int object_width
 ) {
     signed int gx_left = geo->x;
     signed int gx_right = geo->x + geo->size - 1;
@@ -72,7 +73,7 @@ signed int geo_check_square_collision(
     signed int gy_bot = geo->y - geo->size + 1;
 
     signed int ox_left = object_x;
-    signed int ox_right = object_x + object_size - 1;
+    signed int ox_right = object_x + object_width - 1;
     signed int oy_top = object_y;
     signed int oy_bot = object_y - object_size + 1;
 
@@ -106,7 +107,8 @@ signed int geo_check_lava_collision(
     Geo *geo,
     unsigned int lava_x,
     unsigned int lava_y,
-    unsigned int lava_size
+    unsigned int lava_size,
+    unsigned int lava_width
 ) {
     signed int gx_left = geo->x + 2;   /* Inset feet slightly */
     signed int gx_right = geo->x + 29;
@@ -114,7 +116,7 @@ signed int geo_check_lava_collision(
     signed int gy_bot = geo->y - geo->size + 1;
 
     signed int lx_left = lava_x;
-    signed int lx_right = lava_x + lava_size - 1;
+    signed int lx_right = lava_x + lava_width - 1;
     signed int ly_top = lava_y;
 
     /* Optimization: Only check 3 points on the bottom surface against the top of lava */

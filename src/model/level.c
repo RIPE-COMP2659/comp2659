@@ -90,18 +90,15 @@ Level get_level1(void)
                 jump_width += 32; /* +1 block width every 4th jump */
             }
             
-            /* Fill lava blocks in the gap (32px units) */
-            for (k = 32; k < jump_width; k += 32) {
-                level_lava[current_lava++] = create_lava(bx + k, 32);
+            if (jump_width > 32) {
+                level_lava[current_lava++] = create_lava_rect(bx + 32, 32, jump_width - 32);
             }
             bx += jump_width;
         }
     }
 
-    /* Connection Gap between Ascension and Descent (160px gap) */
-    for (k = 32; k < 160; k += 32) {
-        level_lava[current_lava++] = create_lava(bx + k, 32);
-    }
+    /* Connection Gap between Ascension and Descent (160px gap) - Pooled */
+    level_lava[current_lava++] = create_lava_rect(bx + 32, 32, 128); /* 160 - 32 = 128 */
     bx += 160;
     last_y = by; /* Start descent from the peak height */
 
@@ -122,8 +119,8 @@ Level get_level1(void)
                 jump_width += 32; /* 1st jump (+1), then every 3rd jump (+1) */
             }
             
-            for (k = 32; k < jump_width; k += 32) {
-                level_lava[current_lava++] = create_lava(bx + k, 32);
+            if (jump_width > 32) {
+                level_lava[current_lava++] = create_lava_rect(bx + 32, 32, jump_width - 32);
             }
             bx += jump_width;
         }

@@ -52,12 +52,16 @@ static const unsigned int LAVA_SPRITE[LAVA_SIZE][LAVA_SIZE / WORD] = {
 
 Lava create_lava(unsigned int x, unsigned int y)
 {
-    Lava lava;
+    return create_lava_rect(x, y, LAVA_SIZE);
+}
 
+Lava create_lava_rect(unsigned int x, unsigned int y, unsigned int width)
+{
+    Lava lava;
     lava.x = x;
     lava.y = y;
     lava.size = LAVA_SIZE;
+    lava.width = width;
     lava.sprite = LAVA_SPRITE;
-
     return lava;
 }

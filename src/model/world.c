@@ -135,7 +135,8 @@ void world_collision_geo_block(World *world, Block *block)
         &world->geo,
         block->x,
         block->y,
-        block->size);
+        block->size,
+        block->width);
 
     if (collision == COLLISION_TOP)
     {
@@ -176,7 +177,8 @@ void world_collision_geo_lava(World *world, Lava *lava)
         &world->geo,
         lava->x,
         lava->y,
-        lava->size);
+        lava->size,
+        lava->width);
 
     if (collision != COLLISION_NONE && collision != COLLISION_ERROR)
     {

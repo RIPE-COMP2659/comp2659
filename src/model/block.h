@@ -22,7 +22,8 @@
 typedef struct {
     unsigned int x;
     unsigned int y;
-    unsigned int size;
+    unsigned int size;  /* This is height */
+    unsigned int width; /* This is horizontal width */
     const unsigned int (*sprite)[BLOCK_SIZE / WORD];
 } Block;
 
@@ -40,5 +41,6 @@ typedef struct {
  *    Block: Constructed object with respective x, y, default size, and sprite
  */
 Block create_block(unsigned int x, unsigned int y);
+Block create_block_rect(unsigned int x, unsigned int y, unsigned int width);
 
 #endif
