@@ -2725,10 +2725,15 @@ print_exit_sel(UINT8 *base)
 
 UINT8 splash_screen(void)
 {
-    UINT8 *base = (UINT8 *)get_video_base();
+    long old_ssp;
+    UINT8 *base;
     UINT8 selection = FALSE;
     UINT8 cursor = PLAY;
     int key;
+
+    old_ssp = Super(0);
+    base = (UINT8 *)get_video_base();
+    Super(old_ssp);
 
     print_splash(base);
     print_play_sel(base); /* Start with Play selected */
