@@ -27,11 +27,11 @@ volatile const SCANCODE *const IKBD_RDR = IKBD_RDR_ADDR;
 /* Circular queue */
 #define QUEUE_SIZE 256
 
+#define MOUSE_MASK 0xF8 /* If it's a mouse byte, high 5 bits are set */
+
 SCANCODE queue[QUEUE_SIZE];
 int queue_head;
 int queue_tail;
-
-static char *scancode_2_ascii;
 
 /* Mouse state */
 int mouse_x;
@@ -59,7 +59,6 @@ void init_input(void)
 {
     long old_ssp;
 
-    scancode_2_ascii = (char *)((Keytbl(-1, -1, -1))->unshift);
     queue_head = 0;
     queue_tail = 0;
     mouse_x = 0;
@@ -123,8 +122,8 @@ void handle_ikbd_byte(void) {
     byte = *IKBD_RDR;
 
     if (isr_state == STATE_INPUT_AWAIT) {
-        if ((byte & 0xF8) == 0xF8) {
-            mouse_buttons = byte & 0x03;
+        if ((byte & MOUSE_MASK) == MOUSE_MASK) {
+            mouse_buttons = byte & 0x03; /* Bottom two bits for buttons */
             isr_state = STATE_MOUSE_X_AWAIT;
         } else {
             enqueue(byte);

@@ -48,6 +48,9 @@ int main_game(void)
         timeThen = get_time();
         while (quit != TRUE && game_won != TRUE)
         {
+            /* Silly-while consumes both make and breaks properly
+               otherwise jumping logic becomes far more verbose */
+            /* Not ideal, but necessary for time constraints */
             while ((sc = get_input()) != 0) {
                 switch (sc) {
                     case JUMP:

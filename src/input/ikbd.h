@@ -12,7 +12,6 @@
  */
 #include "../shared/dtypes.h"
 
-/* */
 #define IKBD_ISR 70
 
 #define IKBD_CTRL_ADDR      0xFFFC00
@@ -30,10 +29,10 @@
 
 #define IKBD_SR_RDRF        0x01    /* Status bit 0: Receive Data Register Full */
 
-#define ESC_SCANCODE    0x01
-#define BREAK_BIT       0x80
+#define ESC_SCANCODE        0x01
+#define BREAK_BIT           0x80
 
-#define IKBD_SR_IRQ      0x80    /* Status bit 7: IRQ pending */
+#define IKBD_SR_IRQ         0x80    /* Status bit 7: IRQ pending */
 
 #define SC_SPACE 0x39
 #define SC_Q 0x10
