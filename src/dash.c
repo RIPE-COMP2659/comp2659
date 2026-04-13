@@ -100,17 +100,14 @@ int main_game(void)
                 game_won = TRUE;
             }
 
-            /* Initial render */
             render(&model, 0);
         }
 
         /* Renable the keyboard */
         toggle_keyboard_sound();
-
-        /* Clean up music */
         stop_music();
-
         restore_input();
+        shutdown_render_buffers();
 
         return 0;
     }
