@@ -17,7 +17,6 @@ int main_game(void)
     UINT8 quit = FALSE;
     UINT8 game_won = FALSE;
     signed int died_this_frame;
-    unsigned int input;
     signed int current_event;
     unsigned long timeThen, timeNow, timeElapsed;
 
@@ -57,35 +56,40 @@ int main_game(void)
 
             timeNow = get_time();
             timeElapsed = timeNow - timeThen;
-            timeThen = timeNow; /* update here, before on_clock_tick's death wait */
 
             /* NOTE: This keeps the game from crashing, no clue why, something in music timing */
-            if (timeElapsed == 0)
+            if (timeElapsed != 0)
             {
-                timeElapsed = 1;
+
+                /* Update music with elapsed VBL ticks */
+                update_music(timeElapsed);
+
+                /* Step gameplay only on odd clock ticks. */
+                if ((timeNow & 1) != 0)
+                {
+                    died_this_frame = on_clock_tick(&model);
+
+                    if (died_this_frame == TRUE)
+                    {
+                        clear_render_buffers();
+                        start_music(SONG_MEGALO);
+                    }
+
+                    current_event = check_level_complete(&model);
+                    if (current_event == EVENT_LEVEL_DONE)
+                    {
+                        stop_music();
+                        play_level_complete_effect();
+                        game_won = TRUE;
+                    }
+
+                    /* Initial render */
+                    render(&model, 0);
+                }
+
+                /* Advance frame baseline to avoid reusing old elapsed time. */
+                timeThen = timeNow;
             }
-
-            /* Update music with elapsed VBL ticks */
-            update_music(timeElapsed);
-
-            died_this_frame = on_clock_tick(&model);
-
-            if (died_this_frame == TRUE)
-            {
-                clear_render_buffers();
-                start_music(SONG_MEGALO);
-            }
-
-            current_event = check_level_complete(&model);
-            if (current_event == EVENT_LEVEL_DONE)
-            {
-                stop_music();
-                play_level_complete_effect();
-                game_won = TRUE;
-            }
-
-            /* Initial render */
-            render(&model, 0);
         }
 
         /* Renable the keyboard */
@@ -93,8 +97,6 @@ int main_game(void)
 
         /* Clean up music */
         stop_music();
-
-        return 0;
     }
 
     return 0;
