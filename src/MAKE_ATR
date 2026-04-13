@@ -50,8 +50,7 @@ PSG_OBJECTS = $(PSG).o $(MUSIC).o
 # File Names, Base - Splash object group
 SPLASH_OBJECTS = $(SPLASH).o
 
-# File Names, Tests - PSG (song integration)
-TSONG = tsong
+# File Names, Tests - PSG
 TMUSIC = tmusic
 EFFECTS = effects
 
@@ -120,7 +119,7 @@ UNITY      = $(UNITY_FOLDER)\unity.c
 
 # Events Test Configuration
 EVENTS_TEST_FLAGS = $(SHARED_FLAGS) -I. -I$(MODEL_FOLDER) -I$(SHARED_FOLDER) -I$(RENDER_FOLDER) -I$(EVENTS_FOLDER) -I$(UNITY_FOLDER) -DUNITY_EXCLUDE_STDINT_H -DUNITY_INT_WIDTH=16 -DUNITY_LONG_WIDTH=32 -DUNITY_POINTER_WIDTH=32 -DTESTING
-EVENTS_TEST_SRC = $(TEST_SRC) $(EVENTS_FOLDER)\$(ASYNC).c $(EVENTS_FOLDER)\$(COND).c $(EVENTS_FOLDER)\$(SYNC).c
+EVENTS_TEST_SRC = $(TEST_SRC)
 
 # Raster Test Configuration
 RASTER_TEST_FLAGS = $(SHARED_FLAGS) -I. -I$(SHARED_FOLDER) -I$(RASTER_FOLDER) -I$(UNITY_FOLDER) -DUNITY_EXCLUDE_STDINT_H -DUNITY_INT_WIDTH=16 -DUNITY_LONG_WIDTH=32 -DUNITY_POINTER_WIDTH=32 -DTESTING
@@ -245,64 +244,59 @@ $(CLR_SCN).o: $(RASTER_FOLDER)\$(CLR_SCN).s
 
 
 # ----- Test Builds ----------------------------------------------------------
-$(TBLOCK):
-	$(ATARI_CC) $(TEST_FLAGS) $(TESTS_MODEL_FOLDER)\$(TBLOCK).c $(TEST_SRC) $(UNITY) -o $(TBLOCK).ut
+$(TBLOCK): $(COND).o $(EFFECTS).o $(MUSIC).o $(PSG).o $(CLOCK).o
+	$(ATARI_CC) $(TEST_FLAGS) $(TESTS_MODEL_FOLDER)\$(TBLOCK).c $(TEST_SRC) $(COND).o $(EFFECTS).o $(MUSIC).o $(PSG).o $(CLOCK).o $(UNITY) -o $(TBLOCK).ut
 
-$(TGEO):
-	$(ATARI_CC) $(TEST_FLAGS) $(TESTS_MODEL_FOLDER)\$(TGEO).c $(TEST_SRC) $(UNITY) -o $(TGEO).ut
+$(TGEO): $(COND).o $(EFFECTS).o $(MUSIC).o $(PSG).o $(CLOCK).o
+	$(ATARI_CC) $(TEST_FLAGS) $(TESTS_MODEL_FOLDER)\$(TGEO).c $(TEST_SRC) $(COND).o $(EFFECTS).o $(MUSIC).o $(PSG).o $(CLOCK).o $(UNITY) -o $(TGEO).ut
 
-$(TLAVA):
-	$(ATARI_CC) $(TEST_FLAGS) $(TESTS_MODEL_FOLDER)\$(TLAVA).c $(TEST_SRC) $(UNITY) -o $(TLAVA).ut
+$(TLAVA): $(COND).o $(EFFECTS).o $(MUSIC).o $(PSG).o $(CLOCK).o
+	$(ATARI_CC) $(TEST_FLAGS) $(TESTS_MODEL_FOLDER)\$(TLAVA).c $(TEST_SRC) $(COND).o $(EFFECTS).o $(MUSIC).o $(PSG).o $(CLOCK).o $(UNITY) -o $(TLAVA).ut
 
-$(TLEVEL):
-	$(ATARI_CC) $(TEST_FLAGS) $(TESTS_MODEL_FOLDER)\$(TLEVEL).c $(TEST_SRC) $(UNITY) -o $(TLEVEL).ut
+$(TLEVEL): $(COND).o $(EFFECTS).o $(MUSIC).o $(PSG).o $(CLOCK).o
+	$(ATARI_CC) $(TEST_FLAGS) $(TESTS_MODEL_FOLDER)\$(TLEVEL).c $(TEST_SRC) $(COND).o $(EFFECTS).o $(MUSIC).o $(PSG).o $(CLOCK).o $(UNITY) -o $(TLEVEL).ut
 
-$(TSPIKE):
-	$(ATARI_CC) $(TEST_FLAGS) $(TESTS_MODEL_FOLDER)\$(TSPIKE).c $(TEST_SRC) $(UNITY) -o $(TSPIKE).ut
+$(TSPIKE): $(COND).o $(EFFECTS).o $(MUSIC).o $(PSG).o $(CLOCK).o
+	$(ATARI_CC) $(TEST_FLAGS) $(TESTS_MODEL_FOLDER)\$(TSPIKE).c $(TEST_SRC) $(COND).o $(EFFECTS).o $(MUSIC).o $(PSG).o $(CLOCK).o $(UNITY) -o $(TSPIKE).ut
 
-$(TWORLD):
-	$(ATARI_CC) $(TEST_FLAGS) $(TESTS_MODEL_FOLDER)\$(TWORLD).c $(TEST_SRC) $(UNITY) -o $(TWORLD).ut
+$(TWORLD): $(COND).o $(EFFECTS).o $(MUSIC).o $(PSG).o $(CLOCK).o
+	$(ATARI_CC) $(TEST_FLAGS) $(TESTS_MODEL_FOLDER)\$(TWORLD).c $(TEST_SRC) $(COND).o $(EFFECTS).o $(MUSIC).o $(PSG).o $(CLOCK).o $(UNITY) -o $(TWORLD).ut
 
-$(TMODEL):
-	$(ATARI_CC) $(TEST_FLAGS) $(TESTS_MODEL_FOLDER)\$(TMODEL).c $(TEST_SRC) $(UNITY) -o $(TMODEL).ut
+$(TMODEL): $(COND).o $(EFFECTS).o $(MUSIC).o $(PSG).o $(CLOCK).o
+	$(ATARI_CC) $(TEST_FLAGS) $(TESTS_MODEL_FOLDER)\$(TMODEL).c $(TEST_SRC) $(COND).o $(EFFECTS).o $(MUSIC).o $(PSG).o $(CLOCK).o $(UNITY) -o $(TMODEL).ut
 
-$(TCAMERA):
-	$(ATARI_CC) $(TEST_FLAGS) $(TESTS_MODEL_FOLDER)\$(TCAMERA).c $(TEST_SRC) $(UNITY) -o $(TCAMERA).ut
+$(TCAMERA): $(COND).o $(EFFECTS).o $(MUSIC).o $(PSG).o $(CLOCK).o
+	$(ATARI_CC) $(TEST_FLAGS) $(TESTS_MODEL_FOLDER)\$(TCAMERA).c $(TEST_SRC) $(COND).o $(EFFECTS).o $(MUSIC).o $(PSG).o $(CLOCK).o $(UNITY) -o $(TCAMERA).ut
 
 
 # ----- Render Test Builds ---------------------------------------------------
 # Include clear-screen object so render.o's reference to _clear_screen is satisfied
-$(TRENDER): $(PLT_REC).o $(BMAP_32).o $(BOUNDS).o $(PLT_CLIP).o $(CLR_REG).o $(CLR_SCN).o
-	$(ATARI_CC) $(RENDER_TEST_FLAGS) $(TESTS_RENDER_FOLDER)\$(TRENDER).c $(RENDER_TEST_SRC) $(PLT_REC).o $(BMAP_32).o $(BOUNDS).o $(PLT_CLIP).o $(CLR_REG).o $(CLR_SCN).o $(UNITY) -o $(TRENDER).ut
+$(TRENDER): $(PLT_REC).o $(BMAP_32).o $(BOUNDS).o $(PLT_CLIP).o $(CLR_REG).o $(CLR_SCN).o $(COND).o $(EFFECTS).o $(MUSIC).o $(PSG).o $(CLOCK).o
+	$(ATARI_CC) $(RENDER_TEST_FLAGS) $(TESTS_RENDER_FOLDER)\$(TRENDER).c $(RENDER_TEST_SRC) $(PLT_REC).o $(BMAP_32).o $(BOUNDS).o $(PLT_CLIP).o $(CLR_REG).o $(CLR_SCN).o $(COND).o $(EFFECTS).o $(MUSIC).o $(PSG).o $(CLOCK).o $(UNITY) -o $(TRENDER).ut
 
 
 # ----- Events Test Builds ---------------------------------------------------
-$(TASYNC):
-	$(ATARI_CC) $(EVENTS_TEST_FLAGS) $(TESTS_EVENTS_FOLDER)\$(TASYNC).c $(EVENTS_TEST_SRC) $(UNITY) -o $(TASYNC).ut
+$(TASYNC): $(COND).o $(EFFECTS).o $(MUSIC).o $(PSG).o $(CLOCK).o
+	$(ATARI_CC) $(EVENTS_TEST_FLAGS) $(TESTS_EVENTS_FOLDER)\$(TASYNC).c $(EVENTS_TEST_SRC) $(EVENTS_FOLDER)\$(ASYNC).c $(COND).o $(EFFECTS).o $(MUSIC).o $(PSG).o $(CLOCK).o $(UNITY) -o $(TASYNC).ut
 
-$(TCOND):
-	$(ATARI_CC) $(EVENTS_TEST_FLAGS) $(TESTS_EVENTS_FOLDER)\$(TCOND).c $(EVENTS_TEST_SRC) $(UNITY) -o $(TCOND).ut
+$(TCOND): $(EFFECTS).o $(MUSIC).o $(PSG).o $(CLOCK).o
+	$(ATARI_CC) $(EVENTS_TEST_FLAGS) $(TESTS_EVENTS_FOLDER)\$(TCOND).c $(EVENTS_TEST_SRC) $(EVENTS_FOLDER)\$(COND).c $(EFFECTS).o $(MUSIC).o $(PSG).o $(CLOCK).o $(UNITY) -o $(TCOND).ut
 
-$(TSYNC):
-	$(ATARI_CC) $(EVENTS_TEST_FLAGS) $(TESTS_EVENTS_FOLDER)\$(TSYNC).c $(EVENTS_TEST_SRC) $(UNITY) -o $(TSYNC).ut
+$(TSYNC): $(COND).o $(EFFECTS).o $(MUSIC).o $(PSG).o $(CLOCK).o
+	$(ATARI_CC) $(EVENTS_TEST_FLAGS) $(TESTS_EVENTS_FOLDER)\$(TSYNC).c $(EVENTS_TEST_SRC) $(EVENTS_FOLDER)\$(SYNC).c $(COND).o $(EFFECTS).o $(MUSIC).o $(PSG).o $(CLOCK).o $(UNITY) -o $(TSYNC).ut
+
 
 # ----- Input Test Builds ----------------------------------------------------
 $(TINPUT): $(INPUT).o
 	$(ATARI_CC) $(MAIN_FLAGS) $(TESTS_INPUT_FOLDER)\$(TINPUT).c $(INPUT).o -o $(TINPUT).tos
 
+
 # ----- PSG Test Builds ------------------------------------------------------
 $(TPSG): $(PSG).o $(CLOCK).o
 	$(ATARI_CC) $(MAIN_FLAGS) $(TESTS_PSG_FOLDER)\$(TPSG).c $(PSG).o $(CLOCK).o -o $(TPSG).tos
 
-$(TSONG): $(PSG).o $(MUSIC).o
-	$(ATARI_CC) $(MAIN_FLAGS) $(TESTS_PSG_FOLDER)\$(TSONG).c $(PSG).o $(MUSIC).o -o $(TSONG).tos
-
-$(TMUSIC).tos: $(PSG).o $(MUSIC).o $(CLOCK).o
+$(TMUSIC): $(PSG).o $(MUSIC).o $(CLOCK).o
 	$(ATARI_CC) $(MAIN_FLAGS) $(TESTS_PSG_FOLDER)\$(TMUSIC).c $(PSG).o $(MUSIC).o $(CLOCK).o -o $(TMUSIC).tos
-
-# Convenience target: build and show how to run tmusic from terminal
-.PHONY: tmusic
-tmusic: $(TMUSIC).tos
 
 
 # TODO: For some of these, there is cascading dependencies on objects, eg chr
@@ -368,7 +362,7 @@ $(TCLOCK): $(CLOCK).o
 
 
 # ----- Test Execution -------------------------------------------------------
-test: $(TINPUT) $(TPSG) $(TSONG) $(TBLOCK) $(TGEO) $(TLAVA) $(TLEVEL) $(TSPIKE) $(TWORLD) $(TMODEL) $(TCAMERA) $(TRENDER) $(TASYNC) $(TCOND) $(TSYNC) $(TCLR_SCN) $(TCLR_REG) $(TPLT_PXL) $(TPLT_HOR) $(TPLT_VRT) $(TPLT_LIN) $(TPLT_REC) $(TPLT_SQR) $(TPLT_TRI) $(TBMAP_8) $(TBMAP_16) $(TBMAP_32) $(TPLT_CHR) $(TPLT_STR) $(TBOUNDS) $(TPLT_CLIP) $(TGET_VID) $(TSET_VID)
+test: $(TINPUT) $(TPSG) $(TMUSIC) $(TBLOCK) $(TGEO) $(TLAVA) $(TLEVEL) $(TSPIKE) $(TWORLD) $(TMODEL) $(TCAMERA) $(TRENDER) $(TASYNC) $(TCOND) $(TSYNC) $(TCLR_SCN) $(TCLR_REG) $(TPLT_PXL) $(TPLT_HOR) $(TPLT_VRT) $(TPLT_LIN) $(TPLT_REC) $(TPLT_SQR) $(TPLT_TRI) $(TBMAP_8) $(TBMAP_16) $(TBMAP_32) $(TPLT_CHR) $(TPLT_STR) $(TBOUNDS) $(TPLT_CLIP) $(TGET_VID) $(TSET_VID)
 	$(TBLOCK).ut
 	$(TGEO).ut
 	$(TLAVA).ut
@@ -399,7 +393,7 @@ test: $(TINPUT) $(TPSG) $(TSONG) $(TBLOCK) $(TGEO) $(TLAVA) $(TLEVEL) $(TSPIKE) 
 	$(TPLT_CLIP).ut
 	$(TGET_VID).ut
 	$(TSET_VID).ut
-	$(TSONG).tos
+	$(TMUSIC).tos
 
 
 # ----- Raster Library Builds ------------------------------------------------
@@ -456,4 +450,4 @@ $(SET_VID).o: $(RASTER_FOLDER)\$(SET_VID).s
 
 # ----- Output ---------------------------------------------------------------
 # Otherwise the Make can think that the commands are files.
-.PHONY: test $(TINPUT) $(TPSG) $(TBLOCK) $(TGEO) $(TLAVA) $(TLEVEL) $(TSPIKE) $(TWORLD) $(TMODEL) $(TCAMERA) $(TRENDER) $(TASYNC) $(TCOND) $(TSYNC) $(TCLR_SCN) $(TCLR_REG) $(TPLT_PXL) $(TPLT_HOR) $(TPLT_VRT) $(TPLT_LIN) $(TPLT_REC) $(TPLT_SQR) $(TPLT_TRI) $(TBMAP_8) $(TBMAP_16) $(TBMAP_32) $(TPLT_CHR) $(TPLT_STR) $(TBOUNDS) $(TPLT_CLIP) $(TGET_VID) $(TSET_VID)
+.PHONY: test $(TINPUT) $(TPSG) $(TBLOCK) $(TGEO) $(TLAVA) $(TLEVEL) $(TSPIKE) $(TWORLD) $(TMODEL) $(TCAMERA) $(TRENDER) $(TASYNC) $(TCOND) $(TSYNC) $(TCLR_SCN) $(TCLR_REG) $(TPLT_PXL) $(TPLT_HOR) $(TPLT_VRT) $(TPLT_LIN) $(TPLT_REC) $(TPLT_SQR) $(TPLT_TRI) $(TBMAP_8) $(TBMAP_16) $(TBMAP_32) $(TPLT_CHR) $(TPLT_STR) $(TBOUNDS) $(TPLT_CLIP) $(TGET_VID) $(TSET_VID) $(TMUSIC)

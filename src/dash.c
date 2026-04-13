@@ -38,7 +38,7 @@ int main_game(void)
         toggle_keyboard_sound();
 
         /* Start background music (driven by update_music from the main loop) */
-        start_music(SONG_GLORIA);
+        start_music(SONG_MEGALO);
 
         timeThen = get_time();
         while (quit != TRUE && game_won != TRUE)
@@ -73,7 +73,7 @@ int main_game(void)
             if (died_this_frame == TRUE)
             {
                 clear_render_buffers();
-                start_music(SONG_GLORIA);
+                start_music(SONG_MEGALO);
             }
 
             current_event = check_level_complete(&model);
