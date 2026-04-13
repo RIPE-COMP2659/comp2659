@@ -19,8 +19,8 @@
 
 /* Level one (consistently using L2 sizes for current draft) */
 #define L1_BLOCKS_SIZE 200
-#define L1_SPIKES_SIZE 15
-#define L1_LAVA_SIZE 5
+#define L1_SPIKES_SIZE 20
+#define L1_LAVA_SIZE 100
 
 Level create_level(
     Block *blocks,
@@ -51,57 +51,92 @@ Level get_level1(void)
     static Lava level_lava[L1_LAVA_SIZE];
     int i;
     int current_block;
-    unsigned int last_x;
+    int current_lava;
+    int current_spike;
     unsigned int last_y;
     unsigned int next_y;
+    unsigned int bx;
+    unsigned int by;
+    unsigned int jump_width;
+    int k;
 
-    /* Test 1: 3-block right jump over lava (x_diff = 96px) */
-    /* Starting block */
-    level_blocks[0] = create_block(464 + 320, 64);
-    level_blocks[1] = create_block(464 + 320, 96);
-    /* 2-block wide lava pit (for a 3-right jump) */
-    level_lava[0] = create_lava(496 + 320, 32);
-    level_lava[1] = create_lava(528 + 320, 32);
+    /* Test 1: Triple Spike (3 spikes in a row) */
+    level_spikes[0] = create_spike(352, 64);
+    level_spikes[1] = create_spike(384, 64);
+    level_spikes[2] = create_spike(416, 64);
 
-    /* 2-high landing block (strictly 3 blocks right: 464 + 96 = 560) */
-    
-    level_blocks[2] = create_block(560 + 320, 64);
+    current_block = 0;
+    current_lava = 0;
+    current_spike = 3;
 
 #define NUM_STAIR_STEPS 15
 
-    /* Test 2: Ascending stair ladder (NUM_STAIR_STEPS steps, 4-right jumps = 128px) */
-    current_block = 3;
-    last_x = 928 + 320;
+    /* Test 2: Ascending stair ladder with drift compensation (every 4th jump wider) */
+    bx = 928;
     last_y = 64;
     for(i = 0; i < NUM_STAIR_STEPS; i++) {
-        level_blocks[current_block++] = create_block(last_x + (i * 128), last_y + (i * 32));
+        by = last_y + (i * 32);
+        level_blocks[current_block++] = create_block(bx, by);
+
+        /* Fill lava directly under the block if it's hovering */
+        if (by > 64) {
+             level_lava[current_lava++] = create_lava(bx, 32);
+        }
+
+        /* If there's another step, fill the gap with lava */
+        if (i < NUM_STAIR_STEPS - 1) {
+            jump_width = 128;
+            if ((i + 1) % 4 == 0) {
+                jump_width += 32; /* +1 block width every 4th jump */
+            }
+            
+            /* Fill lava blocks in the gap (32px units) */
+            for (k = 32; k < jump_width; k += 32) {
+                level_lava[current_lava++] = create_lava(bx + k, 32);
+            }
+            bx += jump_width;
+        }
     }
 
-    /* Test 3: Descending stairway (NUM_STAIR_STEPS steps, 5-right spacing = 160px) */
-    /* Start descent from the final peak of Test 2 plus a 5-block gap */
-    last_x = last_x + ((NUM_STAIR_STEPS - 1) * 128) + 160;
-    last_y = last_y + ((NUM_STAIR_STEPS - 1) * 32);
+    /* Connection Gap between Ascension and Descent (160px gap) */
+    for (k = 32; k < 160; k += 32) {
+        level_lava[current_lava++] = create_lava(bx + k, 32);
+    }
+    bx += 160;
+    last_y = by; /* Start descent from the peak height */
+
+    /* Test 3: Descending stairway with drift compensation (1st jump then every 3rd) */
     for(i = 0; i < NUM_STAIR_STEPS; i++) {
-        /* Each step down is 1 block lower than the previous peak/step */
         next_y = last_y - ((i + 1) * 32);
-        /* If we go below ground level (64), stop decreasing height */
         if (next_y < 64) next_y = 64; 
-        level_blocks[current_block++] = create_block(last_x + (i * 160), next_y);
-    }
+        
+        level_blocks[current_block++] = create_block(bx, next_y);
 
-    /* Add triple spike encounter at ground level near the start */
-    level_spikes[0] = create_spike(128+256, 64);
-    level_spikes[1] = create_spike(160+256, 64);
-    level_spikes[2] = create_spike(192+256, 64);
+        if (next_y > 64) {
+             level_lava[current_lava++] = create_lava(bx, 32);
+        }
+
+        if (i < NUM_STAIR_STEPS - 1) {
+            jump_width = 160;
+            if (i == 0 || (i % 3 == 0)) {
+                jump_width += 32; /* 1st jump (+1), then every 3rd jump (+1) */
+            }
+            
+            for (k = 32; k < jump_width; k += 32) {
+                level_lava[current_lava++] = create_lava(bx + k, 32);
+            }
+            bx += jump_width;
+        }
+    }
 
     /* Fill remainder with dummy values to avoid garbage rendering */
     for(i = current_block; i < L1_BLOCKS_SIZE; i++) {
         level_blocks[i] = create_block(0, 0); 
     }
-    for(i = 3; i < L1_SPIKES_SIZE; i++) {
+    for(i = current_spike; i < L1_SPIKES_SIZE; i++) {
         level_spikes[i] = create_spike(0, 0);
     }
-    for(i = 2; i < L1_LAVA_SIZE; i++) {
+    for(i = current_lava; i < L1_LAVA_SIZE; i++) {
         level_lava[i] = create_lava(0, 0);
     }
 
@@ -111,9 +146,9 @@ Level get_level1(void)
         level_spikes,
         level_lava,
         current_block,
-        3,
-        2,
-        6320
+        current_spike,
+        current_lava,
+        30000
     );
 }
 
