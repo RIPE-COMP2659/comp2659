@@ -5,197 +5,193 @@
 /* NOTE: This is only useful if we have different sprites for multiplayer */
 /* The global sprite for geo */
 const unsigned int GEO_SPRITE[GEO_SIZE][GEO_SIZE / WORD] = {
-    {0x800C, 0x3001}, 
-    {0x3FC9, 0x93FC},
-    {0x7FEB, 0xD7FE},
-    {0x7FEB, 0xD7FE},
-    {0x7FC9, 0x93FE},
-    {0x7C0C, 0x303E},
-    {0x79FF, 0xFF9E},
-    {0x7BFF, 0xFFDE},
-    {0x7BFF, 0xFFDE},
-    {0x7BFF, 0xFFDE},
-    {0x33FF, 0xFFCC},
-    {0x03FF, 0xFFC0},
-    {0xFFFF, 0xFFFF},
-    {0x87F8, 0x1FE1},
-    {0x33FB, 0xDFCC},
-    {0x7BFA, 0x5FDE},
-    {0x7BFA, 0x5FDE},
-    {0x33FB, 0xDFCC},
-    {0x87F8, 0x1FE1},
-    {0xFFFF, 0xFFFF},
-    {0x03FF, 0xFFC0},
-    {0x33FF, 0xFFCC},
-    {0x7BFF, 0xFFDE},
-    {0x7BFF, 0xFFDE},
-    {0x7BFF, 0xFFDE},
-    {0x79FF, 0xFF9E},
-    {0x7C0C, 0x303E},
-    {0x7FC9, 0x93FE},
-    {0x7FEB, 0xD7FE},
-    {0x7FEB, 0xD7FE},
-    {0x3FC9, 0x93FC},
-    {0x800C, 0x3001} 
+    {0x7FE3, 0xC7FE},
+    {0xC036, 0x6403},
+    {0x9FD5, 0xA5F9},
+    {0xBFD5, 0xA5FD},
+    {0xB836, 0x661D},
+    {0xB3E3, 0xC3CD},
+    {0xB600, 0x006D},
+    {0xB400, 0x002D},
+    {0xB400, 0x002D},
+    {0xB400, 0x002D},
+    {0xCC00, 0x0033},
+    {0x7800, 0x001E},
+    {0x0000, 0x0000},
+    {0x7807, 0xE01E},
+    {0xCC04, 0x2033},
+    {0xB405, 0xA02D},
+    {0xB405, 0xA02D},
+    {0xCC04, 0x2033},
+    {0x7807, 0xE01E},
+    {0x0000, 0x0000},
+    {0x7800, 0x001E},
+    {0xCC00, 0x0033},
+    {0xB400, 0x002D},
+    {0xB400, 0x002D},
+    {0xB400, 0x002D},
+    {0xB600, 0x006D},
+    {0xB3E3, 0xC7CD},
+    {0xB836, 0x6C1D},
+    {0xBFD5, 0xABFD},
+    {0x9FD5, 0xABF9},
+    {0xC036, 0x6C03},
+    {0x7FE3, 0xC7FE}
 };
 
 /** See geo.h for documentation */
 Geo create_geo(unsigned int x, unsigned int y, unsigned int ground_y) {
-    Geo geo;
+  Geo geo;
 
-    geo.ddy = GEO_DDY_SCALED;
-    geo.dx = GEO_DX;
-    geo.dy = 0;
-    geo.is_landed = FALSE;
-    geo.is_dead = FALSE;
-    geo.ground_y = ground_y;
-    geo.x = x;
-    geo.y = y;
-    geo.y_scaled = y << GEO_PHYSICS_SHIFT;
-    geo.size = GEO_SIZE;
-    geo.jump_buffer = 0;
-    geo.sprite = GEO_SPRITE;
+  geo.ddy = GEO_DDY_SCALED;
+  geo.dx = GEO_DX;
+  geo.dy = 0;
+  geo.is_landed = FALSE;
+  geo.is_dead = FALSE;
+  geo.ground_y = ground_y;
+  geo.x = x;
+  geo.y = y;
+  geo.y_scaled = y << GEO_PHYSICS_SHIFT;
+  geo.size = GEO_SIZE;
+  geo.jump_buffer = 0;
+  geo.sprite = GEO_SPRITE;
 
-    return geo;
+  return geo;
 }
 
 /** See header file for documentation */
-signed int geo_check_square_collision(
-    Geo *geo,
-    unsigned int object_x,
-    unsigned int object_y,
-    unsigned int object_size
-) {
-    signed int geo_left = geo->x;
-    signed int geo_right = geo->x + geo->size;
-    signed int geo_bottom = geo->y - geo->size;
-    signed int geo_top = geo->y;
+signed int geo_check_square_collision(Geo *geo, unsigned int object_x,
+                                      unsigned int object_y,
+                                      unsigned int object_size) {
+  signed int geo_left = geo->x;
+  signed int geo_right = geo->x + geo->size;
+  signed int geo_bottom = geo->y - geo->size;
+  signed int geo_top = geo->y;
 
-    signed int object_left = object_x;
-    signed int object_right = object_x + object_size;
-    signed int object_top = object_y;
-    signed int object_bottom = object_y - object_size;
+  signed int object_left = object_x;
+  signed int object_right = object_x + object_size;
+  signed int object_top = object_y;
+  signed int object_bottom = object_y - object_size;
 
-    signed int collision_result = COLLISION_ERROR;
+  signed int collision_result = COLLISION_ERROR;
 
-    /* TODO: Optimize logic after determining desired behaviour based on
-       gameplay */
-    if (geo_right < object_left || geo_left > object_right ||
-        geo_top <= object_bottom || geo_bottom > object_top) {
-        collision_result = COLLISION_NONE;
-    } else { /* A collision has occured */
-        unsigned int vertical_overlap = 0;
+  /* TODO: Optimize logic after determining desired behaviour based on
+     gameplay */
+  if (geo_right < object_left || geo_left > object_right ||
+      geo_top <= object_bottom || geo_bottom > object_top) {
+    collision_result = COLLISION_NONE;
+  } else { /* A collision has occured */
+    unsigned int vertical_overlap = 0;
 
-        /* NOTE: There's some better math that can likely be done with vertical overlap as signed
-                 For example, assume that two objects are overlapping and the same height, and
-                 we calculate the overlap using geo's bottom - object's top, but the value is
-                 negative, then we know that the vertical overlap is size + vertical overlap.
-                 Something like this can probably speed up logic. */
-        /* NOTE: There's probably also one little bit with the NONE and left/right */
-        /* Geo's top is inside the object, assume a bottom collision */
-        if (geo_top < object_top) {
-            vertical_overlap = geo_top - object_bottom;
-            collision_result = COLLISION_BOTTOM;
-        /* Geo's bottom is inside the object */
-        } else if (geo_bottom >= object_bottom) {
-            vertical_overlap = object_top - geo_bottom;
-            collision_result = COLLISION_TOP;
-        }
-
-        /* We can only have a left collision before geo is passed
-           and we only care if it is significant, otherwise unforgiving */
-        if (geo_left < object_left && vertical_overlap > VO_TOLERANCE) {
-            collision_result = COLLISION_LEFT;
-        }
+    /* NOTE: There's some better math that can likely be done with vertical
+       overlap as signed For example, assume that two objects are overlapping
+       and the same height, and we calculate the overlap using geo's bottom -
+       object's top, but the value is negative, then we know that the vertical
+       overlap is size + vertical overlap. Something like this can probably
+       speed up logic. */
+    /* NOTE: There's probably also one little bit with the NONE and left/right
+     */
+    /* Geo's top is inside the object, assume a bottom collision */
+    if (geo_top < object_top) {
+      vertical_overlap = geo_top - object_bottom;
+      collision_result = COLLISION_BOTTOM;
+      /* Geo's bottom is inside the object */
+    } else if (geo_bottom >= object_bottom) {
+      vertical_overlap = object_top - geo_bottom;
+      collision_result = COLLISION_TOP;
     }
 
-    return collision_result;
+    /* We can only have a left collision before geo is passed
+       and we only care if it is significant, otherwise unforgiving */
+    if (geo_left < object_left && vertical_overlap > VO_TOLERANCE) {
+      collision_result = COLLISION_LEFT;
+    }
+  }
+
+  return collision_result;
 }
 
 /** See header file for documentation */
-signed int geo_check_spike_collision(
-    Geo *geo,
-    unsigned int spike_x,
-    unsigned int spike_y,
-    unsigned int spike_size
-) {
-    signed int gx_left = geo->x;
-    signed int gx_right = geo->x + geo->size;
-    signed int gy_top = geo->y;
-    signed int gy_bottom = geo->y - geo->size;
+signed int geo_check_spike_collision(Geo *geo, unsigned int spike_x,
+                                     unsigned int spike_y,
+                                     unsigned int spike_size) {
+  signed int gx_left = geo->x;
+  signed int gx_right = geo->x + geo->size;
+  signed int gy_top = geo->y;
+  signed int gy_bottom = geo->y - geo->size;
 
-    /* Check 4 points of the spike against Geo's bounding box:
-       middle 2 at the top, and bottom left/right.
-       Since sy is the top, py is sy at the top and sy - 31 at the bottom. */
+  /* Check 4 points of the spike against Geo's bounding box:
+     middle 2 at the top, and bottom left/right.
+     Since sy is the top, py is sy at the top and sy - 31 at the bottom. */
 
-    /* Top peaks (checking both pixels for the apex) */
-    signed int py = spike_y;
-    signed int px1 = spike_x + 15;
-    signed int px2 = spike_x + 16;
+  /* Top peaks (checking both pixels for the apex) */
+  signed int py = spike_y;
+  signed int px1 = spike_x + 15;
+  signed int px2 = spike_x + 16;
 
-    if ((px1 >= gx_left && px1 <= gx_right && py <= gy_top && py >= gy_bottom) ||
-        (px2 >= gx_left && px2 <= gx_right && py <= gy_top && py >= gy_bottom)) {
-        return COLLISION_BOTTOM;
-    }
+  if ((px1 >= gx_left && px1 <= gx_right && py <= gy_top && py >= gy_bottom) ||
+      (px2 >= gx_left && px2 <= gx_right && py <= gy_top && py >= gy_bottom)) {
+    return COLLISION_BOTTOM;
+  }
 
-    /* Bottom corners */
-    py = spike_y - spike_size + 1;
-    px1 = spike_x;
-    px2 = spike_x + spike_size - 1;
+  /* Bottom corners */
+  py = spike_y - spike_size + 1;
+  px1 = spike_x;
+  px2 = spike_x + spike_size - 1;
 
-    if ((px1 >= gx_left && px1 <= gx_right && py <= gy_top && py >= gy_bottom) ||
-        (px2 >= gx_left && px2 <= gx_right && py <= gy_top && py >= gy_bottom)) {
-        return COLLISION_BOTTOM;
-    }
+  if ((px1 >= gx_left && px1 <= gx_right && py <= gy_top && py >= gy_bottom) ||
+      (px2 >= gx_left && px2 <= gx_right && py <= gy_top && py >= gy_bottom)) {
+    return COLLISION_BOTTOM;
+  }
 
-    return COLLISION_NONE;
+  return COLLISION_NONE;
 }
 
 /** See header file for documentation */
 void geo_jump(Geo *geo) {
-    geo->jump_buffer = 8; /* Buffer the jump for 8 frames*/
+  geo->jump_buffer = 8; /* Buffer the jump for 8 frames*/
 }
 
 /** See header file for documentation */
 void geo_update(Geo *geo) {
-    geo->x += geo->dx;
-    geo->dy += geo->ddy;
+  geo->x += geo->dx;
+  geo->dy += geo->ddy;
 
-    /* TODO: Revisit clamping, might be able to simplify physics */
-    if (geo->dy < GEO_TERMINAL_DY_SCALED) {
-        geo->dy = GEO_TERMINAL_DY_SCALED;
+  /* TODO: Revisit clamping, might be able to simplify physics */
+  if (geo->dy < GEO_TERMINAL_DY_SCALED) {
+    geo->dy = GEO_TERMINAL_DY_SCALED;
+  }
+
+  geo->y_scaled += geo->dy;
+  geo->y = geo->y_scaled >> GEO_PHYSICS_SHIFT;
+  geo_update_landed(geo);
+
+  /* Jump Buffering Logic: */
+  if (geo->jump_buffer > 0) {
+    if (geo->is_landed == TRUE) {
+      geo->dy = GEO_JUMP_DY_SCALED;
+      geo->is_landed = FALSE;
+      geo->jump_buffer = 0;
+      play_jump_effect();
+    } else {
+      geo->jump_buffer--;
     }
-
-    geo->y_scaled += geo->dy;
-    geo->y = geo->y_scaled >> GEO_PHYSICS_SHIFT;
-    geo_update_landed(geo);
-
-    /* Jump Buffering Logic: */
-    if (geo->jump_buffer > 0) {
-        if (geo->is_landed == TRUE) {
-            geo->dy = GEO_JUMP_DY_SCALED;
-            geo->is_landed = FALSE;
-            geo->jump_buffer = 0;
-            play_jump_effect();
-        } else {
-            geo->jump_buffer--;
-        }
-    }
+  }
 }
 
 /* TODO: This currently snaps geo up to the position of landed even if
    they're much lower, might be weird in practice. */
 /** See header file for documentation */
 void geo_update_landed(Geo *geo) {
-    signed int geo_bottom = geo->y - geo->size;
-    signed int ground_y = geo->ground_y;
+  signed int geo_bottom = geo->y - geo->size;
+  signed int ground_y = geo->ground_y;
 
-    if (geo_bottom <= ground_y && geo->dy <= 0) {
-        geo->is_landed = TRUE;
-        geo->y = geo->ground_y + geo->size;
-        geo->y_scaled = geo->y << GEO_PHYSICS_SHIFT;
-        geo->dy = 0;
-    } else {
-        geo->is_landed = FALSE;
-    }
+  if (geo_bottom <= ground_y && geo->dy <= 0) {
+    geo->is_landed = TRUE;
+    geo->y = geo->ground_y + geo->size;
+    geo->y_scaled = geo->y << GEO_PHYSICS_SHIFT;
+    geo->dy = 0;
+  } else {
+    geo->is_landed = FALSE;
+  }
 }

@@ -57,21 +57,21 @@ Level get_level1(void)
 
     /* Test 1: 3-block right jump over lava (x_diff = 96px) */
     /* Starting block */
-    level_blocks[0] = create_block(464, 64);
-    level_blocks[1] = create_block(464, 96);
+    level_blocks[0] = create_block(464 + 320, 64);
+    level_blocks[1] = create_block(464 + 320, 96);
     /* 2-block wide lava pit (for a 3-right jump) */
-    level_lava[0] = create_lava(496, 32);
-    level_lava[1] = create_lava(528, 32);
+    level_lava[0] = create_lava(496 + 320, 32);
+    level_lava[1] = create_lava(528 + 320, 32);
 
     /* 2-high landing block (strictly 3 blocks right: 464 + 96 = 560) */
     
-    level_blocks[2] = create_block(560, 64);
+    level_blocks[2] = create_block(560 + 320, 64);
 
 #define NUM_STAIR_STEPS 15
 
     /* Test 2: Ascending stair ladder (NUM_STAIR_STEPS steps, 4-right jumps = 128px) */
     current_block = 3;
-    last_x = 928;
+    last_x = 928 + 320;
     last_y = 64;
     for(i = 0; i < NUM_STAIR_STEPS; i++) {
         level_blocks[current_block++] = create_block(last_x + (i * 128), last_y + (i * 32));
@@ -89,11 +89,16 @@ Level get_level1(void)
         level_blocks[current_block++] = create_block(last_x + (i * 160), next_y);
     }
 
+    /* Add triple spike encounter at ground level near the start */
+    level_spikes[0] = create_spike(128+256, 64);
+    level_spikes[1] = create_spike(160+256, 64);
+    level_spikes[2] = create_spike(192+256, 64);
+
     /* Fill remainder with dummy values to avoid garbage rendering */
     for(i = current_block; i < L1_BLOCKS_SIZE; i++) {
         level_blocks[i] = create_block(0, 0); 
     }
-    for(i = 0; i < L1_SPIKES_SIZE; i++) {
+    for(i = 3; i < L1_SPIKES_SIZE; i++) {
         level_spikes[i] = create_spike(0, 0);
     }
     for(i = 2; i < L1_LAVA_SIZE; i++) {
@@ -106,9 +111,9 @@ Level get_level1(void)
         level_spikes,
         level_lava,
         current_block,
-        0,
+        3,
         2,
-        6000
+        6320
     );
 }
 
