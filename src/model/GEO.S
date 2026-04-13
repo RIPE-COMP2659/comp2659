@@ -306,7 +306,7 @@ L24:
 	add.w	d0,16(a3)
 	;line	188
 	move.w	16(a3),d0
-	asr.w	#6,d0
+	lsr.w	#6,d0
 	move.w	d0,14(a3)
 	;line	189
 	move.l	a3,-(a7)

@@ -61,7 +61,7 @@ typedef struct {
   unsigned int ground_y;
   unsigned int x;
   unsigned int y;
-  signed int y_scaled;
+  unsigned int y_scaled;
   unsigned int size;
   unsigned int jump_buffer;
   const unsigned int (*sprite)[GEO_SIZE / WORD];
