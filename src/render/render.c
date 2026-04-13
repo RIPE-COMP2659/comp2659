@@ -38,6 +38,7 @@ static UINT8 buffer_1[BUFFER_SIZE];
 
 /* Aligned buffer pointers - set at runtime */
 static UINT8 *buffers[NUM_BUFFERS];
+static UINT8 *original_video_base = 0;
 
 /* Current buffer indices */
 static int stale_buffer = 1;
@@ -50,6 +51,7 @@ static int display_index = 0;
 void init_render_buffers(void)
 {
     UINT32 addr;
+    long old_ssp;
 
     /* Align buffers to 256-byte boundary */
     buffers[0] = ALIGN_TO_256(buffer_0);
@@ -59,8 +61,26 @@ void init_render_buffers(void)
     clear_screen((UINT32 *)buffers[0]);
     clear_screen((UINT32 *)buffers[1]);
 
-    /* Set screen to show first buffer, start rendering to second */
-    Setscreen(buffers[0], buffers[0], -1);
+    /* Capture current desktop framebuffer so we can restore it on exit. */
+    old_ssp = Super(0);
+    original_video_base = (UINT8 *)get_video_base();
+    set_video_base((UINT16 *)buffers[0]);
+    Super(old_ssp);
+    stale_buffer = 1;
+    display_index = 0;
+}
+
+void shutdown_render_buffers(void)
+{
+    long old_ssp;
+
+    if (original_video_base != 0)
+    {
+        old_ssp = Super(0);
+        set_video_base((UINT16 *)original_video_base);
+        Super(old_ssp);
+    }
+
     stale_buffer = 1;
     display_index = 0;
 }
@@ -96,6 +116,8 @@ void mark_render_complete(void)
  */
 void swap_buffers(void)
 {
+    long old_ssp;
+
     /* Swap render and display indices */
     stale_buffer = display_index;
 
@@ -103,7 +125,9 @@ void swap_buffers(void)
     display_index = display_index ^ 1;
 
     /* Show the newly rendered buffer */
-    Setscreen(buffers[display_index], buffers[display_index], -1);
+    old_ssp = Super(0);
+    set_video_base((UINT16 *)buffers[display_index]);
+    Super(old_ssp);
 }
 /**
  * floor_div8 and clear_sprite_region should not exist. Clearing is bugged

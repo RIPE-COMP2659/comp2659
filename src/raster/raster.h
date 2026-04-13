@@ -19,6 +19,9 @@
 
 #define BYTES_PER_SCREEN 32000
 
+UINT16 *get_video_base();
+void set_video_base(UINT16 *base);
+
 /*
 
  This header file contains all functions in our raster library.
