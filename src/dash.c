@@ -94,6 +94,9 @@ int main_game(void)
         /* Clean up music */
         stop_music();
 
+        /* Restore desktop framebuffer before terminating. */
+        shutdown_render_buffers();
+
         return 0;
     }
 

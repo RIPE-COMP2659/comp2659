@@ -23,6 +23,12 @@
 void init_render_buffers(void);
 
 /**
+ * Restore the original system video base and reset render state.
+ * Must be called before exiting the game after init_render_buffers().
+ */
+void shutdown_render_buffers(void);
+
+/**
  * Clear all render/display buffers immediately.
  * Used when the game state jumps discontinuously, such as on death reset.
  */
