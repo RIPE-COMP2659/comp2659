@@ -140,7 +140,7 @@ Level get_level1(void)
         if (by < 64) by = 64;
         level_blocks[current_block++] = create_block(bx, by);
         if (by > 64) level_lava[current_lava++] = create_lava(bx, 32);
-        bx += 170; 
+        bx += 170+50; 
     }
 
     /* --- SEGMENT 6: THE QUAD-PLATFORM SPIKE GAUNTLET --- */
