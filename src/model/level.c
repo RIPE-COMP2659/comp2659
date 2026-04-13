@@ -21,6 +21,7 @@
 #define L1_BLOCKS_SIZE 200
 #define L1_SPIKES_SIZE 20
 #define L1_LAVA_SIZE 100
+#define NUM_STAIR_STEPS 15
 
 Level create_level(
     Block *blocks,
@@ -69,10 +70,14 @@ Level get_level1(void)
     current_lava = 0;
     current_spike = 3;
 
-#define NUM_STAIR_STEPS 15
+    /* Performance Test Section: 30-block platform with lava below */
+    /* 10 blocks (320px) gap after spikes (448px) = start at 768px */
+    level_blocks[current_block++] = create_block_rect(768, 96, 960);
+    level_lava[current_lava++] = create_lava_rect(768, 32, 960);
 
     /* Test 2: Ascending stair ladder with drift compensation (every 4th jump wider) */
-    bx = 928;
+    /* 10 blocks (320px) gap after platform (1728px) = start at 2048px */
+    bx = 2048;
     last_y = 64;
     for(i = 0; i < NUM_STAIR_STEPS; i++) {
         by = last_y + (i * 32);

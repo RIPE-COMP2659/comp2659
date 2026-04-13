@@ -175,16 +175,16 @@ void geo_jump(Geo *geo) {
 /** See header file for documentation */
 void geo_update(Geo *geo) {
   geo->x += geo->dx;
-  geo->dy += geo->ddy;
 
-  /* TODO: Revisit clamping, might be able to simplify physics */
-  if (geo->dy < GEO_TERMINAL_DY_SCALED) {
-    geo->dy = GEO_TERMINAL_DY_SCALED;
+  if (geo->is_landed == FALSE) {
+    geo->dy += geo->ddy;
+    if (geo->dy < GEO_TERMINAL_DY_SCALED) {
+      geo->dy = GEO_TERMINAL_DY_SCALED;
+    }
+    geo->y_scaled += geo->dy;
+    geo->y = geo->y_scaled >> GEO_PHYSICS_SHIFT;
+    geo_update_landed(geo);
   }
-
-  geo->y_scaled += geo->dy;
-  geo->y = geo->y_scaled >> GEO_PHYSICS_SHIFT;
-  geo_update_landed(geo);
 
   /* Jump Buffering Logic: */
   if (geo->jump_buffer > 0) {
