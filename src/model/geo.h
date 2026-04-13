@@ -13,7 +13,7 @@
    would allow us to steal a large amount of their level design */
 #define GEO_DX 5u                   /*pixels per frame (unscaled) */
 #define GEO_JUMP_DY_SCALED 610      /* Necessary combo with DDY */
-#define GEO_DDY_SCALED -42          /* For height and time */
+#define GEO_DDY_SCALED -30          /* For height and time */
 #define GEO_TERMINAL_DY_SCALED -666 /* -13 pixels * 64 */
 #define GEO_PHYSICS_SHIFT 6         /* Bit shifting scaled values, / or * by 64 */
 /**

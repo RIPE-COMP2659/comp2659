@@ -15,12 +15,45 @@
 #include "level.h"
 
 /* Constants for level sizes */
-#define NUM_LEVELS 1
+#define NUM_LEVELS 2
 
 /* Level one (consistently using L2 sizes for current draft) */
-#define L1_BLOCKS_SIZE 200
-#define L1_SPIKES_SIZE 15
-#define L1_LAVA_SIZE 5
+#define L1_BLOCKS_SIZE 400
+#define L1_SPIKES_SIZE 100
+#define L1_LAVA_SIZE 100
+#define NUM_STAIR_STEPS 12
+
+static void add_block_rect(
+    Block *blocks,
+    int *current_block,
+    unsigned int x,
+    unsigned int y,
+    unsigned int width)
+{
+    unsigned int offset;
+
+    for (offset = 0; offset < width; offset += BLOCK_SIZE)
+    {
+        blocks[*current_block] = create_block(x + offset, y);
+        (*current_block)++;
+    }
+}
+
+static void add_lava_rect(
+    Lava *lava,
+    int *current_lava,
+    unsigned int x,
+    unsigned int y,
+    unsigned int width)
+{
+    unsigned int offset;
+
+    for (offset = 0; offset < width; offset += LAVA_SIZE)
+    {
+        lava[*current_lava] = create_lava(x + offset, y);
+        (*current_lava)++;
+    }
+}
 
 Level create_level(
     Block *blocks,
@@ -50,65 +83,167 @@ Level get_level1(void)
     static Spike level_spikes[L1_SPIKES_SIZE];
     static Lava level_lava[L1_LAVA_SIZE];
     int i;
-    int current_block;
-    unsigned int last_x;
-    unsigned int last_y;
-    unsigned int next_y;
+    int current_block = 0;
+    int current_lava = 0;
+    int current_spike = 0;
+    unsigned int bx, by;
 
-    /* Test 1: 3-block right jump over lava (x_diff = 96px) */
-    /* Starting block */
-    level_blocks[0] = create_block(464, 64);
-    level_blocks[1] = create_block(464, 96);
-    /* 2-block wide lava pit (for a 3-right jump) */
-    level_lava[0] = create_lava(496, 32);
-    level_lava[1] = create_lava(528, 32);
+    /* --- INITIALIZATION --- */
+    /* Starting path: Empty floor stretch for 14 blocks (448px) */
+    /* Ground line is implicitly at 32. Blocks placed at 64 represent ground. */
 
-    /* 2-high landing block (strictly 3 blocks right: 464 + 96 = 560) */
+    /* --- SEGMENT 1: WARMUP SPIKES --- */
+    /* Description: Intro Double Spike */
+    level_spikes[current_spike++] = create_spike(600, 64);
+    level_spikes[current_spike++] = create_spike(632, 64);
+
+    /* Description: Intro Triple Spike */
+    level_spikes[current_spike++] = create_spike(1200, 64);
+    level_spikes[current_spike++] = create_spike(1232, 64);
+    level_spikes[current_spike++] = create_spike(1264, 64);
+
+    /* --- SEGMENT 2: PLATFORMING INTRODUCTION --- */
+    /* Description: Low-height platforms with 1-block slide room */
+    add_block_rect(level_blocks, &current_block, 1600, 96, 128); /* 4 blocks at y=96 */
+    add_block_rect(level_blocks, &current_block, 1856, 96, 128); /* Next platform at y=96 */
+    add_lava_rect(level_lava, &current_lava, 1728, 32, 128);   /* Lava gap */
+
+    /* --- SEGMENT 3: THE FALL (3 RIGHT, 1 DOWN) --- */
+    /* Description: Elevated platform followed by the specific fall jump */
+    /* Jumped to via Section 2 platform 2 (x=1984 end) using 5-right, 1-up (160px) */
+    add_block_rect(level_blocks, &current_block, 2104, 128, 128); 
+    /* Gap of 3 blocks (96px) leading to lower ground: (2144+128+96 = 2368) */
+    add_block_rect(level_blocks, &current_block, 2296, 96, 32); 
+    add_lava_rect(level_lava, &current_lava, 2328, 32, 96);
+
+    /* --- SEGMENT 4: THE BIG STAIRCASE ASCENSION --- */
+    /* Description: 12-block long ladder up using 4-right 1-up spacing */
+    /* Drift compensation: Add 1 block (32px) to the gap every 4th jump. */
+    bx = 3000;
+    for(i = 0; i < NUM_STAIR_STEPS + 1; i++) {
+        unsigned int jump_width = 128+58;
+        by = 64 + (i * 32);
+        level_blocks[current_block++] = create_block(bx, by);
+        if (by > 64) level_lava[current_lava++] = create_lava(bx, 32);
+        bx += jump_width;
+    }
+
+    /* Description: Peak platform for a brief breather */
+    add_block_rect(level_blocks, &current_block, bx, by, 320); 
+    bx += 320+170;
+
+    /* --- SEGMENT 5: STAIRCASE DESCENT --- */
+    /* Description: 12-block stairway down using 5-right 1-down spacing */
+    /* Calculated drift: 170px jump width for -32y jump */
+    for(i = 0; i < NUM_STAIR_STEPS; i++) {
+        by = by - 32;
+        if (by < 64) by = 64;
+        level_blocks[current_block++] = create_block(bx, by);
+        if (by > 64) level_lava[current_lava++] = create_lava(bx, 32);
+        bx += 170; 
+    }
+
+    /* --- SEGMENT 6: THE QUAD-PLATFORM SPIKE GAUNTLET --- */
+    /* Description: 7 platforms, 4 blocks each, spike on 4th block. 
+       Requires jumping off 3rd block (x+64) to clear spike + gap.
+       Jump distance used: 136px (0 drift). Next platform starts at x + 64 + 136. */
+    bx += 500; /* Spacing before challenge */
+    by = 96;   /* Initial platform height */
+    for(i = 0; i < 7; i++) {
+        add_block_rect(level_blocks, &current_block, bx, by, 128);
+        level_spikes[current_spike++] = create_spike(bx + 96, by + 32);
+        /* Shift bx by 200 (128 width + 72 gap) to achieve 136 jump from x+64 */
+        bx += 200;
+        by += 32; /* Next platform is 1 block higher */
+    }
+
+    /* --- SEGMENT 7: FALL-JUMP STAIRCASE --- */
+    /* Description: Alternating cycle of Falling (64px) and Jumping (170px) */
+    add_block_rect(level_blocks, &current_block, bx, by, 640); /* Long bridge */
+    bx += 640; /* End of bridge */
     
-    level_blocks[2] = create_block(560, 64);
+    while (by > 64) {
+        /* Step 1: Fall 1 block */
+        bx += 72;
+        by -= 32; 
+        level_blocks[current_block++] = create_block(bx, by);
 
-#define NUM_STAIR_STEPS 15
+        if (by <= 64) break;
 
-    /* Test 2: Ascending stair ladder (NUM_STAIR_STEPS steps, 4-right jumps = 128px) */
-    current_block = 3;
-    last_x = 928;
-    last_y = 64;
-    for(i = 0; i < NUM_STAIR_STEPS; i++) {
-        level_blocks[current_block++] = create_block(last_x + (i * 128), last_y + (i * 32));
+        /* Step 2: Jump 1 block */
+        bx += 170;
+        by -= 32;
+        level_blocks[current_block++] = create_block(bx, by);
     }
+    add_lava_rect(level_lava, &current_lava, bx - 288, 32, 288);
 
-    /* Test 3: Descending stairway (NUM_STAIR_STEPS steps, 5-right spacing = 160px) */
-    /* Start descent from the final peak of Test 2 plus a 5-block gap */
-    last_x = last_x + ((NUM_STAIR_STEPS - 1) * 128) + 160;
-    last_y = last_y + ((NUM_STAIR_STEPS - 1) * 32);
-    for(i = 0; i < NUM_STAIR_STEPS; i++) {
-        /* Each step down is 1 block lower than the previous peak/step */
-        next_y = last_y - ((i + 1) * 32);
-        /* If we go below ground level (64), stop decreasing height */
-        if (next_y < 64) next_y = 64; 
-        level_blocks[current_block++] = create_block(last_x + (i * 160), next_y);
-    }
+    /* Final Spikes: 4 block gap (128px) after last ground block */
+    bx += 32 + 128; 
+    level_spikes[current_spike++] = create_spike(bx, 64);
+    level_spikes[current_spike++] = create_spike(bx + 32, 64);
+    bx += 500;
+    level_spikes[current_spike++] = create_spike(bx, 64);
+    level_spikes[current_spike++] = create_spike(bx + 32, 64);
+    level_spikes[current_spike++] = create_spike(bx + 64, 64);
 
-    /* Fill remainder with dummy values to avoid garbage rendering */
+    /* --- CLEANUP & END --- */
     for(i = current_block; i < L1_BLOCKS_SIZE; i++) {
         level_blocks[i] = create_block(0, 0); 
     }
-    for(i = 0; i < L1_SPIKES_SIZE; i++) {
+    for(i = current_spike; i < L1_SPIKES_SIZE; i++) {
         level_spikes[i] = create_spike(0, 0);
     }
-    for(i = 2; i < L1_LAVA_SIZE; i++) {
+    for(i = current_lava; i < L1_LAVA_SIZE; i++) {
         level_lava[i] = create_lava(0, 0);
     }
 
-    /* Set actual sizes to matching indices to avoid dummy rendering overhead */
     return create_level(
         level_blocks,
         level_spikes,
         level_lava,
         current_block,
-        0,
-        2,
-        6000
+        current_spike,
+        current_lava,
+        11600
+    );
+}
+
+Level get_level2(void)
+{
+    static Block level_blocks[L1_BLOCKS_SIZE];
+    static Spike level_spikes[L1_SPIKES_SIZE];
+    static Lava level_lava[L1_LAVA_SIZE];
+    int current_block = 0;
+    int current_lava = 0;
+    int current_spike = 0;
+    int i;
+
+    add_block_rect(level_blocks, &current_block, 0, 64, 512);
+    add_lava_rect(level_lava, &current_lava, 512, 32, 96);
+    level_spikes[current_spike++] = create_spike(640, 64);
+    level_spikes[current_spike++] = create_spike(672, 64);
+    add_block_rect(level_blocks, &current_block, 800, 96, 160);
+    add_lava_rect(level_lava, &current_lava, 960, 32, 160);
+    add_block_rect(level_blocks, &current_block, 1200, 64, 256);
+
+    for (i = current_block; i < L1_BLOCKS_SIZE; i++) {
+        level_blocks[i] = create_block(0, 0);
+    }
+    for (i = current_spike; i < L1_SPIKES_SIZE; i++) {
+        level_spikes[i] = create_spike(0, 0);
+    }
+    for (i = current_lava; i < L1_LAVA_SIZE; i++) {
+        level_lava[i] = create_lava(0, 0);
+    }
+
+    return create_level(
+        level_blocks,
+        level_spikes,
+        level_lava,
+        current_block,
+        current_spike,
+        current_lava,
+        2200
     );
 }
 
@@ -117,6 +252,7 @@ Level *get_levels(void)
     static Level levels[NUM_LEVELS];
 
     levels[0] = get_level1();
+    levels[1] = get_level2();
 
     return levels;
 }
