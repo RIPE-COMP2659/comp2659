@@ -50,3 +50,21 @@ void init_input(void);
 void handle_ikbd_byte(void);
 
 void restore_input(void);
+
+/**
+ * Returns the current absolute mouse X coordinate, clamped to [0, SCREEN_WIDTH-1].
+ * Reads from the global updated by the IKBD ISR.
+ */
+int get_mouse_x(void);
+
+/**
+ * Returns the current absolute mouse Y coordinate, clamped to [0, SCREEN_HEIGHT-1].
+ * Reads from the global updated by the IKBD ISR.
+ */
+int get_mouse_y(void);
+
+/**
+ * Returns the current mouse button state byte from the last packet header.
+ * Bit 1 (0x02) = left button pressed; bit 0 (0x01) = right button pressed.
+ */
+UINT8 get_mouse_buttons(void);

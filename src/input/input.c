@@ -61,8 +61,8 @@ void init_input(void)
 
     queue_head = 0;
     queue_tail = 0;
-    mouse_x = 0;
-    mouse_y = 0;
+    mouse_x = SCREEN_WIDTH / 2;
+    mouse_y = SCREEN_HEIGHT / 2;
     mouse_buttons = 0;
     isr_state = STATE_INPUT_AWAIT;
 
@@ -130,9 +130,28 @@ void handle_ikbd_byte(void) {
         }
     } else if (isr_state == STATE_MOUSE_X_AWAIT) {
         mouse_x += (signed char)byte;
+        if (mouse_x < 0) mouse_x = 0;
+        else if (mouse_x >= SCREEN_WIDTH) mouse_x = SCREEN_WIDTH - 1;
         isr_state = STATE_MOUSE_Y_AWAIT;
     } else {
         mouse_y += (signed char)byte;
+        if (mouse_y < 0) mouse_y = 0;
+        else if (mouse_y >= SCREEN_HEIGHT) mouse_y = SCREEN_HEIGHT - 1;
         isr_state = STATE_INPUT_AWAIT;
     }
+}
+
+int get_mouse_x(void)
+{
+    return mouse_x;
+}
+
+int get_mouse_y(void)
+{
+    return mouse_y;
+}
+
+UINT8 get_mouse_buttons(void)
+{
+    return mouse_buttons;
 }
