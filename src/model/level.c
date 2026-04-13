@@ -204,7 +204,7 @@ Level get_level1(void)
         current_block,
         current_spike,
         current_lava,
-        11600
+        13000
     );
 }
 
