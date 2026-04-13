@@ -3,8 +3,13 @@
         xdef    _installVector
         xdef    _ikbdisr
 
+        xref    _handle_ikbd_byte
+
 vectorNum       equ     4
 handler         equ     6
+
+MFP_ISRB        equ     $FFFA11
+MFP_IKBD_BIT    equ     6
 
 ; See .h file for documentation
 _installVector:
@@ -18,4 +23,8 @@ _installVector:
 
 ; See .h file for documentation
 _ikbdisr:
+        movem.l d0-d2/a0-a2,-(sp)      ; save caller-saved registers
+        jsr     _handle_ikbd_byte
+        movem.l (sp)+,d0-d2/a0-a2      ; restore
+        bclr    #MFP_IKBD_BIT,MFP_ISRB ; clear in-service bit
         rte

@@ -2728,16 +2728,16 @@ UINT8 splash_screen(void)
     UINT8 *base = (UINT8 *)Physbase();
     UINT8 selection = FALSE;
     UINT8 cursor = PLAY;
-    int key;
+    SCANCODE sc;
 
     print_splash(base);
-    print_play_sel(base); /* Start with Play selected */
+    print_play_sel(base);
 
     while (selection != TRUE)
     {
-        key = Cnecin();
+        sc = read_scancode();
 
-        if (key == ' ')
+        if (sc == SC_SPACE)
         {
             cursor ^= 1;
             if (cursor == PLAY)
@@ -2749,7 +2749,7 @@ UINT8 splash_screen(void)
                 print_exit_sel(base);
             }
         }
-        else if (key == '\r' || key == '\n')
+        else if (sc == SC_ENTER)
         {
             selection = TRUE;
         }
@@ -2757,4 +2757,3 @@ UINT8 splash_screen(void)
 
     return cursor;
 }
-

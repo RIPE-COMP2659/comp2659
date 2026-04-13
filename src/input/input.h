@@ -39,8 +39,14 @@ int has_input();
  *     None
  *
  * Returns:
- *     char: The character that was pressed by the user.
+ *     SCANCODE: The next queued scancode.
  */
-char get_input();
+SCANCODE get_input(void);
 
 SCANCODE read_scancode(void);
+
+void init_input(void);
+
+void handle_ikbd_byte(void);
+
+void restore_input(void);

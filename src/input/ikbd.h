@@ -33,6 +33,12 @@
 #define ESC_SCANCODE    0x01
 #define BREAK_BIT       0x80
 
+#define IKBD_SR_IRQ      0x80    /* Status bit 7: IRQ pending */
+
+#define SC_SPACE 0x39
+#define SC_Q 0x10
+#define SC_ENTER 0x1C
+
 /**
  * Installs a new interrupt vector and returns the previous vector.
  * Caller is responsible for being in supervisor mode.

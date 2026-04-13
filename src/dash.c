@@ -7,8 +7,8 @@
 #include "psg/effects.h"
 #include "psg/music.h"
 
-#define JUMP 32
-#define QUIT 113
+#define JUMP SC_SPACE
+#define QUIT SC_Q
 
 /* TODO: Death is a little bit out of sync */
 int main_game(void)
@@ -16,12 +16,14 @@ int main_game(void)
     Model model = get_model();
     UINT8 quit = FALSE;
     UINT8 game_won = FALSE;
+    UINT8 init;
     signed int died_this_frame;
     unsigned int input;
     signed int current_event;
     unsigned long timeThen, timeNow, timeElapsed;
 
-    UINT8 init = splash_screen(); /* Prints splash screen and awaits user input */
+    init = splash_screen(); /* Prints splash screen and awaits user input */
+    init_input(); /* Initializes input handling and installs IKBD ISR */
 
     if (init == 0)
     {
@@ -29,6 +31,9 @@ int main_game(void)
     }
     else
     {
+        UINT8 jumping = FALSE;
+        SCANCODE sc;
+
         /* Initialize render buffers */
         init_render_buffers();
         /* Initial render */
@@ -43,16 +48,24 @@ int main_game(void)
         timeThen = get_time();
         while (quit != TRUE && game_won != TRUE)
         {
-            switch (get_input())
-            {
-            case JUMP:
+            while ((sc = get_input()) != 0) {
+                switch (sc) {
+                    case JUMP:
+                        jumping = TRUE;
+                        break;
+                    case JUMP | BREAK_BIT:
+                        jumping = FALSE;
+                        break;
+                    case QUIT:
+                        quit = TRUE;
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            if (jumping == TRUE) {
                 on_jump_request(&model);
-                break;
-            case QUIT:
-                quit = TRUE;
-                break;
-            default:
-                break;
             }
 
             timeNow = get_time();
@@ -94,8 +107,12 @@ int main_game(void)
         /* Clean up music */
         stop_music();
 
+        restore_input();
+
         return 0;
     }
+
+    restore_input(); /* Restore original IKBD vector */
 
     return 0;
 }

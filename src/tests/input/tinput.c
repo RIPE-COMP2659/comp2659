@@ -41,44 +41,10 @@ void test_has_get_input(void)
     }
 }
 
-void test_read_scancode(void)
-{
-    long old_ssp;
-    SCANCODE sc;
-    char ascii;
-    char *scancode_2_ascii;
-    int done = FALSE;
-
-    /* TODO: THIS IS TOS, REPLACE WITH CUSTOM TABLE OR SIMILAR, MAYBE MATH? */
-    scancode_2_ascii = (char *)((Keytbl(-1, -1, -1))->unshift);
-
-    Cconws("Press keys to echo. Press ESC to exit.\r\n");
-
-    old_ssp = Super(0);
-    *IKBD_control = IKBD_POLLING_MODE;
-
-    while (done == FALSE) {
-        sc = read_scancode();
-
-        if (sc == (ESC_SCANCODE | BREAK_BIT)) {
-            done = TRUE;
-        } else if ((sc & BREAK_BIT) == 0) {
-            ascii = scancode_2_ascii[sc];
-            if (ascii != '\0') {
-                Cconout(ascii);
-            }
-        }
-    }
-
-    *IKBD_control = IKBD_RESTORE_MODE;
-    Super(old_ssp);
-
-    Cconws("\r\nExiting...\r\n");
-}
-
 int main()
 {
-    test_read_scancode();
+    init_input();
     test_has_get_input();
+    restore_input();
     return 0;
 }
