@@ -87,6 +87,7 @@ PLT_STR = plt_str
 BOUNDS  = bounds
 PLT_CLIP = plt_clp
 GET_VID = get_vid
+SET_VID = set_vid
 RASTER = raster
 
 # File Names, Base - Splash Screen
@@ -101,7 +102,7 @@ TOS_FLAGS      = $(SHARED_FLAGS) -c -I. -I$(MODEL_FOLDER) -I$(SHARED_FOLDER) -I$
 MODEL_OBJECTS  = $(BLOCK).o $(SPIKE).o $(LAVA).o $(GEO).o $(LEVEL).o $(WORLD).o $(MODEL).o $(CAMERA).o $(MAIN).o
 EVENTS_OBJECTS = $(ASYNC).o $(COND).o $(SYNC).o
 CLOCK_OBJECTS = $(CLOCK).o
-RASTER_OBJECTS = $(CLR_SCN).o $(CLR_REG).o $(PLT_PXL).o $(PLT_HOR).o $(PLT_VRT).o $(PLT_LIN).o $(PLT_REC).o $(PLT_SQR).o $(PLT_TRI).o $(BMAP_8).o $(BMAP_16).o $(BMAP_32).o $(PLT_CHR).o $(PLT_STR).o $(BOUNDS).o $(PLT_CLIP).o $(GET_VID).o
+RASTER_OBJECTS = $(CLR_SCN).o $(CLR_REG).o $(PLT_PXL).o $(PLT_HOR).o $(PLT_VRT).o $(PLT_LIN).o $(PLT_REC).o $(PLT_SQR).o $(PLT_TRI).o $(BMAP_8).o $(BMAP_16).o $(BMAP_32).o $(PLT_CHR).o $(PLT_STR).o $(BOUNDS).o $(PLT_CLIP).o $(GET_VID).o $(SET_VID).o
 RENDER_OBJECTS = $(RENDER).o
 INPUT_OBJECTS  = $(INPUT).o
 PSG_OBJECTS    = $(PSG).o $(EFFECTS).o $(MUSIC).o
@@ -173,6 +174,7 @@ TPLT_STR = t${PLT_STR}
 TBOUNDS  = t${BOUNDS}
 TPLT_CLIP = t${PLT_CLIP}
 TGET_VID = tget_vid
+TSET_VID = tset_vid
 
 # File Names, Tests - Clock
 TCLOCK = t${CLOCK}
@@ -353,8 +355,11 @@ $(TBOUNDS): $(BOUNDS).o
 $(TPLT_CLIP): $(PLT_CLIP).o
 	$(ATARI_CC) $(RASTER_TEST_FLAGS) $(TESTS_RASTER_FOLDER)\$(TPLT_CLIP).c $(PLT_CLIP).o $(UNITY) -o $(TPLT_CLIP).ut
 
-$(TGET_VID): $(GET_VID).o
+$(TGET_VID): $(TESTS_RASTER_FOLDER)\$(TGET_VID).c $(GET_VID).o
 	$(ATARI_CC) $(RASTER_TEST_FLAGS) $(TESTS_RASTER_FOLDER)\$(TGET_VID).c $(GET_VID).o $(UNITY) -o $(TGET_VID).ut
+
+$(TSET_VID): $(TESTS_RASTER_FOLDER)\$(TSET_VID).c $(SET_VID).o $(GET_VID).o
+	$(ATARI_CC) $(RASTER_TEST_FLAGS) $(TESTS_RASTER_FOLDER)\$(TSET_VID).c $(SET_VID).o $(GET_VID).o $(UNITY) -o $(TSET_VID).ut
 
 
 # ----- Clock Test Builds ---------------------------------------------------
@@ -363,7 +368,7 @@ $(TCLOCK): $(CLOCK).o
 
 
 # ----- Test Execution -------------------------------------------------------
-test: $(TINPUT) $(TPSG) $(TSONG) $(TBLOCK) $(TGEO) $(TLAVA) $(TLEVEL) $(TSPIKE) $(TWORLD) $(TMODEL) $(TCAMERA) $(TRENDER) $(TASYNC) $(TCOND) $(TSYNC) $(TCLR_SCN) $(TCLR_REG) $(TPLT_PXL) $(TPLT_HOR) $(TPLT_VRT) $(TPLT_LIN) $(TPLT_REC) $(TPLT_SQR) $(TPLT_TRI) $(TBMAP_8) $(TBMAP_16) $(TBMAP_32) $(TPLT_CHR) $(TPLT_STR) $(TBOUNDS) $(TPLT_CLIP) $(TGET_VID)
+test: $(TINPUT) $(TPSG) $(TSONG) $(TBLOCK) $(TGEO) $(TLAVA) $(TLEVEL) $(TSPIKE) $(TWORLD) $(TMODEL) $(TCAMERA) $(TRENDER) $(TASYNC) $(TCOND) $(TSYNC) $(TCLR_SCN) $(TCLR_REG) $(TPLT_PXL) $(TPLT_HOR) $(TPLT_VRT) $(TPLT_LIN) $(TPLT_REC) $(TPLT_SQR) $(TPLT_TRI) $(TBMAP_8) $(TBMAP_16) $(TBMAP_32) $(TPLT_CHR) $(TPLT_STR) $(TBOUNDS) $(TPLT_CLIP) $(TGET_VID) $(TSET_VID)
 	$(TBLOCK).ut
 	$(TGEO).ut
 	$(TLAVA).ut
@@ -393,6 +398,7 @@ test: $(TINPUT) $(TPSG) $(TSONG) $(TBLOCK) $(TGEO) $(TLAVA) $(TLEVEL) $(TSPIKE) 
 	$(TBOUNDS).ut
 	$(TPLT_CLIP).ut
 	$(TGET_VID).ut
+	$(TSET_VID).ut
 	$(TSONG).tos
 
 
@@ -445,6 +451,9 @@ $(PLT_CLIP).o: $(RASTER_FOLDER)\$(PLT_CLIP).s
 $(GET_VID).o: $(RASTER_FOLDER)\$(GET_VID).s
 	$(ATARI_CC) $(SHARED_FLAGS) -c $(RASTER_FOLDER)\$(GET_VID).s -o $(GET_VID).o
 
+$(SET_VID).o: $(RASTER_FOLDER)\$(SET_VID).s
+	$(ATARI_CC) $(SHARED_FLAGS) -c $(RASTER_FOLDER)\$(SET_VID).s -o $(SET_VID).o
+
 # ----- Output ---------------------------------------------------------------
 # Otherwise the Make can think that the commands are files.
-.PHONY: test $(TINPUT) $(TPSG) $(TBLOCK) $(TGEO) $(TLAVA) $(TLEVEL) $(TSPIKE) $(TWORLD) $(TMODEL) $(TCAMERA) $(TRENDER) $(TASYNC) $(TCOND) $(TSYNC) $(TCLR_SCN) $(TCLR_REG) $(TPLT_PXL) $(TPLT_HOR) $(TPLT_VRT) $(TPLT_LIN) $(TPLT_REC) $(TPLT_SQR) $(TPLT_TRI) $(TBMAP_8) $(TBMAP_16) $(TBMAP_32) $(TPLT_CHR) $(TPLT_STR) $(TBOUNDS) $(TPLT_CLIP) $(TGET_VID)
+.PHONY: test $(TINPUT) $(TPSG) $(TBLOCK) $(TGEO) $(TLAVA) $(TLEVEL) $(TSPIKE) $(TWORLD) $(TMODEL) $(TCAMERA) $(TRENDER) $(TASYNC) $(TCOND) $(TSYNC) $(TCLR_SCN) $(TCLR_REG) $(TPLT_PXL) $(TPLT_HOR) $(TPLT_VRT) $(TPLT_LIN) $(TPLT_REC) $(TPLT_SQR) $(TPLT_TRI) $(TBMAP_8) $(TBMAP_16) $(TBMAP_32) $(TPLT_CHR) $(TPLT_STR) $(TBOUNDS) $(TPLT_CLIP) $(TGET_VID) $(TSET_VID)

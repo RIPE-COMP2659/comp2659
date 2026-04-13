@@ -1,5 +1,5 @@
-rtest.tos: test.o clr_scn.o clr_reg.o plt_pxl.o plt_hor.o plt_vrt.o plt_lin.o plt_rec.o plt_sqr.o plt_tri.o bmap_8.o bmap_16.o bmap_32.o plt_chr.o plt_str.o bounds.o plt_clp.o get_vid.o
-	cc68x -g test.o clr_scn.o clr_reg.o plt_pxl.o plt_hor.o plt_vrt.o plt_lin.o plt_rec.o plt_sqr.o plt_tri.o bmap_8.o bmap_16.o bmap_32.o plt_chr.o plt_str.o bounds.o plt_clp.o get_vid.o -o rtest.tos
+rtest.tos: test.o clr_scn.o clr_reg.o plt_pxl.o plt_hor.o plt_vrt.o plt_lin.o plt_rec.o plt_sqr.o plt_tri.o bmap_8.o bmap_16.o bmap_32.o plt_chr.o plt_str.o bounds.o plt_clp.o get_vid.o set_vid.o
+	cc68x -g test.o clr_scn.o clr_reg.o plt_pxl.o plt_hor.o plt_vrt.o plt_lin.o plt_rec.o plt_sqr.o plt_tri.o bmap_8.o bmap_16.o bmap_32.o plt_chr.o plt_str.o bounds.o plt_clp.o get_vid.o set_vid.o -o rtest.tos
 
 test.o: test.c raster.h
 	cc68x -g -c test.c
@@ -54,3 +54,6 @@ plt_clp.o: plt_clp.s
 
 get_vid.o: get_vid.s
 	cc68x -g -c get_vid.s
+
+set_vid.o: set_vid.s
+	cc68x -g -c set_vid.s
