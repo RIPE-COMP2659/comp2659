@@ -15,6 +15,11 @@
  */
 #include <osbind.h>
 #include "../shared/dtypes.h"
+#include "ikbd.h"
+
+extern volatile UINT8 * const IKBD_control;
+extern volatile const UINT8 * const IKBD_status;
+extern volatile const SCANCODE * const IKBD_RDR;
 
 /**
  * Checks if there is pending input to be processed.
@@ -34,6 +39,14 @@ int has_input();
  *     None
  *
  * Returns:
- *     char: The character that was pressed by the user.
+ *     SCANCODE: The next queued scancode.
  */
-char get_input();
+SCANCODE get_input(void);
+
+SCANCODE read_scancode(void);
+
+void init_input(void);
+
+void handle_ikbd_byte(void);
+
+void restore_input(void);

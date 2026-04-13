@@ -14,5 +14,6 @@
  */
 
 #include "../raster/raster.h"
+#include "../input/input.h"
 
 UINT8 splash_screen(void);
