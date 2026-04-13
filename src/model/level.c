@@ -18,10 +18,10 @@
 #define NUM_LEVELS 1
 
 /* Level one (consistently using L2 sizes for current draft) */
-#define L1_BLOCKS_SIZE 200
-#define L1_SPIKES_SIZE 20
+#define L1_BLOCKS_SIZE 400
+#define L1_SPIKES_SIZE 100
 #define L1_LAVA_SIZE 100
-#define NUM_STAIR_STEPS 15
+#define NUM_STAIR_STEPS 12
 
 Level create_level(
     Block *blocks,
@@ -51,87 +51,110 @@ Level get_level1(void)
     static Spike level_spikes[L1_SPIKES_SIZE];
     static Lava level_lava[L1_LAVA_SIZE];
     int i;
-    int current_block;
-    int current_lava;
-    int current_spike;
-    unsigned int last_y;
-    unsigned int next_y;
-    unsigned int bx;
-    unsigned int by;
-    unsigned int jump_width;
-    int k;
+    int current_block = 0;
+    int current_lava = 0;
+    int current_spike = 0;
+    unsigned int bx, by;
 
-    /* Test 1: Triple Spike (3 spikes in a row) */
-    level_spikes[0] = create_spike(352, 64);
-    level_spikes[1] = create_spike(384, 64);
-    level_spikes[2] = create_spike(416, 64);
+    /* --- INITIALIZATION --- */
+    /* Starting path: Empty floor stretch for 14 blocks (448px) */
+    /* Ground line is implicitly at 32. Blocks placed at 64 represent ground. */
 
-    current_block = 0;
-    current_lava = 0;
-    current_spike = 3;
+    /* --- SEGMENT 1: WARMUP SPIKES --- */
+    /* Description: Intro Double Spike */
+    level_spikes[current_spike++] = create_spike(600, 64);
+    level_spikes[current_spike++] = create_spike(632, 64);
 
-    /* Performance Test Section: 30-block platform with lava below */
-    /* 10 blocks (320px) gap after spikes (448px) = start at 768px */
-    level_blocks[current_block++] = create_block_rect(768, 96, 960);
-    level_lava[current_lava++] = create_lava_rect(768, 32, 960);
+    /* Description: Intro Triple Spike */
+    level_spikes[current_spike++] = create_spike(1200, 64);
+    level_spikes[current_spike++] = create_spike(1232, 64);
+    level_spikes[current_spike++] = create_spike(1264, 64);
 
-    /* Test 2: Ascending stair ladder with drift compensation (every 4th jump wider) */
-    /* 10 blocks (320px) gap after platform (1728px) = start at 2048px */
-    bx = 2048;
-    last_y = 64;
+    /* --- SEGMENT 2: PLATFORMING INTRODUCTION --- */
+    /* Description: Low-height platforms with 1-block slide room */
+    level_blocks[current_block++] = create_block_rect(1600, 96, 128); /* 4 blocks at y=96 */
+    level_blocks[current_block++] = create_block_rect(1856, 96, 128); /* Next platform at y=96 */
+    level_lava[current_lava++] = create_lava_rect(1728, 32, 128);   /* Lava gap */
+
+    /* --- SEGMENT 3: THE FALL (3 RIGHT, 1 DOWN) --- */
+    /* Description: Elevated platform followed by the specific fall jump */
+    /* Jumped to via Section 2 platform 2 (x=1984 end) using 5-right, 1-up (160px) */
+    level_blocks[current_block++] = create_block_rect(2104, 128, 128); 
+    /* Gap of 3 blocks (96px) leading to lower ground: (2144+128+96 = 2368) */
+    level_blocks[current_block++] = create_block_rect(2296, 96, 32); 
+    level_lava[current_lava++] = create_lava_rect(2328, 32, 96);
+
+    /* --- SEGMENT 4: THE BIG STAIRCASE ASCENSION --- */
+    /* Description: 12-block long ladder up using 4-right 1-up spacing */
+    /* Drift compensation: Add 1 block (32px) to the gap every 4th jump. */
+    bx = 3000;
+    for(i = 0; i < NUM_STAIR_STEPS + 1; i++) {
+        unsigned int jump_width = 128+8;
+        by = 64 + (i * 32);
+        level_blocks[current_block++] = create_block(bx, by);
+        if (by > 64) level_lava[current_lava++] = create_lava(bx, 32);
+        bx += jump_width;
+    }
+
+    /* Description: Peak platform for a brief breather */
+    level_blocks[current_block++] = create_block_rect(bx, by, 320); 
+    bx += 320+170;
+
+    /* --- SEGMENT 5: STAIRCASE DESCENT --- */
+    /* Description: 12-block stairway down using 5-right 1-down spacing */
+    /* Calculated drift: 170px jump width for -32y jump */
     for(i = 0; i < NUM_STAIR_STEPS; i++) {
-        by = last_y + (i * 32);
+        by = by - 32;
+        if (by < 64) by = 64;
+        level_blocks[current_block++] = create_block(bx, by);
+        if (by > 64) level_lava[current_lava++] = create_lava(bx, 32);
+        bx += 170; 
+    }
+
+    /* --- SEGMENT 6: THE QUAD-PLATFORM SPIKE GAUNTLET --- */
+    /* Description: 7 platforms, 4 blocks each, spike on 4th block. 
+       Requires jumping off 3rd block (x+64) to clear spike + gap.
+       Jump distance used: 136px (0 drift). Next platform starts at x + 64 + 136. */
+    bx += 500; /* Spacing before challenge */
+    by = 96;   /* Initial platform height */
+    for(i = 0; i < 7; i++) {
+        level_blocks[current_block++] = create_block_rect(bx, by, 128);
+        level_spikes[current_spike++] = create_spike(bx + 96, by + 32);
+        /* Shift bx by 200 (128 width + 72 gap) to achieve 136 jump from x+64 */
+        bx += 200;
+        by += 32; /* Next platform is 1 block higher */
+    }
+
+    /* --- SEGMENT 7: FALL-JUMP STAIRCASE --- */
+    /* Description: Alternating cycle of Falling (64px) and Jumping (170px) */
+    level_blocks[current_block++] = create_block_rect(bx, by, 640); /* Long bridge */
+    bx += 640; /* End of bridge */
+    
+    while (by > 64) {
+        /* Step 1: Fall 1 block */
+        bx += 72;
+        by -= 32; 
         level_blocks[current_block++] = create_block(bx, by);
 
-        /* Fill lava directly under the block if it's hovering */
-        if (by > 64) {
-             level_lava[current_lava++] = create_lava(bx, 32);
-        }
+        if (by <= 64) break;
 
-        /* If there's another step, fill the gap with lava */
-        if (i < NUM_STAIR_STEPS - 1) {
-            jump_width = 128;
-            if ((i + 1) % 4 == 0) {
-                jump_width += 32; /* +1 block width every 4th jump */
-            }
-            
-            if (jump_width > 32) {
-                level_lava[current_lava++] = create_lava_rect(bx + 32, 32, jump_width - 32);
-            }
-            bx += jump_width;
-        }
+        /* Step 2: Jump 1 block */
+        bx += 170;
+        by -= 32;
+        level_blocks[current_block++] = create_block(bx, by);
     }
+    level_lava[current_lava++] = create_lava_rect(bx-288, 32, 288);
 
-    /* Connection Gap between Ascension and Descent (160px gap) - Pooled */
-    level_lava[current_lava++] = create_lava_rect(bx + 32, 32, 128); /* 160 - 32 = 128 */
-    bx += 160;
-    last_y = by; /* Start descent from the peak height */
+    /* Final Spikes: 4 block gap (128px) after last ground block */
+    bx += 32 + 128; 
+    level_spikes[current_spike++] = create_spike(bx, 64);
+    level_spikes[current_spike++] = create_spike(bx + 32, 64);
+    bx += 500;
+    level_spikes[current_spike++] = create_spike(bx, 64);
+    level_spikes[current_spike++] = create_spike(bx + 32, 64);
+    level_spikes[current_spike++] = create_spike(bx + 64, 64);
 
-    /* Test 3: Descending stairway with drift compensation (1st jump then every 3rd) */
-    for(i = 0; i < NUM_STAIR_STEPS; i++) {
-        next_y = last_y - ((i + 1) * 32);
-        if (next_y < 64) next_y = 64; 
-        
-        level_blocks[current_block++] = create_block(bx, next_y);
-
-        if (next_y > 64) {
-             level_lava[current_lava++] = create_lava(bx, 32);
-        }
-
-        if (i < NUM_STAIR_STEPS - 1) {
-            jump_width = 160;
-            if (i == 0 || (i % 3 == 0)) {
-                jump_width += 32; /* 1st jump (+1), then every 3rd jump (+1) */
-            }
-            
-            if (jump_width > 32) {
-                level_lava[current_lava++] = create_lava_rect(bx + 32, 32, jump_width - 32);
-            }
-            bx += jump_width;
-        }
-    }
-
-    /* Fill remainder with dummy values to avoid garbage rendering */
+    /* --- CLEANUP & END --- */
     for(i = current_block; i < L1_BLOCKS_SIZE; i++) {
         level_blocks[i] = create_block(0, 0); 
     }
@@ -142,7 +165,6 @@ Level get_level1(void)
         level_lava[i] = create_lava(0, 0);
     }
 
-    /* Set actual sizes to matching indices to avoid dummy rendering overhead */
     return create_level(
         level_blocks,
         level_spikes,
@@ -150,7 +172,7 @@ Level get_level1(void)
         current_block,
         current_spike,
         current_lava,
-        30000
+        11600
     );
 }
 
