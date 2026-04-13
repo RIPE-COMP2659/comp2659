@@ -68,17 +68,19 @@ signed int geo_check_square_collision(
     unsigned int object_width
 ) {
     signed int gx_left = geo->x;
-    signed int gx_right = geo->x + geo->size - 1;
+    signed int gx_right = geo->x + geo->size;
     signed int gy_top = geo->y;
-    signed int gy_bot = geo->y - geo->size + 1;
+    signed int gy_bot = geo->y - geo->size;
 
     signed int ox_left = object_x;
-    signed int ox_right = object_x + object_width - 1;
+    signed int ox_right = object_x + object_width;
     signed int oy_top = object_y;
-    signed int oy_bot = object_y - object_size + 1;
+    signed int oy_bot = object_y - object_size;
 
     /* AABB Quick Check */
-    if (gx_right < ox_left || gx_left > ox_right ||
+    /* Horizontal exclusive: must overlap by at least 1px to collide */
+    /* Vertical inclusive: touching the top counts for landing */
+    if (gx_right <= ox_left || gx_left >= ox_right ||
         gy_bot > oy_top || gy_top < oy_bot) {
         return COLLISION_NONE;
     }
@@ -94,11 +96,20 @@ signed int geo_check_square_collision(
         }
     } else {
         /* Moving Up: Check top corners for head-strike */
+        /* If our feet are near or above the top, we are safe (jumping away or at edge) */
+        if (gy_bot >= oy_top - 4) {
+            return COLLISION_NONE;
+        }
+
         /* Only die if we are physically hitting the bottom of the block from underneath */
         if (gy_top <= oy_bot + 16) {
             return COLLISION_BOTTOM;
         } else {
-            return COLLISION_LEFT;
+            /* Side collision check: requires significant horizontal overlap */
+            if (gx_right > ox_left + 2 && gx_left < ox_right - 2) {
+                return COLLISION_LEFT;
+            }
+            return COLLISION_NONE;
         }
     }
 }
@@ -111,12 +122,12 @@ signed int geo_check_lava_collision(
     unsigned int lava_width
 ) {
     signed int gx_left = geo->x + 2;   /* Inset feet slightly */
-    signed int gx_right = geo->x + 29;
+    signed int gx_right = geo->x + 30;
     signed int gx_mid = geo->x + 16;
-    signed int gy_bot = geo->y - geo->size + 1;
+    signed int gy_bot = geo->y - geo->size;
 
     signed int lx_left = lava_x;
-    signed int lx_right = lava_x + lava_width - 1;
+    signed int lx_right = lava_x + lava_width;
     signed int ly_top = lava_y;
 
     /* Optimization: Only check 3 points on the bottom surface against the top of lava */
@@ -146,11 +157,11 @@ signed int geo_check_spike_collision(
 
     /* Points to check: Apex (tip) and the two bottom corners */
     unsigned int py_top = spike_y;
-    unsigned int py_bot = spike_y - (spike_size - 1);
-    unsigned int px_apex1 = spike_x + 15;
-    unsigned int px_apex2 = spike_x + 16;
+    unsigned int py_bot = spike_y - spike_size;
+    unsigned int px_apex1 = spike_x + (spike_size / 2);
+    unsigned int px_apex2 = spike_x + (spike_size / 2);
     unsigned int px_left = spike_x;
-    unsigned int px_right = spike_x + (spike_size - 1);
+    unsigned int px_right = spike_x + spike_size;
 
     /* Check Tip */
     if ((px_apex1 >= gx_left && px_apex1 <= gx_right && py_top <= gy_top && py_top >= gy_bottom) ||
@@ -176,15 +187,14 @@ void geo_jump(Geo *geo) {
 void geo_update(Geo *geo) {
   geo->x += geo->dx;
 
-  if (geo->is_landed == FALSE) {
-    geo->dy += geo->ddy;
-    if (geo->dy < GEO_TERMINAL_DY_SCALED) {
-      geo->dy = GEO_TERMINAL_DY_SCALED;
-    }
-    geo->y_scaled += geo->dy;
-    geo->y = geo->y_scaled >> GEO_PHYSICS_SHIFT;
-    geo_update_landed(geo);
+  /* Always apply gravity and movement for consistency with collision system */
+  geo->dy += geo->ddy;
+  if (geo->dy < GEO_TERMINAL_DY_SCALED) {
+    geo->dy = GEO_TERMINAL_DY_SCALED;
   }
+  geo->y_scaled += geo->dy;
+  geo->y = geo->y_scaled >> GEO_PHYSICS_SHIFT;
+  geo_update_landed(geo);
 
   /* Jump Buffering Logic: */
   if (geo->jump_buffer > 0) {
