@@ -12,6 +12,7 @@
  * to the screen. Based on information in the game model. Currently doesn't
  * minimize rendering
  */
+/* TODO: Heavy code cleanup is preferable */
 
 #include "splash.h"
 #include <stdio.h>
@@ -2699,66 +2700,249 @@ static UINT8 splash_screen_bmap[] = {
 };
 
 
+#define SPLASH_BYTES_PER_ROW 80
+
+/* ---- Mouse cursor definition ---- */
+#define CURSOR_HEIGHT 16
+#define CURSOR_WIDTH  16
+
+/* Classic arrow cursor, 16-pixels wide. XOR-plotted for universal visibility. */
+static const UINT16 cursor_bmap[CURSOR_HEIGHT] = {
+    0x8000, /* X... .... .... .... */
+    0xC000, /* XX.. .... .... .... */
+    0xE000, /* XXX. .... .... .... */
+    0xF000, /* XXXX .... .... .... */
+    0xF800, /* XXXX X... .... .... */
+    0xFC00, /* XXXX XX.. .... .... */
+    0xFE00, /* XXXX XXX. .... .... */
+    0xFF00, /* XXXX XXXX .... .... */
+    0xFF80, /* XXXX XXXX X... .... */
+    0xFFC0, /* XXXX XXXX XX.. .... */
+    0xFC00, /* XXXX XX.. .... .... */
+    0xDC00, /* XX.X XX.. .... .... */
+    0x8600, /* X... .XX. .... .... */
+    0x0600, /* .... .XX. .... .... */
+    0x0300, /* .... ..XX .... .... */
+    0x0300  /* .... ..XX .... .... */
+};
+
+static UINT8 cursor_backfill[CURSOR_HEIGHT][3];
+
+/* Menu buttons */
+#define BUTTON_WIDTH  80
+#define BUTTON_HEIGHT 32
+#define PLAY_BOX_TOP    145
+#define PLAY_BOX_BOTTOM (PLAY_BOX_TOP + BUTTON_HEIGHT - 1)
+#define PLAY_BOX_LEFT   326
+#define PLAY_BOX_RIGHT  (PLAY_BOX_LEFT + BUTTON_WIDTH - 1)
+#define EXIT_BOX_TOP    225
+#define EXIT_BOX_BOTTOM (EXIT_BOX_TOP + BUTTON_HEIGHT - 1)
+#define EXIT_BOX_LEFT   326
+#define EXIT_BOX_RIGHT  (EXIT_BOX_LEFT + BUTTON_WIDTH - 1)
+
+/*
+ * XOR-plots the 16x16 arrow cursor into the given buffer at (cx, cy).
+ * cx is clamped so the cursor never overflows the right edge of a row.
+ * cy is clamped so the cursor never overflows the bottom of the screen.
+ */
+static void draw_cursor(UINT8 *base, int x, int y) {
+    unsigned int row = 0;
+    UINT8 *row_ptr; /* Used in loop to find the row offset */
+    unsigned int column_offset; /* Used in loop to access the column byte */
+    unsigned int shift; /* Used in loop to bit shift within byte */
+
+    /* Clamp x and y in screen bounds */
+    /* Violates formatter, but VSC default format is cumbersome */
+    if (x < 0) { x = 0; }
+    else if (x > SCREEN_WIDTH - CURSOR_WIDTH) { x = SCREEN_WIDTH - CURSOR_WIDTH; }
+    if (y < 0) { y = 0; }
+    else if (y > SCREEN_HEIGHT - CURSOR_HEIGHT) { y = SCREEN_HEIGHT - CURSOR_HEIGHT; }
+
+    /* Setup pointers and indices based on clamped coordinates */
+    row_ptr = base + y * SPLASH_BYTES_PER_ROW;
+    column_offset = x >> 3; /* Divide by 8 for index, each byte is 8 pixels */
+    shift = x & 7; /* Modulo 8 for bit shift within byte */
+
+    while (row < CURSOR_HEIGHT)
+    {
+        UINT32 extended = (UINT32)cursor_bmap[row] << (16 - shift);
+
+        row_ptr[column_offset] ^= (UINT8)((extended >> 24) & 0xFF);
+        row_ptr[column_offset + 1] ^= (UINT8)((extended >> 16) & 0xFF);
+        if (shift > 0)
+            row_ptr[column_offset + 2] ^= (UINT8)((extended >> 8) & 0xFF);
+        
+        row_ptr += SPLASH_BYTES_PER_ROW;
+        row++;
+    }
+}
+
+static void save_cursor_background(UINT8 *base, int cx, int cy)
+{
+    int row;
+    int clamp_x, clamp_y;
+
+    clamp_x = cx < 0 ? 0
+            : cx > SCREEN_WIDTH - CURSOR_WIDTH ? SCREEN_WIDTH - CURSOR_WIDTH
+            : cx;
+    clamp_y = cy < 0 ? 0
+            : cy > SCREEN_HEIGHT - CURSOR_HEIGHT ? SCREEN_HEIGHT - CURSOR_HEIGHT
+            : cy;
+
+    for (row = 0; row < CURSOR_HEIGHT; row++) {
+        UINT8 *row_ptr = base + (clamp_y + row) * SPLASH_BYTES_PER_ROW;
+        int byte_idx = clamp_x >> 3;
+        int shift = clamp_x & 7;
+
+        cursor_backfill[row][0] = row_ptr[byte_idx];
+        cursor_backfill[row][1] = row_ptr[byte_idx + 1];
+        cursor_backfill[row][2] = shift > 0 ? row_ptr[byte_idx + 2] : 0;
+    }
+}
+
+static void restore_cursor_background(UINT8 *base, int cx, int cy)
+{
+    int row;
+    int clamp_x, clamp_y;
+
+    clamp_x = cx < 0 ? 0
+            : cx > SCREEN_WIDTH - CURSOR_WIDTH ? SCREEN_WIDTH - CURSOR_WIDTH
+            : cx;
+    clamp_y = cy < 0 ? 0
+            : cy > SCREEN_HEIGHT - CURSOR_HEIGHT ? SCREEN_HEIGHT - CURSOR_HEIGHT
+            : cy;
+
+    for (row = 0; row < CURSOR_HEIGHT; row++) {
+        UINT8 *row_ptr = base + (clamp_y + row) * SPLASH_BYTES_PER_ROW;
+        int byte_idx = clamp_x >> 3;
+        int shift = clamp_x & 7;
+
+        row_ptr[byte_idx] = cursor_backfill[row][0];
+        row_ptr[byte_idx + 1] = cursor_backfill[row][1];
+        if (shift > 0)
+            row_ptr[byte_idx + 2] = cursor_backfill[row][2];
+    }
+}
+
+static int in_play_rect(int x, int y)
+{
+    return x >= PLAY_BOX_LEFT && x <= PLAY_BOX_RIGHT &&
+           y >= PLAY_BOX_TOP  && y <= PLAY_BOX_BOTTOM;
+}
+
+static int in_exit_rect(int x, int y)
+{
+    return x >= EXIT_BOX_LEFT && x <= EXIT_BOX_RIGHT &&
+           y >= EXIT_BOX_TOP  && y <= EXIT_BOX_BOTTOM;
+}
+
 void print_splash(UINT8 *base)
 {
     register int i = 0;
     register UINT8 *location = base;
     register UINT8 *pattern = splash_screen_bmap;
 
-    /* could write */
-
     while (i++ < BYTES_PER_SCREEN)
         *(location++) = *(pattern++);
 }
 
-print_play_sel(UINT8 *base)
+static void print_play_sel(UINT8 *base)
 {
     plot_string(base, SPRITE_TOP_LABEL_ROW, SPRITE_LABEL_COL, "Play <-");
     plot_string(base, SPRITE_BOTTOM_LABEL_ROW, SPRITE_LABEL_COL, "exit   ");
 }
 
-print_exit_sel(UINT8 *base)
+static void print_exit_sel(UINT8 *base)
 {
     plot_string(base, SPRITE_TOP_LABEL_ROW, SPRITE_LABEL_COL, "Play   ");
     plot_string(base, SPRITE_BOTTOM_LABEL_ROW, SPRITE_LABEL_COL, "exit <-");
 }
 
+/*
+ * Mouse-driven splash screen.
+ *
+ * Renders the splash menu onto the active framebuffer. The mouse cursor is
+ * XOR-plotted in place with a saved background so the previous location can be
+ * restored cleanly. A left-click inside the Play or Exit rectangle returns the
+ * chosen option.
+ *
+ * The IKBD ISR (init_input) must already be active when this is called so
+ * that the mouse globals are being updated.
+ *
+ * Returns: PLAY (1) or EXIT (0).
+ */
 UINT8 splash_screen(void)
 {
-    long old_ssp;
     UINT8 *base;
-    UINT8 selection = FALSE;
-    UINT8 cursor = PLAY;
+    long   old_ssp;
+    int    mx, my, prev_mx, prev_my;
+    UINT8  buttons, prev_buttons;
+    UINT8  result;
+    UINT8  cursor;
     SCANCODE sc;
 
     old_ssp = Super(0);
     base = (UINT8 *)get_video_base();
     Super(old_ssp);
 
+    mx = get_mouse_x();
+    my = get_mouse_y();
+    cursor = PLAY;
     print_splash(base);
     print_play_sel(base);
+    save_cursor_background(base, mx, my);
+    draw_cursor(base, mx, my);
 
-    while (selection != TRUE)
-    {
-        sc = read_scancode();
+    prev_mx      = mx;
+    prev_my      = my;
+    prev_buttons = get_mouse_buttons();
 
-        if (sc == SC_SPACE)
-        {
-            cursor ^= 1;
-            if (cursor == PLAY)
-            {
-                print_play_sel(base);
-            }
-            else
-            {
-                print_exit_sel(base);
+    while (1) {
+        mx      = get_mouse_x();
+        my      = get_mouse_y();
+        buttons = get_mouse_buttons();
+
+        while ((sc = get_input()) != 0) {
+            if (sc == SC_SPACE) {
+                restore_cursor_background(base, prev_mx, prev_my);
+                cursor ^= 1;
+                if (cursor == PLAY)
+                    print_play_sel(base);
+                else
+                    print_exit_sel(base);
+
+                save_cursor_background(base, prev_mx, prev_my);
+                draw_cursor(base, prev_mx, prev_my);
+            } else if (sc == SC_ENTER) {
+                restore_cursor_background(base, prev_mx, prev_my);
+                return cursor;
             }
         }
-        else if (sc == SC_ENTER)
-        {
-            selection = TRUE;
+
+        /* Detect left-button down-click (transition from released to pressed). */
+        if ((prev_buttons & 0x02) == 0 && (buttons & 0x02) != 0) {
+            if (in_play_rect(mx, my)) {
+                result = PLAY;
+                restore_cursor_background(base, prev_mx, prev_my);
+                return result;
+            }
+            if (in_exit_rect(mx, my)) {
+                result = EXIT;
+                restore_cursor_background(base, prev_mx, prev_my);
+                return result;
+            }
+        }
+        prev_buttons = buttons;
+
+        if (mx != prev_mx || my != prev_my) {
+            restore_cursor_background(base, prev_mx, prev_my);
+            save_cursor_background(base, mx, my);
+            draw_cursor(base, mx, my);
+            prev_mx = mx;
+            prev_my = my;
         }
     }
 
-    return cursor;
+    /* Unreachable; satisfies non-void return type. */
+    return EXIT;
 }

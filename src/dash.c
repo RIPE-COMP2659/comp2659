@@ -22,8 +22,8 @@ int main_game(void)
     signed int current_event;
     unsigned long timeThen, timeNow, timeElapsed;
 
-    init = splash_screen(); /* Prints splash screen and awaits user input */
     init_input(); /* Initializes input handling and installs IKBD ISR */
+    init = splash_screen(); /* Prints splash screen and awaits user input */
 
     if (init == 0)
     {
