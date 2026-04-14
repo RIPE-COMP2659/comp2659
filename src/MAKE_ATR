@@ -276,8 +276,8 @@ $(TCAMERA): $(COND).o $(EFFECTS).o $(MUSIC).o $(PSG).o $(CLOCK).o
 
 # ----- Render Test Builds ---------------------------------------------------
 # Include clear-screen object so render.o's reference to _clear_screen is satisfied
-$(TRENDER): $(PLT_REC).o $(BMAP_32).o $(BOUNDS).o $(PLT_CLIP).o $(CLR_REG).o $(CLR_SCN).o $(COND).o $(EFFECTS).o $(MUSIC).o $(PSG).o $(CLOCK).o
-	$(ATARI_CC) $(RENDER_TEST_FLAGS) $(TESTS_RENDER_FOLDER)\$(TRENDER).c $(RENDER_TEST_SRC) $(PLT_REC).o $(BMAP_32).o $(BOUNDS).o $(PLT_CLIP).o $(CLR_REG).o $(CLR_SCN).o $(COND).o $(EFFECTS).o $(MUSIC).o $(PSG).o $(CLOCK).o $(UNITY) -o $(TRENDER).ut
+$(TRENDER): $(PLT_REC).o $(BMAP_32).o $(BOUNDS).o $(PLT_CLIP).o $(CLR_REG).o $(CLR_SCN).o $(GET_VID).o $(SET_VID).o $(COND).o $(EFFECTS).o $(MUSIC).o $(PSG).o $(CLOCK).o
+	$(ATARI_CC) $(RENDER_TEST_FLAGS) $(TESTS_RENDER_FOLDER)\$(TRENDER).c $(RENDER_TEST_SRC) $(PLT_REC).o $(BMAP_32).o $(BOUNDS).o $(PLT_CLIP).o $(CLR_REG).o $(CLR_SCN).o $(GET_VID).o $(SET_VID).o $(COND).o $(EFFECTS).o $(MUSIC).o $(PSG).o $(CLOCK).o $(UNITY) -o $(TRENDER).ut
 
 
 # ----- Events Test Builds ---------------------------------------------------
@@ -295,8 +295,8 @@ $(TSYNC): $(COND).o $(EFFECTS).o $(MUSIC).o $(PSG).o $(CLOCK).o
 $(TINPUT): $(INPUT).o $(IKBD).o
 	$(ATARI_CC) $(MAIN_FLAGS) $(TESTS_INPUT_FOLDER)\$(TINPUT).c $(INPUT).o $(IKBD).o -o $(TINPUT).tos
 
-$(TIKBD): $(IKBD).o
-	$(ATARI_CC) $(MAIN_FLAGS) $(TESTS_INPUT_FOLDER)\$(TIKBD).c $(IKBD).o -o $(TIKBD).tos
+$(TIKBD): $(INPUT).o $(IKBD).o
+	$(ATARI_CC) $(MAIN_FLAGS) $(TESTS_INPUT_FOLDER)\$(TIKBD).c $(INPUT).o $(IKBD).o -o $(TIKBD).tos
 
 
 # ----- PSG Test Builds ------------------------------------------------------
