@@ -12,6 +12,7 @@
  * to the screen. Based on information in the game model. Currently doesn't
  * minimize rendering
  */
+/* TODO: Heavy code cleanup is preferable */
 
 #include "splash.h"
 #include <stdio.h>
@@ -2744,28 +2745,35 @@ static UINT8 cursor_backfill[CURSOR_HEIGHT][3];
  * cx is clamped so the cursor never overflows the right edge of a row.
  * cy is clamped so the cursor never overflows the bottom of the screen.
  */
-static void draw_cursor(UINT8 *base, int cx, int cy)
-{
-    int row;
-    int clamp_x, clamp_y;
+static void draw_cursor(UINT8 *base, int x, int y) {
+    unsigned int row = 0;
+    UINT8 *row_ptr; /* Used in loop to find the row offset */
+    unsigned int column_offset; /* Used in loop to access the column byte */
+    unsigned int shift; /* Used in loop to bit shift within byte */
 
-    clamp_x = cx < 0 ? 0
-            : cx > SCREEN_WIDTH - CURSOR_WIDTH ? SCREEN_WIDTH - CURSOR_WIDTH
-            : cx;
-    clamp_y = cy < 0 ? 0
-            : cy > SCREEN_HEIGHT - CURSOR_HEIGHT ? SCREEN_HEIGHT - CURSOR_HEIGHT
-            : cy;
+    /* Clamp x and y in screen bounds */
+    /* Violates formatter, but VSC default format is cumbersome */
+    if (x < 0) { x = 0; }
+    else if (x > SCREEN_WIDTH - CURSOR_WIDTH) { x = SCREEN_WIDTH - CURSOR_WIDTH; }
+    if (y < 0) { y = 0; }
+    else if (y > SCREEN_HEIGHT - CURSOR_HEIGHT) { y = SCREEN_HEIGHT - CURSOR_HEIGHT; }
 
-    for (row = 0; row < CURSOR_HEIGHT; row++) {
-        UINT8 *row_ptr = base + (clamp_y + row) * SPLASH_BYTES_PER_ROW;
-        int byte_idx = clamp_x >> 3;
-        int shift    = clamp_x & 7;
+    /* Setup pointers and indices based on clamped coordinates */
+    row_ptr = base + y * SPLASH_BYTES_PER_ROW;
+    column_offset = x >> 3; /* Divide by 8 for index, each byte is 8 pixels */
+    shift = x & 7; /* Modulo 8 for bit shift within byte */
+
+    while (row < CURSOR_HEIGHT)
+    {
         UINT32 extended = (UINT32)cursor_bmap[row] << (16 - shift);
 
-        row_ptr[byte_idx]     ^= (UINT8)((extended >> 24) & 0xFF);
-        row_ptr[byte_idx + 1] ^= (UINT8)((extended >> 16) & 0xFF);
+        row_ptr[column_offset] ^= (UINT8)((extended >> 24) & 0xFF);
+        row_ptr[column_offset + 1] ^= (UINT8)((extended >> 16) & 0xFF);
         if (shift > 0)
-            row_ptr[byte_idx + 2] ^= (UINT8)((extended >> 8) & 0xFF);
+            row_ptr[column_offset + 2] ^= (UINT8)((extended >> 8) & 0xFF);
+        
+        row_ptr += SPLASH_BYTES_PER_ROW;
+        row++;
     }
 }
 
