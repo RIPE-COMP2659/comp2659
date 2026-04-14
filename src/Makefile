@@ -30,10 +30,10 @@ COVERAGE_FLAGS = -fprofile-arcs -ftest-coverage -O0
 # -Ievents means include from events subdirectory (for event headers)
 # -Ios_wrap means include from os_wrap subdirectory (for oswrap headers)
 OSWRAP_FOLDER = os_wrap
-INCLUDES = -I. -Itests/unity -Imodel -Ishared -Ievents -I$(OSWRAP_FOLDER)
+INCLUDES = -I. -Itests/unity -Imodel -Ishared -Ievents -I$(OSWRAP_FOLDER) -Isplash
 
 # Source files - automatically discover all .c files in src directory (excluding tests/)
-SRC = $(filter-out tests/%, $(wildcard *.c model/*.c events/*.c))
+SRC = $(filter-out tests/%, $(wildcard *.c model/*.c events/*.c splash/*.c))
 SRC_BASENAMES = $(basename $(SRC))
 UNITY_FILES = tests/unity/unity.c
 TEST_SUPPORT_SRC = $(filter-out dash.c,$(SRC))
@@ -47,7 +47,7 @@ TEST_EXECS = $(TEST_MODEL_EXECS) $(TEST_EVENTS_EXECS)
 
 # Main program sources
 MAIN_EXE = dash$(EXE_EXT)
-MAIN_SRC = dash.c model/clock.c os_wrap/oswrap.c model/model.c model/block.c model/spike.c model/lava.c model/geo.c model/camera.c model/level.c model/world.c events/async.c events/cond.c events/sync.c render/render.c
+MAIN_SRC = dash.c model/clock.c os_wrap/oswrap.c model/model.c model/block.c model/spike.c model/lava.c model/geo.c model/camera.c model/level.c model/world.c events/async.c events/cond.c events/sync.c render/render.c splash/splash.c
 
 # Default target
 all: main

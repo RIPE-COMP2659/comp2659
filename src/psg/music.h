@@ -16,7 +16,12 @@
 
 #include "../shared/dtypes.h"
 #include "psg.h"
+#include "notes.h"
 #include <osbind.h>
+
+#define CHANNEL_A 0
+#define CHANNEL_B 1
+#define CHANNEL_C 2
 
 typedef struct {
     unsigned int pitch;    /* Note frequency divider (0 = Rest) */
@@ -28,7 +33,10 @@ typedef enum {
     SONG_BOURREE,
     SONG_TETRIS,
     SONG_HOT_CROSS_BUNS,
-    SONG_GLORIA
+    SONG_GLORIA,
+    SONG_HIGH_GLORIA,
+    SONG_MOUNTAIN_KING,
+    SONG_MEGALO
 } SongChoice;
 
 /* Updated to take a SongChoice enum */

@@ -2,6 +2,7 @@
 #define GEO_H
 
 #include "../shared/dtypes.h"
+#include "../psg/effects.h"
 
 /* The length and width of geo in pixels */
 #define GEO_SIZE 32
@@ -10,11 +11,11 @@
    2 block jump height and 1 second duration during a 70 FPS game. This is
    because the original Impossible Game had roughly that exact design and it
    would allow us to steal a large amount of their level design */
-#define GEO_DX 5u               /*pixels per frame (unscaled) */
-#define GEO_JUMP_DY_SCALED 610 /* Necessary combo with DDY */
-#define GEO_DDY_SCALED -42     /* For height and time */
+#define GEO_DX 5u                   /*pixels per frame (unscaled) */
+#define GEO_JUMP_DY_SCALED 610      /* Necessary combo with DDY */
+#define GEO_DDY_SCALED -30          /* For height and time */
 #define GEO_TERMINAL_DY_SCALED -666 /* -13 pixels * 64 */
-#define GEO_PHYSICS_SHIFT 6    /* Bit shifting scaled values, / or * by 64 */
+#define GEO_PHYSICS_SHIFT 6         /* Bit shifting scaled values, / or * by 64 */
 /**
  * Represents the player character, Geo. Might have more than one if we do
  * two player. See the #defines for an explanation on some of the fields
@@ -55,19 +56,20 @@
  * const unsigned int (*sprite)[GEO_SIZE / WORD]:
  *     The pointer to the sprite of Geo, a 32x32 pixel image
  */
-typedef struct {
-  signed int ddy;
-  unsigned int dx;
-  signed int dy;
-  signed int is_landed;
-  signed int is_dead;
-  unsigned int ground_y;
-  unsigned int x;
-  unsigned int y;
-  unsigned int y_scaled;
-  unsigned int size;
-  unsigned int jump_buffer;
-  const unsigned int (*sprite)[GEO_SIZE / WORD];
+typedef struct
+{
+    signed int ddy;
+    unsigned int dx;
+    signed int dy;
+    signed int is_landed;
+    signed int is_dead;
+    unsigned int ground_y;
+    unsigned int x;
+    unsigned int y;
+    unsigned int y_scaled;
+    unsigned int size;
+    unsigned int jump_buffer;
+    const unsigned int (*sprite)[GEO_SIZE / WORD];
 } Geo;
 
 /**

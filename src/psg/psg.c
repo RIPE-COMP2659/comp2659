@@ -1,5 +1,4 @@
 /* See psg.h for documentation */
-
 #include "psg.h"
 
 /* Hardware addresses */

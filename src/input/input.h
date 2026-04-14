@@ -15,6 +15,11 @@
  */
 #include <osbind.h>
 #include "../shared/dtypes.h"
+#include "ikbd.h"
+
+extern volatile UINT8 * const IKBD_control;
+extern volatile const UINT8 * const IKBD_status;
+extern volatile const SCANCODE * const IKBD_RDR;
 
 /**
  * Checks if there is pending input to be processed.
@@ -34,6 +39,32 @@ int has_input();
  *     None
  *
  * Returns:
- *     char: The character that was pressed by the user.
+ *     SCANCODE: The next queued scancode.
  */
-char get_input();
+SCANCODE get_input(void);
+
+SCANCODE read_scancode(void);
+
+void init_input(void);
+
+void handle_ikbd_byte(void);
+
+void restore_input(void);
+
+/**
+ * Returns the current absolute mouse X coordinate, clamped to [0, SCREEN_WIDTH-1].
+ * Reads from the global updated by the IKBD ISR.
+ */
+int get_mouse_x(void);
+
+/**
+ * Returns the current absolute mouse Y coordinate, clamped to [0, SCREEN_HEIGHT-1].
+ * Reads from the global updated by the IKBD ISR.
+ */
+int get_mouse_y(void);
+
+/**
+ * Returns the current mouse button state byte from the last packet header.
+ * Bit 1 (0x02) = left button pressed; bit 0 (0x01) = right button pressed.
+ */
+UINT8 get_mouse_buttons(void);

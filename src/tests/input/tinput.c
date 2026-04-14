@@ -15,24 +15,36 @@
 #include "../../shared/dtypes.h"
 #include <osbind.h>
 
-int main() {
-  int done = FALSE;
-  char ch;
+void test_has_get_input(void)
+{
+    int done = FALSE;
+    char ch;
 
-  Cconws("Input test program started. Press 'q' to quit.\r\n");
+    Cconws("Input test program started. Press 'q' to quit.\r\n");
 
-  while (done == FALSE) {
-    if (has_input() == TRUE) {
-      ch = get_input();
+    while (done == FALSE)
+    {
+        if (has_input() == TRUE)
+        {
+            ch = get_input();
 
-      if (ch == 'q') {
-        done = TRUE;
-        Cconws("Exiting...\r\n");
-      } else {
-        Cconws("Key pressed\r\n");
-      }
+            if (ch == 'q')
+            {
+                done = TRUE;
+                Cconws("Exiting...\r\n");
+            }
+            else
+            {
+                Cconws("Key pressed\r\n");
+            }
+        }
     }
-  }
+}
 
-  return 0;
+int main()
+{
+    init_input();
+    test_has_get_input();
+    restore_input();
+    return 0;
 }

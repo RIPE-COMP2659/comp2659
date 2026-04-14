@@ -22,10 +22,7 @@ void test_clear_region(UINT8 *base)
     clear_region((UINT32 *)base, 410, 100, 48, 48);
     clear_region((UINT32 *)base, 401, 100, 48, 48);
 
-
-
-   clear_region((UINT32 *)base, 0, 0, 48, 48);
-
+    clear_region((UINT32 *)base, 0, 0, 48, 48);
 
     /* Test 2: 48x48 optimized path - different position */
     clear_region((UINT32 *)base, 50, 80, 48, 48);
@@ -1009,81 +1006,4 @@ void test_plot_string(UINT8 *base)
 
     /* Test 10: Empty string (should do nothing) */
     plot_string(base, 350, 10, "");
-}
-
-void fill_screen(UINT32 *base, char pattern)
-{
-    register int i = 0;
-    register UINT32 *loc = base;
-
-    while (i++ < BYTES_PER_SCREEN / 4)
-        *(loc++) = pattern;
-}
-
-int main(void)
-{
-    UINT8 *base = (UINT8 *)Physbase();
-
-    disable_cursor();
-
-    /* Test 1: Clear Screen */
-    fill_screen((UINT32 *)base, -1); /* fill with white */
-    Cnecin();
-    test_clear_screen(base);
-    Cnecin();
-
-    /* Test 2: Clear Region - various sizes and positions */
-    test_clear_region(base);
-    Cnecin();
-
-    /* Test 3: Plot Pixel - draw patterns */
-    test_plot_pixel(base);
-    Cnecin();
-
-    /* Test 4: Plot Horizontal Line */
-    test_plot_horizontal_line(base);
-    Cnecin();
-
-    /* Test 5: Plot Vertical Line */
-    test_plot_vertical_line(base);
-    Cnecin();
-
-    /* Test 6: Plot Line - arbitrary lines */
-    test_plot_line(base);
-    Cnecin();
-
-    /* Test 7: Plot Rectangle - filled rectangles */
-    test_plot_rectangle(base);
-    Cnecin();
-
-    /* Test 8: Plot Square - filled squares */
-    test_plot_square(base);
-    Cnecin();
-
-    /* Test 9: Plot Triangle - filled triangles */
-    test_plot_triangle(base);
-    Cnecin();
-
-    /* Test 10: Plot Bitmap 8 - 8-pixel wide bitmaps */
-    test_plot_bitmap_8(base);
-    Cnecin();
-
-    /* Test 11: Plot Bitmap 16 - 16-pixel wide bitmaps */
-    test_plot_bitmap_16(base);
-    Cnecin();
-
-    /* Test 12: Plot Bitmap 32 - 32-pixel wide bitmaps */
-    test_plot_bitmap_32(base);
-    Cnecin();
-
-    /* Test 13: Plot Character - individual characters */
-    test_plot_character(base);
-    Cnecin();
-
-    /* Test 14: Plot String - text strings */
-    test_plot_string(base);
-
-    Cnecin();
-
-    return 0;
 }
